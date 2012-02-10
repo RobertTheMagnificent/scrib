@@ -28,7 +28,9 @@ Email:          tenach [ at ] whube [ dot ] com
 * python-irclib
 	 ( http://python-irclib.sourceforge.net/ 
 	   Most distros: install python-irclib			       )
-	
+
+* Will be moving to using PyBrain.
+
 ========================================================================
  .
 ..:

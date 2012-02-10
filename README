@@ -1,0 +1,34 @@
+
+========================================================================
+===================       SCRIB IRC CHATBOT        =====================
+========================================================================
+
+License:        GNU AGPLv3 or later
+Author:         Thomas Martin & The Whube Developers
+Email:          tenach [ at ] whube [ dot ] com
+
+========================================================================
+===================            NOTES               =====================
+========================================================================
+
+* tools/feedme.py lets you fill scrib's brain with text from a file.
+* tools/twitter.py requires python-twyt
+* There are soem other in-dev tools that use PHP to feed scrib some
+  naughtiness in a basket.
+
+========================================================================
+===================        WHAT YOU NEED           =====================
+========================================================================
+
+* GNU/Linux 
+   ( As paultag says: I'm sure you could get this to work with windows,
+     but that's just all kinds of dumb. Don't use nonfree crap.
+     PLUG: USE LINUX! IT WORKS GREAT! <3 LINUX			       )
+
+* python-irclib
+	 ( http://python-irclib.sourceforge.net/ 
+	   Most distros: install python-irclib			       )
+	
+========================================================================
+ .
+..:

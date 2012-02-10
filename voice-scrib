@@ -1,0 +1,18 @@
+#!/bin/bash
+MSG=$*
+if [[ $MSG =~ "*'*" ]]; then
+	MESG=(sed "s:':\':" $MSG)
+else
+	MESG=$MSG
+fi
+
+# Original voice
+#espeak -ven-gb+m1 -p20 -s70 -g4 -k4 -l2 -s137 "$MESG" >/dev/null 2>&1
+
+# After taking advice from Josh
+#espeak -ven-gb+m3 -p30 -s60 -g1 -k4 -l2 -s129 "$MSG" >/dev/null 2>&1
+
+espeak -ven-us+m2 -p45 -s100 -g8 -k3 -l5 -s200 "$MSG" >/dev/null 2>&1
+# For rendering:
+#espeak -ven-us+m2 -p45 -s100 -g8 -k3 -l5 -s200 "$MSG" -w /home/tenach/balls.wav >/dev/null 2>&1
+espeak -ven-gb+m3 -p30 -s60 -g2 -k3 -l2 -s129 "$MSG" -w /home/tenach/scribwelcome.wav >/dev/null 2>&1

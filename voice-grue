@@ -1,0 +1,10 @@
+#!/bin/bash
+MSG=$*
+if [[ $MSG =~ "*'*" ]]; then
+	MESG=(sed "s:':\':" $MSG)
+else
+	MESG=$MSG
+fi
+
+# Original voice. Needs a little tweaking still.
+espeak -ven-us+m2 -p40 -s100 -g2 -k6 -l9 -s118 "$MSG" >/dev/null 2>&1

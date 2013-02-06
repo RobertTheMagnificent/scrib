@@ -4,7 +4,7 @@
 ========================================================================
 
 License:        GNU AGPLv3 or later
-Author:         Thomas Martin & The Whube Developers
+Author:         Thomas Mashek & The Whube Developers
 Email:          tenach [ at ] whube [ dot ] com
 
 ========================================================================
@@ -19,11 +19,6 @@ Email:          tenach [ at ] whube [ dot ] com
 ========================================================================
 ===================        WHAT YOU NEED           =====================
 ========================================================================
-
-* GNU/Linux 
-   ( As paultag says: I'm sure you could get this to work with windows,
-     but that's just all kinds of dumb. Don't use nonfree crap.
-     PLUG: USE LINUX! IT WORKS GREAT! <3 LINUX			       )
 
 * python-irclib
 	 ( http://python-irclib.sourceforge.net/ 

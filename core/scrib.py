@@ -88,7 +88,7 @@ class scrib:
 		"limit": "Owner command. Usage: !limit [number]\nSet the number of words that pyBorg can learn",
 		"alias": "Owner command. Usage: !alias : Show the differents aliases\n!alias <alias> : show the words attached to this alias\n!alias <alias> <word> : link the word to the alias",
 		"owner": "Usage : !owner password\nAdd the user in the owner list",
-		"fortune": "Usage: tells you something."
+		"fortune": "Usage: tells you something.",
 		"date": "Tells you the date."
 		#"tweet": "Tweet las thing said"
 	}
@@ -694,8 +694,8 @@ class scrib:
 			elif command_list[0] == "!tweet":
 				msg = 'test :3'
 			# Date command
-			elif command_list[0] == '!date":
-				msg = "It is ".join(i for i in os.popen('date').readlines()])
+			elif command_list[0] == "!date":
+				msg = "It is ".join(i for i in os.popen('date').readlines())
 			# Quit
 			elif command_list[0] == "!quit":
 				# Close the dictionary

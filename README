@@ -12,8 +12,7 @@ Email:          tenach [ at ] whube [ dot ] com
 ========================================================================
 
 * tools/feedme.py lets you fill scrib's brain with text from a file.
-* tools/twitter.py requires python-twyt
-* There are soem other in-dev tools that use PHP to feed scrib some
+* There are some other in-dev tools that use PHP to feed scrib some
   naughtiness in a basket.
 
 ========================================================================
@@ -23,6 +22,12 @@ Email:          tenach [ at ] whube [ dot ] com
 * python-irclib
 	 ( http://python-irclib.sourceforge.net/ 
 	   Most distros: install python-irclib			       )
+
+* espeak (optional)
+	(  http://espeak.sourceforge.net/
+	   If you wish to use the voice-grue or voice-scrib, you'll
+	   need to install espeak.
+	   Most distros: install espeak				       )
 
 * Will be moving to using PyBrain.
 

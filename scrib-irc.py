@@ -48,9 +48,7 @@ class ModIRC(SingleServerIRCBot):
 	owner_mask = []
 
 	# IRC Command list
-	commandlist =   "IRC Module Commands:\n!chans, !ignore, \
-			!join, !nick, !part, !quit, !quitmsg, !reply2ignored, !replyrate, !shutup, \
-			!stealth, !unignore, !wakeup, !talk, !owner"
+	commandlist =   "IRC Module Commands:\n!chans, !ignore, !join, !nick, !part, !quit, !quitmsg, !reply2ignored, !replyrate, !shutup, !stealth, !unignore, !wakeup, !talk, !owner"
 	# IRC Command 
 	commanddict = {
 		"shutup": "Owner command. Usage: !shutup\nStop the bot talking",

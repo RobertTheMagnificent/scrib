@@ -69,8 +69,7 @@ class scrib:
 	ver_string += " My braintechnology is at %s." % brainVer
 
 	# Main command list
-	commandlist = "Scrib commands:\n!checkdict, !contexts, !help, !known, !learning, !rebuilddict, \
-!replace, !unlearn, !purge, !version, !words, !limit, !alias, !save, !censor, !uncensor, !owner, !fortune. !tweet, !date"
+	commandlist = "Scrib commands:\n!checkdict, !contexts, !help, !known, !learning, !rebuilddict, !replace, !unlearn, !purge, !version, !words, !limit, !alias, !save, !censor, !uncensor, !owner, !fortune. !tweet, !date"
 	commanddict = {
 		"help": "Owner command. Usage: !help [command]\nPrints information about using a command, or a list of commands if no command is given",
 		"version": "Usage: !version\nDisplay what version of Scrib we are running",
@@ -90,7 +89,6 @@ class scrib:
 		"owner": "Usage : !owner password\nAdd the user in the owner list",
 		"fortune": "Usage: tells you something.",
 		"date": "Tells you the date."
-		#"tweet": "Tweet las thing said"
 	}
 
 	def __init__(self):

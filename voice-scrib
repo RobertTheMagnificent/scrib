@@ -14,5 +14,4 @@ fi
 
 espeak -ven-us+m2 -p45 -s100 -g8 -k3 -l5 -s200 "$MSG" >/dev/null 2>&1
 # For rendering:
-#espeak -ven-us+m2 -p45 -s100 -g8 -k3 -l5 -s200 "$MSG" -w /home/tenach/balls.wav >/dev/null 2>&1
-espeak -ven-gb+m3 -p30 -s60 -g2 -k3 -l2 -s129 "$MSG" -w /home/tenach/scribwelcome.wav >/dev/null 2>&1
+# espeak -ven-gb+m3 -p30 -s60 -g2 -k3 -l2 -s129 "$MSG" -w $PWD/scrib.wav >/dev/null 2>&1

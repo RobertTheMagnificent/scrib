@@ -10,22 +10,14 @@ import time
 import zipfile
 import re
 
-# Let us include from our lib folder.
-# As a side note, the imp module may be nice for making
-# a plugin system.
-# e.g.:
-# py_mod = imp.load_source(mod_name,filename_path) # Loads .py file
-# py_mod = imp.load_compiled(mod_name,filename_path) # Loads .pyc file
-
-# sys.path.append('../core')
-
 def filter_message(message, bot):
 	"""
 	Make easier to learn and reply to.
-  """
+	"""
 	
 	# to lowercase
-	message = message.lower()
+	# Turning off to see wtf goes on.
+	# message = message.lower()
 
 	# remove garbage
 	message = message.replace("\"", "")

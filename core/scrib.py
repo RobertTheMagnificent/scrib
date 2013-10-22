@@ -687,6 +687,7 @@ class scrib:
 			elif command_list[0] == "!quit":
 				# Close the dictionary
 				self.save_all()
+				print "Saved. Goodbye!"
 				sys.exit()
 				
 			# Save changes
@@ -697,7 +698,7 @@ class scrib:
 
 	def replace(self, old, new):
 		"""
-		Replace all occuraces of 'old' in the dictionary with
+		Replace all occurrences of 'old' in the dictionary with
 		'new'. Nice for fixing learnt typos.
 		"""
 		try:

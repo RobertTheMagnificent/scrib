@@ -278,7 +278,9 @@ class ModIRC(SingleServerIRCBot):
 
 
 		# Pass message onto scrib
-		if source in self.owners and e.source() in self.owner_mask:
+		if body[0] == "!":
+			print "Exclamation detected: no reply."
+		elif source in self.owners and e.source() in self.owner_mask:
 			self.scrib.process_msg(self, body, replyrate, learn, (body, source, target, c, e), owner=1)
 		else:
 			#start a new thread

@@ -299,43 +299,39 @@ class scrib:
 		#	elif self.settings.process_with == "megahal" and self.settings.learning == 1:
 		#		mh_python.learn(body)
 
-		if body[0][:1] == "!":
-			print "Exclamation detected: no reply."
-			return
-		else:
 		# Make a reply if desired
-			if randint(0, 99) < replyrate:
+		if randint(0, 99) < replyrate:
 
-				message  = ""
+			message  = ""
 
-				#Look if we can find a prepared answer
-				for sentence in self.answers.sentences.keys():
-					pattern = "^%s$" % sentence
-					if re.search(pattern, body):
-						message = self.answers.sentences[sentence][randint(0, len(self.answers.sentences[sentence])-1)]
-						break
+			#Look if we can find a prepared answer
+			for sentence in self.answers.sentences.keys():
+				pattern = "^%s$" % sentence
+				if re.search(pattern, body):
+					message = self.answers.sentences[sentence][randint(0, len(self.answers.sentences[sentence])-1)]
+					break
+				else:
+					if body in self.unfilterd:
+						self.unfilterd[body] = self.unfilterd[body] + 1
 					else:
-						if body in self.unfilterd:
-							self.unfilterd[body] = self.unfilterd[body] + 1
-						else:
-							self.unfilterd[body] = 0
+						self.unfilterd[body] = 0
 
-				if message == "":
-					if self.settings.process_with == "scrib":
-						message = self.reply(body)
-				#	elif self.settings.process_with == "megahal":
-				#		message = mh_python.doreply(body)
+			if message == "":
+				if self.settings.process_with == "scrib":
+					message = self.reply(body)
+			#	elif self.settings.process_with == "megahal":
+			#		message = mh_python.doreply(body)
 
-				# single word reply: always output
-				if len(message.split()) == 1:
-					io_module.output(message, args)
-					return
-				# empty. do not output
-				if message == "":
-					return
-				# else output
-				if owner==0: time.sleep(.2*len(message))
+			# single word reply: always output
+			if len(message.split()) == 1:
 				io_module.output(message, args)
+				return
+			# empty. do not output
+			if message == "":
+				return
+			# else output
+			if owner==0: time.sleep(.2*len(message))
+			io_module.output(message, args)
 	
 	def do_commands(self, io_module, body, args, owner):
 		"""
@@ -987,12 +983,12 @@ class scrib:
 			words = body.split()
 			# Ignore sentences of < 1 words XXX was <3
 			if len(words) < 1:
-				print "Too small. Not learning."
+				print "Too small. Not learning: %s" %words
 				return
 
 			# Ignore if the sentence starts with an exclamation
 			if words[0][:1] == "!":
-				print "Not learning line: %s" %words
+				print "Exclamation detected: not learning: %s" %words
 				return
 			
 			vowels = "aÃ Ã¢eÃ©Ã¨ÃªiÃ®Ã¯oÃ¶Ã´uÃ¼Ã»y"

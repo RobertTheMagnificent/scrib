@@ -285,7 +285,7 @@ class scrib:
 		body = body + " "
 
 		# Parse commands
-		if body[0] == "!":
+		if body[0][:1] == "!":
 			self.do_commands(io_module, body, args, owner)
 			return
 
@@ -299,7 +299,10 @@ class scrib:
 		#	elif self.settings.process_with == "megahal" and self.settings.learning == 1:
 		#		mh_python.learn(body)
 
-		if body[0] != "!":
+		if body[0][:1] == "!":
+			print "Exclamation detected: no reply."
+			return
+		else:
 		# Make a reply if desired
 			if randint(0, 99) < replyrate:
 

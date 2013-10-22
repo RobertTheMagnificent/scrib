@@ -983,20 +983,22 @@ class scrib:
 			words = body.split()
 			# Ignore sentences of < 1 words XXX was <3
 			if len(words) < 1:
+				print "Too small. Not learning."
 				return
 
 			# Ignore if the sentence starts with an exclamation
-			if words[0][0] == "!" or words[0][0] == "! ":
+			if words[0][:1] == "!":
+				print "Not learning line: %s" %words
 				return
 			
-			voyelles = "aÃ Ã¢eÃ©Ã¨ÃªiÃ®Ã¯oÃ¶Ã´uÃ¼Ã»y"
+			vowels = "aÃ Ã¢eÃ©Ã¨ÃªiÃ®Ã¯oÃ¶Ã´uÃ¼Ã»y"
 			for x in xrange(0, len(words)):
 
 				nb_voy = 0
 				digit = 0
 				char = 0
 				for c in words[x]:
-					if c in voyelles:
+					if c in vowels:
 						nb_voy += 1
 					if c.isalpha():
 						char += 1
@@ -1013,12 +1015,6 @@ class scrib:
 				or ( ((nb_voy*100) / len(words[x]) < 26) and len(words[x]) > 5 ) \
 				or ( char and digit ) \
 				or ( self.words.has_key(words[x]) == 0 and self.settings.learning == 0 ):
-					#if one word as more than 13 characters, don't learn
-					#		( in french, this represent 12% of the words )
-					#and d'ont learn words where there are less than 25% of voyels
-					#don't learn the sentence if one word is censored
-					#don't learn too if there are digits and char in the word
-					#same if learning is off
 					return
 				elif ( "-" in words[x] or "_" in words[x] ) :
 					words[x]="#nick"

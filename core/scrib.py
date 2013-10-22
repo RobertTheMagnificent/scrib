@@ -10,11 +10,13 @@ import time
 import zipfile
 import re
 
+# sys.path.append('../core')
+
 def filter_message(message, bot):
 	"""
 	Make easier to learn and reply to.
 	"""
-	
+
 	# remove garbage
 	message = message.replace("\"", "")
 	message = message.replace("\n", " ")
@@ -51,7 +53,7 @@ class scrib:
 	import re
 	import cfgfile
 
-	coreVer = "0.6.4"
+	coreVer = "0.6.3"
 	brainVer = "0.0.1"
 	ver_string = "I am a version %s scrib." % coreVer
 	ver_string += " My braintechnology is at %s." % brainVer
@@ -339,7 +341,7 @@ class scrib:
 		msg = ""
 
 		command_list = body.split()
-		command_list[0] = command_list[0]()
+		command_list[0] = command_list[0]
 
 		# Guest commands.
 	
@@ -362,7 +364,7 @@ class scrib:
 		elif command_list[0] == "!known" and self.settings.process_with == "scrib":
 			if len(command_list) == 2:
 				# single word specified
-				word = command_list[1]()
+				word = command_list[1]
 				if self.words.has_key(word):
 					c = len(self.words[word])
 					msg = "%s is known (%d contexts)" % (word, c)
@@ -372,7 +374,7 @@ class scrib:
 				# multiple words.
 				words = []
 				for x in command_list[1:]:
-					words.append(x())
+					words.append(x)
 				msg = "Number of contexts: "
 				for x in words:
 					if self.words.has_key(x):
@@ -392,7 +394,7 @@ class scrib:
 			elif command_list[0] == "!help":
 				if len(command_list) > 1:
 					# Help for a specific command
-					cmd = command_list[1]()
+					cmd = command_list[1]
 					dic = None
 					if cmd in self.commanddict.keys():
 						dic = self.commanddict
@@ -415,7 +417,7 @@ class scrib:
 				if len(command_list) == 1:
 					msg += str(self.settings.max_words)
 				else:
-					limit = int(command_list[1]())
+					limit = int(command_list[1])
 					self.settings.max_words = limit
 					msg += "now " + command_list[1]
 
@@ -489,7 +491,7 @@ class scrib:
 
 				if len(command_list) == 2:
 				# limite d occurences a effacer
-					c_max = command_list[1]()
+					c_max = command_list[1]
 				else:
 					c_max = 0
 
@@ -531,8 +533,8 @@ class scrib:
 			elif command_list[0] == "!replace" and self.settings.process_with == "scrib":
 				if len(command_list) < 3:
 					return
-				old = command_list[1]()
-				new = command_list[2]()
+				old = command_list[1]
+				new = command_list[2]
 				msg = self.replace(old, new)
 
 			# Print contexts [flooding...:-]
@@ -542,7 +544,7 @@ class scrib:
 
 				# build context we are looking for
 				context = " ".join(command_list[1:])
-				context = context()
+				context = context
 				if context == "":
 					return
 				io_module.output("Contexts containing \""+context+"\":", args)
@@ -583,7 +585,7 @@ class scrib:
 			elif command_list[0] == "!unlearn" and self.settings.process_with == "scrib":
 				# build context we are looking for
 				context = " ".join(command_list[1:])
-				context = context()
+				context = context
 				if context == "":
 					return
 				print "Looking for: "+context
@@ -603,7 +605,7 @@ class scrib:
 					else:
 						msg += "on"
 				else:
-					toggle = command_list[1]()
+					toggle = command_list[1]
 					if toggle == "on":
 						msg += "on"
 						self.settings.learning = 1
@@ -625,7 +627,7 @@ class scrib:
 						if command_list[x] in self.settings.censored:
 							msg += "%s is already censored" % command_list[x]
 						else:
-							self.settings.censored.append(command_list[x]())
+							self.settings.censored.append(command_list[x])
 							self.unlearn(command_list[x])
 							msg += "done"
 						msg += "\n"
@@ -636,7 +638,7 @@ class scrib:
 				# eg !unignore tom dick harry
 				for x in xrange(1, len(command_list)):
 					try:
-						self.settings.censored.remove(command_list[x]())
+						self.settings.censored.remove(command_list[x])
 						msg = "done"
 					except ValueError, e:
 						pass
@@ -984,7 +986,7 @@ class scrib:
 			if len(words) < 1:
 				return
 
-			voyelles = "aÃ Ã¢eÃ©Ã¨ÃªiÃ®Ã¯oÃ¶Ã´uÃ¼Ã»y"
+			voyelles = "aÃ Ã¢eÃ©Ã¨ÃªiÃ®Ã¯oÃ¶Ã´uÃ¼Ã»y"
 			for x in xrange(0, len(words)):
 
 				nb_voy = 0

@@ -240,11 +240,11 @@ class ModIRC(SingleServerIRCBot):
 		print body
 
 		# Ignore selected nicks
-		if self.settings.ignorelist.count(source.lower()) > 0 \
+		if self.settings.ignorelist.count(source) > 0 \
 			and self.settings.replyIgnored == 1:
 			print "Not learning from %s" % source
 			learn = 0
-		elif self.settings.ignorelist.count(source.lower()) > 0:
+		elif self.settings.ignorelist.count(source) > 0:
 			print "Ignoring %s" % source
 			return
 
@@ -265,7 +265,7 @@ class ModIRC(SingleServerIRCBot):
 		replyrate = self.settings.speaking * self.settings.reply_chance
 
 		# double reply chance if the text contains our nickname :-)
-		if body.lower().find(self.settings.myname.lower() ) != -1:
+		if body.find(self.settings.myname ) != -1:
 			replyrate = replyrate * 2
 
 		# Always reply to private messages
@@ -291,7 +291,7 @@ class ModIRC(SingleServerIRCBot):
 		msg = ""
 
 		command_list = body.split()
-		command_list[0] = command_list[0].lower()
+		command_list[0] = command_list[0]
 
 		### User commands
 		# Query replyrate
@@ -324,7 +324,7 @@ class ModIRC(SingleServerIRCBot):
 					else:
 						msg = msg + "on"
 				else:
-					toggle = command_list[1].lower()
+					toggle = command_list[1]
 					if toggle == "on":
 						msg = msg + "on"
 						self.settings.stealth = 1
@@ -404,7 +404,7 @@ class ModIRC(SingleServerIRCBot):
 				# eg !ignore tom dick harry
 				else:
 					for x in xrange(1, len(command_list)):
-						self.settings.ignorelist.append(command_list[x].lower())
+						self.settings.ignorelist.append(command_list[x])
 						msg = "done"
 			# remove someone from the ignore list
 			elif command_list[0] == "!unignore":
@@ -412,7 +412,7 @@ class ModIRC(SingleServerIRCBot):
 				# eg !unignore tom dick harry
 				for x in xrange(1, len(command_list)):
 					try:
-						self.settings.ignorelist.remove(command_list[x].lower())
+						self.settings.ignorelist.remove(command_list[x])
 						msg = "done"
 					except:
 						pass
@@ -465,7 +465,7 @@ class ModIRC(SingleServerIRCBot):
 		message = message.replace("#nick", source)
 
 		# Decide. should we do a ctcp action?
-		if message.find(self.settings.myname.lower()+" ") == 0:
+		if message.find(self.settings.myname+" ") == 0:
 			action = 1
 			message = message[len(self.settings.myname)+1:]
 		else:
@@ -522,7 +522,7 @@ if __name__ == "__main__":
 	except:
 		traceback.print_exc()
 		c = raw_input("I crashed. Save dictionary? (y/n) ")
-		if c.lower()[:1] == 'n':
+		if c[:1] == 'n':
 			sys.exit(0)
 	bot.disconnect(bot.settings.quitmsg)
 	my_scrib.save_all()

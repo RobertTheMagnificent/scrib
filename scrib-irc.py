@@ -258,7 +258,7 @@ class ModIRC(SingleServerIRCBot):
 
 		# Ignore quoted messages
 		if body[0] == "<" or body[0:1] == "\"" or body[0:1] == " <":
-			print "[#] Ignoring quoted text".
+			print "[#] Ignoring quoted text."
 			return
 
 		# We want replies reply_chance%, if speaking is on

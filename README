@@ -23,14 +23,20 @@ Email:          tenach [ at ] whube [ dot ] com
 	 ( http://python-irclib.sourceforge.net/ 
 	   Most distros: install python-irclib			       )
 
-* espeak (optional)
+
+========================================================================
+===================        Optional Derp           =====================
+========================================================================
+
+* espeak
 	(  http://espeak.sourceforge.net/
 	   If you wish to use the voice-grue or voice-scrib, you'll
 	   need to install espeak.
 	   Most distros: install espeak				       )
 
-* Will be moving to using PyBrain.
 
-========================================================================
+Will be moving to using PyBrain. Maybe. Eventually.
+
+
  .
 ..:

@@ -48,7 +48,7 @@ class ModIRC(SingleServerIRCBot):
 	owner_mask = []
 
 	# IRC Command list
-	commandlist =   "IRC Module Commands:\n!chans, !ignore, !join, !nick, !part, !quit, !quitmsg, !replyIgnored, !replyrate, !sleep, !stealth, !unignore, !wakeup, !talk, !owner"
+	commandlist =   "IRC Module Commands:\n!chans, !ignore, !join, !nick, !part, !quit, !quitmsg, !replyIgnored, !replyrate, !sleep, !private, !unignore, !wakeup, !talk, !owner"
 	# IRC Command 
 	commanddict = {
 		"sleep": "Owner command. Usage: !sleep\nStop the bot talking",
@@ -61,7 +61,7 @@ class ModIRC(SingleServerIRCBot):
 		"unignore": "Owner command. Usage: !unignore nick1 [nick2 [...]]\nUnignores one or more nicknames",
 		"replyrate": "Owner command. Usage: !replyrate [rate%]\nSet rate of bot replies to rate%. Without arguments (not an owner-only command) shows the current reply rate",
 		"replyIgnored": "Owner command. Usage: !replyIgnored [on|off]\nAllow/disallow replying to ignored users. Without arguments shows the current setting",
-		"stealth": "Owner command. Usage: !stealth [on|off]\nTurn stealth mode on or off (disable non-owner commands and don't return CTCP VERSION). Without arguments shows the current setting",
+		"private": "Owner command. Usage: !private [on|off]\nTurn private mode on or off (disable non-owner commands and don't return CTCP VERSION). Without arguments shows the current setting",
 		"quitmsg": "Owner command. Usage: !quitmsg [message]\nSet the quit message. Without arguments show the current quit message",
 		"talk": "Owner command. Usage !talk nick message\nmake the bot send the sentence 'message' to 'nick'",
 		"quit": "Owner command. Usage: !quit\nMake the bot quit IRC",
@@ -84,7 +84,7 @@ class ModIRC(SingleServerIRCBot):
 			  "servers": ("IRC Server to connect to (server, port [,password])", [("irc.starchat.net", 6667)]),
 			  "chans": ("Channels to auto-join", ["#test"]),
 			  "speaking": ("Allow the bot to talk on channels", 1),
-			  "stealth": ("Hide the fact we are a bot", 0),
+			  "private": ("Hide the fact we are a bot", 0),
 			  "ignorelist": ("Ignore these nicknames:", []),
 			  "replyIgnored": ("Reply to ignored people", 0),
 			  "reply_chance": ("Chance of reply (%) per message", 33),
@@ -144,8 +144,8 @@ class ModIRC(SingleServerIRCBot):
 			pass
 
 	def get_version(self):
-		if self.settings.stealth:
-			# stealth mode. we shall be a windows luser today
+		if self.settings.private:
+			# private mode. we shall be a windows luser today
 			return "Omnominator"
 		else:
 			return self.scrib.ver_string
@@ -248,10 +248,10 @@ class ModIRC(SingleServerIRCBot):
 			print "[~] Ignoring %s" % source
 			return
 
-		# Stealth mode. disable commands for non owners
+		# private mode. disable commands for non owners
 		if (not source in self.owners) and self.settings.stealth:
 			while body[:1] == "!":
-				print "[!] Stealth mode is on, ignoring command: %s" %body
+				print "[!] Private mode is on, ignoring command: %s" %body
 				return
 
 		if body == "":

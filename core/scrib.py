@@ -17,7 +17,7 @@ import re
 # py_mod = imp.load_source(mod_name,filename_path) # Loads .py file
 # py_mod = imp.load_compiled(mod_name,filename_path) # Loads .pyc file
 
-sys.path.append('../core')
+# sys.path.append('../core')
 
 def filter_message(message, bot):
 	"""

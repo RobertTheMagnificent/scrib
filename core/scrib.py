@@ -986,7 +986,7 @@ class scrib:
 				return
 
 			# Ignore if the sentence starts with an exclamation
-			if words[0][0] == "!":
+			if words[0][0] == "!" or words[0][0] == "! ":
 				return
 			
 			voyelles = "aÃ Ã¢eÃ©Ã¨ÃªiÃ®Ã¯oÃ¶Ã´uÃ¼Ã»y"

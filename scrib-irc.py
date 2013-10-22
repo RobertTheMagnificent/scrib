@@ -352,17 +352,17 @@ class ModIRC(SingleServerIRCBot):
 			# Stop talking
 			elif command_list[0] == "!sleep":
 				if self.settings.speaking == 1:
-					msg = "I'll be quiet :-("
+					msg = "Going to sleep.  Goodnight!"
 					self.settings.speaking = 0
 				else:
-					msg = ":-x"
+					msg = "Zzz.."
 			# Wake up again
 			elif command_list[0] == "!wakeup":
 				if self.settings.speaking == 0:
 					self.settings.speaking = 1
 					msg = "Whoohoo!"
 				else:
-					msg = "But i'm already awake..."
+					msg = "But I'm already awake..."
 						
 			# Join a channel or list of channels
 			elif command_list[0] == "!join":

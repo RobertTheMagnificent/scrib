@@ -211,7 +211,7 @@ class scrib:
 					file.write(data)
 					file.close()
 			except (OSError, IOError), e:
-				print "no zip found. Is the programm launch for first time ?"
+				print "no zip found. Is the program launch for first time ?"
 
 
 			f = open("data/words.dat", "wb")
@@ -336,7 +336,7 @@ class scrib:
 	
 	def do_commands(self, io_module, body, args, owner):
 		"""
-		Respond to user comands.
+		Respond to user commands.
 		"""
 		msg = ""
 
@@ -360,7 +360,7 @@ class scrib:
 				num_cpw = 0.0
 			msg = "I know %d words (%d contexts, %.2f per word), 1%d lines." % (num_w, num_c, num_cpw, num_l)
 				
-		# Do i know this word
+		# Do I know this word
 		elif command_list[0] == "!known" and self.settings.process_with == "scrib":
 			if len(command_list) == 2:
 				# single word specified
@@ -490,7 +490,7 @@ class scrib:
 				compteur = 0
 
 				if len(command_list) == 2:
-				# limite d occurences a effacer
+				# limited occurences a effacer
 					c_max = command_list[1]
 				else:
 					c_max = 0
@@ -585,7 +585,7 @@ class scrib:
 			elif command_list[0] == "!unlearn" and self.settings.process_with == "scrib":
 				# build context we are looking for
 				context = " ".join(command_list[1:])
-				context = context
+				
 				if context == "":
 					return
 				print "Looking for: "+context
@@ -979,13 +979,16 @@ class scrib:
 			"""
 			Learn from a sentence.
 			"""
-			import re
 
 			words = body.split()
 			# Ignore sentences of < 1 words XXX was <3
 			if len(words) < 1:
 				return
 
+			# Ignore if the sentence starts with an exclamation
+			if words[0][0] == "!":
+				return
+			
 			voyelles = "aÃ Ã¢eÃ©Ã¨ÃªiÃ®Ã¯oÃ¶Ã´uÃ¼Ã»y"
 			for x in xrange(0, len(words)):
 

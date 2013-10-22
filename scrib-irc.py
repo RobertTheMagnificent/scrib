@@ -251,7 +251,8 @@ class ModIRC(SingleServerIRCBot):
 		# Stealth mode. disable commands for non owners
 		if (not source in self.owners) and self.settings.stealth:
 			while body[:1] == "!":
-				body = body[1:]
+				print "[!] Stealth mode is on, ignoring command: %s" %body
+				return
 
 		if body == "":
 			return

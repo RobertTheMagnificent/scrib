@@ -285,7 +285,7 @@ class scrib:
 		body = body + " "
 
 		# Parse commands
-		if body[0][:1] == "!":
+		if body[0:1] == "!":
 			self.do_commands(io_module, body, args, owner)
 			return
 
@@ -983,12 +983,11 @@ class scrib:
 			words = body.split()
 			# Ignore sentences of < 1 words XXX was <3
 			if len(words) < 1:
-				print "Too small. Not learning: %s" %words
 				return
 
 			# Ignore if the sentence starts with an exclamation
-			if words[0][:1] == "!":
-				print "Exclamation detected: not learning: %s" %words
+			if body[0:1] == "!":
+				print "[!] Not learning: %s" %words
 				return
 			
 			vowels = "aÃ Ã¢eÃ©Ã¨ÃªiÃ®Ã¯oÃ¶Ã´uÃ¼Ã»y"
@@ -1008,7 +1007,7 @@ class scrib:
 				for censored in self.settings.censored:
 					pattern = "^%s$" % censored
 					if re.search(pattern, words[x]):
-						print "Censored word %s" %words[x]
+						print "[~] Censored word %s" %words[x]
 						return
 
 				if len(words[x]) > 13 \

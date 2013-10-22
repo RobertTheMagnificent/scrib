@@ -242,10 +242,10 @@ class ModIRC(SingleServerIRCBot):
 		# Ignore selected nicks
 		if self.settings.ignorelist.count(source) > 0 \
 			and self.settings.replyIgnored == 1:
-			print "Not learning from %s" % source
+			print "[~] Not learning from %s" % source
 			learn = 0
 		elif self.settings.ignorelist.count(source) > 0:
-			print "Ignoring %s" % source
+			print "[~] Ignoring %s" % source
 			return
 
 		# Stealth mode. disable commands for non owners
@@ -258,7 +258,7 @@ class ModIRC(SingleServerIRCBot):
 
 		# Ignore quoted messages
 		if body[0] == "<" or body[0:1] == "\"" or body[0:1] == " <":
-			print "Ignoring quoted text"
+			print "[#] Ignoring quoted text".
 			return
 
 		# We want replies reply_chance%, if speaking is on
@@ -273,7 +273,7 @@ class ModIRC(SingleServerIRCBot):
 			replyrate = 100
 
 			# Parse ModIRC commands
-			if body[0] == "!":
+			if body[0:1] == "!":
 				if self.irc_commands(body, source, target, c, e) == 1:return
 				return
 

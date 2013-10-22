@@ -53,7 +53,7 @@ class scrib:
 	import re
 	import cfgfile
 
-	coreVer = "0.6.4"
+	coreVer = "0.6.5"
 	brainVer = "0.0.1"
 	ver_string = "I am a version %s scrib." % coreVer
 	ver_string += " My braintechnology is at %s." % brainVer
@@ -299,40 +299,40 @@ class scrib:
 		#	elif self.settings.process_with == "megahal" and self.settings.learning == 1:
 		#		mh_python.learn(body)
 
-
+		if body[0] != "!":
 		# Make a reply if desired
-		if randint(0, 99) < replyrate:
+			if randint(0, 99) < replyrate:
 
-			message  = ""
+				message  = ""
 
-			#Look if we can find a prepared answer
-			for sentence in self.answers.sentences.keys():
-				pattern = "^%s$" % sentence
-				if re.search(pattern, body):
-					message = self.answers.sentences[sentence][randint(0, len(self.answers.sentences[sentence])-1)]
-					break
-				else:
-					if body in self.unfilterd:
-						self.unfilterd[body] = self.unfilterd[body] + 1
+				#Look if we can find a prepared answer
+				for sentence in self.answers.sentences.keys():
+					pattern = "^%s$" % sentence
+					if re.search(pattern, body):
+						message = self.answers.sentences[sentence][randint(0, len(self.answers.sentences[sentence])-1)]
+						break
 					else:
-						self.unfilterd[body] = 0
+						if body in self.unfilterd:
+							self.unfilterd[body] = self.unfilterd[body] + 1
+						else:
+							self.unfilterd[body] = 0
 
-			if message == "":
-				if self.settings.process_with == "scrib":
-					message = self.reply(body)
-			#	elif self.settings.process_with == "megahal":
-			#		message = mh_python.doreply(body)
+				if message == "":
+					if self.settings.process_with == "scrib":
+						message = self.reply(body)
+				#	elif self.settings.process_with == "megahal":
+				#		message = mh_python.doreply(body)
 
-			# single word reply: always output
-			if len(message.split()) == 1:
+				# single word reply: always output
+				if len(message.split()) == 1:
+					io_module.output(message, args)
+					return
+				# empty. do not output
+				if message == "":
+					return
+				# else output
+				if owner==0: time.sleep(.2*len(message))
 				io_module.output(message, args)
-				return
-			# empty. do not output
-			if message == "":
-				return
-			# else output
-			if owner==0: time.sleep(.2*len(message))
-			io_module.output(message, args)
 	
 	def do_commands(self, io_module, body, args, owner):
 		"""
@@ -482,7 +482,7 @@ class scrib:
 							old_num_contexts,
 							self.settings.num_contexts - old_num_contexts)
 
-			#Remove rares words
+			#Remove rare words
 			elif command_list[0] == "!purge" and self.settings.process_with == "scrib":
 				t = time.time()
 
@@ -655,7 +655,7 @@ class scrib:
 				elif len(command_list) == 2:
 					if command_list[1][0] != '~': command_list[1] = '~' + command_list[1]
 					if command_list[1] in self.settings.aliases.keys():
-						msg = "Thoses words : %s  are aliases to %s" \
+						msg = "These words : %s  are aliases to %s" \
 						% ( " ".join(self.settings.aliases[command_list[1]]), command_list[1] )
 					else:
 						msg = "The alias %s is not known" % command_list[1][1:]
@@ -786,6 +786,7 @@ class scrib:
 		if len(words) == 0:
 			return ""
 		
+		
 		#remove words on the ignore list
 		#words = filter((lambda x: x not in self.settings.ignore_list and not x.isdigit() ), words)
 		words = [x for x in words if x not in self.settings.ignore_list and not x.isdigit()]
@@ -816,7 +817,7 @@ class scrib:
 		sentence = [word]
 		done = 0
 		while done == 0:
-			#create a dictionary wich will contain all the words we can found before the "chosen" word
+			#create a dictionary which will contain all the words we can found before the "chosen" word
 			pre_words = {"" : 0}
 			#this is for prevent the case when we have an ignore_listed word
 			word = str(sentence[0].split(" ")[0])

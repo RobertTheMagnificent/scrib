@@ -5,7 +5,7 @@
 import string
 import sys
 
-sys.path.append('../core')
+sys.path.append('core')
 import scrib
 
 class ModFileIn:

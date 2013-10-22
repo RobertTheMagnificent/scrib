@@ -1,4 +1,4 @@
-from plugins import TestPlugin
+from plugins import ScribPlugin
 
 def sendMessage( event, text ):
 	if TestPlugin.process_table[event] != '':

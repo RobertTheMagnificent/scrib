@@ -8,14 +8,6 @@ Author:         Sina Mashek & The Whube Developers
 Email:          tenach [ at ] whube [ dot ] com
 
 ========================================================================
-===================            NOTES               =====================
-========================================================================
-
-* tools/feedme.py lets you fill scrib's brain with text from a file.
-* There are some other in-dev tools that use PHP to feed scrib some
-  naughtiness in a basket.
-
-========================================================================
 ===================        WHAT YOU NEED           =====================
 ========================================================================
 
@@ -23,9 +15,14 @@ Email:          tenach [ at ] whube [ dot ] com
 	 ( http://python-irclib.sourceforge.net/ 
 	   Most distros: install python-irclib			       )
 
+========================================================================
+===================        INITIAL SETUP           =====================
+========================================================================
+
+* Please set conf/scrib-irc.py to taste before running.
 
 ========================================================================
-===================        Optional Derp           =====================
+===================        OPTIONAL DERP           =====================
 ========================================================================
 
 * espeak
@@ -34,8 +31,12 @@ Email:          tenach [ at ] whube [ dot ] com
 	   need to install espeak.
 	   Most distros: install espeak				       )
 
+========================================================================
+===================            NOTES               =====================
+========================================================================
 
-Will be moving to using PyBrain. Maybe. Eventually.
+* feedme.py lets you fill scrib's brain with text from a file.
+* Will be moving to using PyBrain. Maybe. Eventually.
 
 
  .

@@ -48,7 +48,7 @@ class ModIRC(SingleServerIRCBot):
 	owner_mask = []
 
 	# IRC Command list
-	commandlist =   "IRC Module Commands:\n!chans, !ignore, !join, !nick, !part, !quit, !quitmsg, !reply2ignored, !replyrate, !sleep, !stealth, !unignore, !wakeup, !talk, !owner"
+	commandlist =   "IRC Module Commands:\n!chans, !ignore, !join, !nick, !part, !quit, !quitmsg, !replyIgnored, !replyrate, !sleep, !stealth, !unignore, !wakeup, !talk, !owner"
 	# IRC Command 
 	commanddict = {
 		"sleep": "Owner command. Usage: !sleep\nStop the bot talking",
@@ -60,7 +60,7 @@ class ModIRC(SingleServerIRCBot):
 		"ignore": "Owner command. Usage: !ignore [nick1 [nick2 [...]]]\nIgnore one or more nicknames. Without arguments it lists ignored nicknames",
 		"unignore": "Owner command. Usage: !unignore nick1 [nick2 [...]]\nUnignores one or more nicknames",
 		"replyrate": "Owner command. Usage: !replyrate [rate%]\nSet rate of bot replies to rate%. Without arguments (not an owner-only command) shows the current reply rate",
-		"reply2ignored": "Owner command. Usage: !reply2ignored [on|off]\nAllow/disallow replying to ignored users. Without arguments shows the current setting",
+		"replyIgnored": "Owner command. Usage: !replyIgnored [on|off]\nAllow/disallow replying to ignored users. Without arguments shows the current setting",
 		"stealth": "Owner command. Usage: !stealth [on|off]\nTurn stealth mode on or off (disable non-owner commands and don't return CTCP VERSION). Without arguments shows the current setting",
 		"quitmsg": "Owner command. Usage: !quitmsg [message]\nSet the quit message. Without arguments show the current quit message",
 		"talk": "Owner command. Usage !talk nick message\nmake the bot send the sentence 'message' to 'nick'",
@@ -86,7 +86,7 @@ class ModIRC(SingleServerIRCBot):
 			  "speaking": ("Allow the bot to talk on channels", 1),
 			  "stealth": ("Hide the fact we are a bot", 0),
 			  "ignorelist": ("Ignore these nicknames:", []),
-			  "reply2ignored": ("Reply to ignored people", 0),
+			  "replyIgnored": ("Reply to ignored people", 0),
 			  "reply_chance": ("Chance of reply (%) per message", 33),
 			  "quitmsg": ("IRC quit message", "Bye :-("),
 			  "password": ("password for control the bot (Edit manually !)", "")
@@ -241,7 +241,7 @@ class ModIRC(SingleServerIRCBot):
 
 		# Ignore selected nicks
 		if self.settings.ignorelist.count(source.lower()) > 0 \
-			and self.settings.reply2ignored == 1:
+			and self.settings.replyIgnored == 1:
 			print "Not learning from %s" % source
 			learn = 0
 		elif self.settings.ignorelist.count(source.lower()) > 0:
@@ -332,16 +332,12 @@ class ModIRC(SingleServerIRCBot):
 						msg = msg + "off"
 						self.settings.stealth = 0
 
-			# filter mirc colours out?
-			elif command_list[0] == "!nocolor" or command_list[0] == "!nocolour":
-				msg = "obsolete command "
-
 			# Allow/disallow replying to ignored nicks
 			# (they will never be learnt from)
-			elif command_list[0] == "!reply2ignored":
+			elif command_list[0] == "!replyIgnored":
 				msg = "Replying to ignored users "
 				if len(command_list) == 1:
-					if self.settings.reply2ignored == 0:
+					if self.settings.replyIgnored == 0:
 						msg = msg + "off"
 					else:
 						msg = msg + "on"
@@ -349,10 +345,10 @@ class ModIRC(SingleServerIRCBot):
 					toggle = command_list[1]
 					if toggle == "on":
 						msg = msg + "on"
-						self.settings.reply2ignored = 1
+						self.settings.replyIgnored = 1
 					else:
 						msg = msg + "off"
-						self.settings.reply2ignored = 0
+						self.settings.replyIgnored = 0
 			# Stop talking
 			elif command_list[0] == "!sleep":
 				if self.settings.speaking == 1:

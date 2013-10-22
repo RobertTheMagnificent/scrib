@@ -15,10 +15,6 @@ def filter_message(message, bot):
 	Make easier to learn and reply to.
 	"""
 	
-	# to lowercase
-	# Turning off to see wtf goes on.
-	# message = message.lower()
-
 	# remove garbage
 	message = message.replace("\"", "")
 	message = message.replace("\n", " ")
@@ -343,7 +339,7 @@ class scrib:
 		msg = ""
 
 		command_list = body.split()
-		command_list[0] = command_list[0].lower()
+		command_list[0] = command_list[0]()
 
 		# Guest commands.
 	
@@ -366,7 +362,7 @@ class scrib:
 		elif command_list[0] == "!known" and self.settings.process_with == "scrib":
 			if len(command_list) == 2:
 				# single word specified
-				word = command_list[1].lower()
+				word = command_list[1]()
 				if self.words.has_key(word):
 					c = len(self.words[word])
 					msg = "%s is known (%d contexts)" % (word, c)
@@ -376,7 +372,7 @@ class scrib:
 				# multiple words.
 				words = []
 				for x in command_list[1:]:
-					words.append(x.lower())
+					words.append(x())
 				msg = "Number of contexts: "
 				for x in words:
 					if self.words.has_key(x):
@@ -396,7 +392,7 @@ class scrib:
 			elif command_list[0] == "!help":
 				if len(command_list) > 1:
 					# Help for a specific command
-					cmd = command_list[1].lower()
+					cmd = command_list[1]()
 					dic = None
 					if cmd in self.commanddict.keys():
 						dic = self.commanddict
@@ -419,7 +415,7 @@ class scrib:
 				if len(command_list) == 1:
 					msg += str(self.settings.max_words)
 				else:
-					limit = int(command_list[1].lower())
+					limit = int(command_list[1]())
 					self.settings.max_words = limit
 					msg += "now " + command_list[1]
 
@@ -493,7 +489,7 @@ class scrib:
 
 				if len(command_list) == 2:
 				# limite d occurences a effacer
-					c_max = command_list[1].lower()
+					c_max = command_list[1]()
 				else:
 					c_max = 0
 
@@ -535,8 +531,8 @@ class scrib:
 			elif command_list[0] == "!replace" and self.settings.process_with == "scrib":
 				if len(command_list) < 3:
 					return
-				old = command_list[1].lower()
-				new = command_list[2].lower()
+				old = command_list[1]()
+				new = command_list[2]()
 				msg = self.replace(old, new)
 
 			# Print contexts [flooding...:-]
@@ -546,7 +542,7 @@ class scrib:
 
 				# build context we are looking for
 				context = " ".join(command_list[1:])
-				context = context.lower()
+				context = context()
 				if context == "":
 					return
 				io_module.output("Contexts containing \""+context+"\":", args)
@@ -587,7 +583,7 @@ class scrib:
 			elif command_list[0] == "!unlearn" and self.settings.process_with == "scrib":
 				# build context we are looking for
 				context = " ".join(command_list[1:])
-				context = context.lower()
+				context = context()
 				if context == "":
 					return
 				print "Looking for: "+context
@@ -607,7 +603,7 @@ class scrib:
 					else:
 						msg += "on"
 				else:
-					toggle = command_list[1].lower()
+					toggle = command_list[1]()
 					if toggle == "on":
 						msg += "on"
 						self.settings.learning = 1
@@ -629,7 +625,7 @@ class scrib:
 						if command_list[x] in self.settings.censored:
 							msg += "%s is already censored" % command_list[x]
 						else:
-							self.settings.censored.append(command_list[x].lower())
+							self.settings.censored.append(command_list[x]())
 							self.unlearn(command_list[x])
 							msg += "done"
 						msg += "\n"
@@ -640,7 +636,7 @@ class scrib:
 				# eg !unignore tom dick harry
 				for x in xrange(1, len(command_list)):
 					try:
-						self.settings.censored.remove(command_list[x].lower())
+						self.settings.censored.remove(command_list[x]())
 						msg = "done"
 					except ValueError, e:
 						pass

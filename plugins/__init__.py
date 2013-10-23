@@ -1,5 +1,6 @@
 import os
 import sys
+import time
 from plugins import ScribPlugin
 
 plugin_dir = os.path.abspath(os.path.dirname(__file__ )) + "/"

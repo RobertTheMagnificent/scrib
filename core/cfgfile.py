@@ -3,6 +3,7 @@
 # scrib config file
 
 import string
+import time
 
 def _load_config(filename):
 	"""
@@ -39,8 +40,8 @@ def _load_config(filename):
 		try:
 			stuff[string.strip(s[0])] = eval(string.strip(string.join(s[1:], "=")))
 		except:
-			print "Malformed line in %s line %d" % (filename, line)
-			print "\t%s" %s
+			print "[%s][!] Malformed line in %s line %d" % (get_time(), filename, line)
+			print "[%s][!] \t%s" % (get_time(), s)
 			continue
 	return stuff
 		

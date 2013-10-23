@@ -13,5 +13,5 @@ def addPlugin( command, alias, action ):
 	plugin_aliases += " "+alias 
 
 class ScribPlugin:
-	def action(self, stuff):
+	def action(self, stuff, scrib):
 		return "Default Action"

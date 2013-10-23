@@ -6,11 +6,11 @@ command = { "control": "Usage: !control password\nAllow user to have access to b
 
 # Plugin Action
 class ControlPlugin(ScribPlugin.ScribPlugin):
-	def action(self, command_list):
-		if command_list[0] == alias and len(command_list) > 1 and ModIRC.source not in ModIRC.owners:
+	def action(self, command_list, scrib):
+		if command_list[0] == alias and len(command_list) > 1 and scrib.source not in scrib.owners:
 			msg = ""
-			if command_list[1] == ModIRC.settings.password:
-				ModIRC.owners.append(ModIRC.source)
+			if command_list[1] == scrib.settings.password:
+				scrib.owners.append(scrib.source)
 				msg = "You've been added to controllers list."
 			else:
 				msg = "Try again."

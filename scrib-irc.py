@@ -38,7 +38,7 @@ class ModIRC(SingleServerIRCBot):
 	# We are going to store the owner's host mask :3
 	owner_mask = []
 
-	commandlist = " "+PluginManager.ScribPlugin.plugin_aliases
+	commandlist = dict( commandlist.items() + PluginManager.ScribPlugin.plugin_aliases.items() )
 	commanddict = dict( commanddict.items() + PluginManager.ScribPlugin.plugin_commands.items() )
 	
 	def __init__(self, my_scrib, args):

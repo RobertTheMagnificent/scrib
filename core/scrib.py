@@ -101,7 +101,7 @@ class scrib:
 			  "pubsym": ("Symbol to append to cmd msgs in public", "!"),
 			  "no_save"	:("If True, Scrib doesn't save his brain and configuration to disk", "False")
 			} )
-		print "OMGDEBUG: %s" % self.settings.pubsym
+
 		self.answers = self.cfgfile.cfgset()
 		self.answers.load("data/answers.txt",
 			{ "sentences":	("A list of prepared answers", {})
@@ -551,7 +551,7 @@ class scrib:
 				context = " ".join(command_list[1:])
 				if context == "":
 					return
-				io_module.output("%sContexts containing \""+context+"\":", args) % self.settings.pubsym
+				io_module.output(self.settings.pubsym+"Contexts containing \""+context+"\":", args)
 				# Build context list
 				# Pad it
 				context = " "+context+" "

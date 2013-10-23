@@ -10,7 +10,7 @@ class ControlPlugin(ScribPlugin.ScribPlugin):
 		if command_list[0] == alias and len(command_list) > 1 and ModIRC.source not in ModIRC.owners:
 			if command_list[1] == ModIRC.settings.password:
 				ModIRC.owners.append(ModIRC.source)
-				msg "You've been added to controllers list!"
+				msg = "You've been added to controllers list."
 			else:
 				msg = "Try again."
 		return msg

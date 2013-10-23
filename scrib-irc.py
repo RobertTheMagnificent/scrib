@@ -58,8 +58,6 @@ class ModIRC(SingleServerIRCBot):
 		"quit": "Owner command. Usage: !quit\nMake the bot quit IRC.",
 		"control": "Usage: !control password\nAllow user to have access to bot commands."
 	}
-
-	print process_table
 	
 	def __init__(self, my_scrib, args):
 		"""

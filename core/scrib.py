@@ -110,7 +110,7 @@ class scrib:
 
 		# Read the brain
 		if self.settings.process_with == "scrib":
-			print "[#] Reading my brain..."
+			print "[%s][#] Reading my brain..." % get_time()
 			try:
 				zfile = zipfile.ZipFile('data/archive.zip','r')
 				for filename in zfile.namelist():
@@ -119,14 +119,14 @@ class scrib:
 					file.write(data)
 					file.close()
 			except (EOFError, IOError), e:
-				print "[!] No zip found"
+				print "[%s][!] No zip found" % get_time()
 			try:
 
 				f = open("data/version", "rb")
 				s = f.read()
 				f.close()
 				if s != self.brainVer:
-					print "[!] Error loading the brain.\nPlease convert it before launching scrib."
+					print "[%s][!] Error loading the brain.\nPlease convert it before launching scrib." % s
 					sys.exit(1)
 
 				f = open("data/words.dat", "rb")
@@ -143,11 +143,11 @@ class scrib:
 				# Create new database
 				self.words = {}
 				self.lines = {}
-				print "[!] Error reading saves. New database created."
+				print "[%s][!] Error reading saves. New database created." % get_time()
 
 			# Is a resizing required?
 			if len(self.words) != self.settings.num_words:
-				print "[~] Updating my brain's information..."
+				print "[%s][~] Updating my brain's information..." % get_time()
 				self.settings.num_words = len(self.words)
 				num_contexts = 0
 				# Get number of contexts
@@ -162,7 +162,7 @@ class scrib:
 			for x in self.settings.aliases.keys():
 				compteur += len(self.settings.aliases[x])
 			if compteur != self.settings.num_aliases:
-				print "[~] Check brain for new aliases."
+				print "[%s][~] Check brain for new aliases." % get_time()
 				self.settings.num_aliases = compteur
 
 				for x in self.words.keys():
@@ -203,7 +203,7 @@ class scrib:
 
 	def save_all(self):
 		if self.settings.process_with == "scrib" and self.settings.no_save != "True":
-			print "[#] Writing to my brain..."
+			print "[%s][#] Writing to my brain..." % get_time()
 
 			try:
 				zfile = zipfile.ZipFile('data/archive.zip','r')
@@ -213,7 +213,7 @@ class scrib:
 					file.write(data)
 					file.close()
 			except (OSError, IOError), e:
-				print "[!] No brain zip found. Is this the first time scrib has been launched?"
+				print "[%s][!] No brain zip found. Is this the first time scrib has been launched?" % get_time()
 
 
 			f = open("data/words.dat", "wb")
@@ -243,7 +243,7 @@ class scrib:
 				os.remove('data/lines.dat')
 				os.remove('data/version')
 			except (OSError, IOError), e:
-				print "[!] Could not remove the files."
+				print "[%s][!] Could not remove the files." % get_time()
 
 			f = open("data/words.txt", "w")
 			# write each words known
@@ -692,7 +692,7 @@ class scrib:
 			elif command_list[0] == "!quit":
 				# Close the brain
 				self.save_all()
-				print "[#] Saved my brain. Goodbye!"
+				print "[%s][#] Saved my brain. Goodbye!" % get_time()
 				sys.exit()
 				
 			# Save changes
@@ -993,7 +993,7 @@ class scrib:
 
 			# Ignore if the sentence starts with an exclamation
 			if body[0:1] == "!":
-				print "[!] Not learning: %s" %words
+				print "[%s][!] Not learning: %s" % (get_time(), words)
 				return
 			
 			vowels = "aÃ Ã¢eÃ©Ã¨ÃªiÃ®Ã¯oÃ¶Ã´uÃ¼Ã»y"
@@ -1013,7 +1013,7 @@ class scrib:
 				for censored in self.settings.censored:
 					pattern = "^%s$" % censored
 					if re.search(pattern, words[x]):
-						print "[~] Censored word %s" %words[x]
+						print "[!][~] Censored word %s" % (get_time(), words[x])
 						return
 
 				if len(words[x]) > 13 \

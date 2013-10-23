@@ -435,6 +435,8 @@ class ModIRC(SingleServerIRCBot):
 					for x in xrange (2, len (command_list)):
 						phrase = phrase + str(command_list[x]) + " "
 					self.output(phrase, ("", command_list[1], "", c, e))
+			elif command_list[0] == "! %s" % commanddict[command_list[0]]:
+				msg = PluginManager.ScribPlugin.action(command_list)
 
 			self.scrib.settings.save()
 			self.settings.save()

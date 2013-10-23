@@ -125,7 +125,7 @@ class ModIRC(SingleServerIRCBot):
 					pass
 
 	def our_start(self):
-		print "[~][%s] Connecting to %s " % (get_time(), self.settings.servers)
+		print "[%s][~] Connecting to %s " % (get_time(), self.settings.servers)
 		SingleServerIRCBot.__init__(self, self.settings.servers, self.settings.myname, self.settings.realname, 2)
 
 		self.start()
@@ -163,7 +163,7 @@ class ModIRC(SingleServerIRCBot):
 			reason = ""
 
 		if kicked == self.settings.myname:
-			print "[%s] <--  %s was kicked off %s by %s (%s)" % (get_time(), kicked, target, kicker, reason)
+			print "[%s][*] %s was kicked off %s by %s (%s)" % (get_time(), kicked, target, kicker, reason)
 
 	def on_privmsg(self, c, e):
 		self.on_msg(c, e)
@@ -236,7 +236,7 @@ class ModIRC(SingleServerIRCBot):
 		if e.eventtype() == "pubmsg":
 			for x in self.channels[target].users():
 				body = body.replace(x, "#nick")
-		print body
+		print "[%s][%s] %s" % (get_time(), x, body)
 
 		# Ignore selected nicks
 		if self.settings.ignorelist.count(source) > 0 \

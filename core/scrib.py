@@ -126,7 +126,7 @@ class scrib:
 				s = f.read()
 				f.close()
 				if s != self.brainVer:
-					print "[%s][!] Error loading the brain.\nPlease convert it before launching scrib." % s
+					print "[%s][!] Error loading the brain.\nPlease convert it before launching scrib." % get_time()
 					sys.exit(1)
 
 				f = open("data/words.dat", "rb")
@@ -280,7 +280,7 @@ class scrib:
 		except:
 			self.settings.process_with = "scrib"
 			self.settings.save()
-			print "Could not find megahal python library\nProgram ending"
+			print "[%s][!] Could not find megahal python library\nProgram ending" % get_time()
 			sys.exit(1)
 
 		# add trailing space so sentences are broken up correctly
@@ -436,15 +436,15 @@ class scrib:
 
 						# Nasty critical error we should fix
 						if not self.lines.has_key(line_idx):
-							print "%sRemoving broken link '%s' -> %d." % (self.settings.pubsym, w, line_idx)
+							print "[%s][~] Removing broken link '%s' -> %d." % (get_time(), w, line_idx)
 							num_broken = num_broken + 1
 							del wlist[i]
 						else:
 							# Check pointed to word is correct
 							split_line = self.lines[line_idx][0].split()
 							if split_line[word_num] != w:
-								print "%sLine '%s' word %d is not '%s' as expected." % \
-									(self.settings.pubsym, 
+								print "[%s][~] Line '%s' word %d is not '%s' as expected." % \
+									(get_time(), 
 									self.lines[line_idx][0],
 									word_num, w)
 								num_bad = num_bad + 1
@@ -452,7 +452,7 @@ class scrib:
 					if len(wlist) == 0:
 						del self.words[w]
 						self.settings.num_words = self.settings.num_words - 1
-						print "\"%s\" vaped totally" % w
+						print "[%s][!] \"%s\" vaped totally" % (get_time(), w)
 
 				msg = "%sChecked my brain in %0.2fs. Fixed links: %d broken, %d bad." % \
 					(self.settings.pubsym, 
@@ -592,7 +592,7 @@ class scrib:
 				
 				if context == "":
 					return
-				print "Looking for: "+context
+				print "%sLooking for: %s" % (get_time(), context) 
 				# Unlearn contexts containing 'context'
 				t = time.time()
 				self.unlearn(context)
@@ -719,7 +719,7 @@ class scrib:
 			number = self.lines[l][1]
 			if line[w] != old:
 				# fucked brain
-				print "%sBroken link: %s %s" % (self.settings.pubsym, x, self.lines[l][0] )
+				print "[%s][!] Broken link: %s %s" % (get_time(), x, self.lines[l][0] )
 				continue
 			else:
 				line[w] = new
@@ -775,7 +775,7 @@ class scrib:
 			if len(words[x]) == 0:
 				del words[x]
 				self.settings.num_words = self.settings.num_words - 1
-				print "\"%s\" vaped totally" %x
+				print "[%s] \"%s\" vaped totally" % (get_time(), x)
 
 	def reply(self, body):
 		"""

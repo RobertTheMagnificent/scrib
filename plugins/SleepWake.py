@@ -6,10 +6,10 @@ sleep_command = { "sleep": "Usage: !sleep \nMake the bot stop talking." }
 
 # Plugin Action
 class SleepPlugin(ScribPlugin.ScribPlugin):
-	def action(self, command_list):
-		if command_list[0] == alias and len(command_list)==1:
+	def action(self, command_list, scrib):
+		if command_list[0] == sleep_alias and len(command_list)==1:
 			msg = "Going to sleep. Goodnight!"
-			ModIRC.settings.speaking = 0
+			scrib.settings.speaking = 0
 		else:
 			msg = "Zzz..."
 		return msg
@@ -18,9 +18,9 @@ wake_alias = "!wake"
 wake_command = { "wake": "Owner command. Usage: !wake\nAllow the bot to talk." }
 
 class WakePlugin(ScribPlugin.ScribPlugin):
-	def action(self, command_list):
-		if ModIRC.settings.speaking == 0:
-			ModIRC.settings.speaking = 1 
+	def action(self, command_list, scrib):
+		if command_list[0] = wake_alias and scrib.settings.speaking == 0:
+			scrib.settings.speaking = 1 
 			msg = "Whoohoo!"
 		else:
 			msg = "But I'm already awake..."

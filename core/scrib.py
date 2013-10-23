@@ -98,6 +98,7 @@ class scrib:
 			  "num_aliases":("Total of aliases known", 0),
 			  "aliases":	("A list of similars words", {}),
 			  "process_with":("Which module will we use to generate replies? (scrib|megahal)", "scrib"),
+			  "pubsym": ("Symbol to append to cmd msgs in public", "!"),
 			  "no_save"	:("If True, Scrib doesn't save his brain and configuration to disk", "False")
 			} )
 
@@ -125,7 +126,7 @@ class scrib:
 				s = f.read()
 				f.close()
 				if s != self.brainVer:
-					print "Error loading the brain.\nPlease convert it before launching scrib."
+					print "[!] Error loading the brain.\nPlease convert it before launching scrib."
 					sys.exit(1)
 
 				f = open("data/words.dat", "rb")
@@ -142,11 +143,11 @@ class scrib:
 				# Create new database
 				self.words = {}
 				self.lines = {}
-				print "Error reading saves. New database created."
+				print "[!] Error reading saves. New database created."
 
 			# Is a resizing required?
 			if len(self.words) != self.settings.num_words:
-				print "Updating my brain's information..."
+				print "[~] Updating my brain's information..."
 				self.settings.num_words = len(self.words)
 				num_contexts = 0
 				# Get number of contexts
@@ -161,7 +162,7 @@ class scrib:
 			for x in self.settings.aliases.keys():
 				compteur += len(self.settings.aliases[x])
 			if compteur != self.settings.num_aliases:
-				print "Check brain for new aliases."
+				print "[~] Check brain for new aliases."
 				self.settings.num_aliases = compteur
 
 				for x in self.words.keys():
@@ -202,7 +203,7 @@ class scrib:
 
 	def save_all(self):
 		if self.settings.process_with == "scrib" and self.settings.no_save != "True":
-			print "Writing to my brain..."
+			print "[#] Writing to my brain..."
 
 			try:
 				zfile = zipfile.ZipFile('data/archive.zip','r')
@@ -212,7 +213,7 @@ class scrib:
 					file.write(data)
 					file.close()
 			except (OSError, IOError), e:
-				print "No brain zip found. Is this the first time scrib has been launched?"
+				print "[!] No brain zip found. Is this the first time scrib has been launched?"
 
 
 			f = open("data/words.dat", "wb")
@@ -242,7 +243,7 @@ class scrib:
 				os.remove('data/lines.dat')
 				os.remove('data/version')
 			except (OSError, IOError), e:
-				print "Could not remove the files."
+				print "[!] Could not remove the files."
 
 			f = open("data/words.txt", "w")
 			# write each words known
@@ -274,13 +275,13 @@ class scrib:
 		If owner==1 allow owner commands.
 		"""
 
-		#try:
-		#	if self.settings.process_with == "megahal": import mh_python
-		#except:
-		#	self.settings.process_with = "scrib"
-		#	self.settings.save()
-		#	print "Could not find megahal python library\nProgram ending"
-		#	sys.exit(1)
+		try:
+			if self.settings.process_with == "megahal": import mh_python
+		except:
+			self.settings.process_with = "scrib"
+			self.settings.save()
+			print "Could not find megahal python library\nProgram ending"
+			sys.exit(1)
 
 		# add trailing space so sentences are broken up correctly
 		body = body + " "
@@ -297,8 +298,8 @@ class scrib:
 		if learn == 1:
 			if self.settings.process_with == "scrib":
 				self.learn(body)
-		#	elif self.settings.process_with == "megahal" and self.settings.learning == 1:
-		#		mh_python.learn(body)
+			elif self.settings.process_with == "megahal" and self.settings.learning == 1:
+				mh_python.learn(body)
 
 		# Make a reply if desired
 		if randint(0, 99) < replyrate:
@@ -320,8 +321,8 @@ class scrib:
 			if message == "":
 				if self.settings.process_with == "scrib":
 					message = self.reply(body)
-			#	elif self.settings.process_with == "megahal":
-			#		message = mh_python.doreply(body)
+				elif self.settings.process_with == "megahal":
+					message = mh_python.doreply(body)
 
 			# single word reply: always output
 			if len(message.split()) == 1:
@@ -358,7 +359,7 @@ class scrib:
 				num_cpw = num_c/float(num_w) # contexts per word
 			else:
 				num_cpw = 0.0
-			msg = "!I know %d words (%d contexts, %.2f per word), 1%d lines." % (num_w, num_c, num_cpw, num_l)
+			msg = "%sI know %d words (%d contexts, %.2f per word), 1%d lines." % ( self.settings.pubsym, num_w, num_c, num_cpw, num_l)
 				
 		# Do I know this word
 		elif command_list[0] == "!known" and self.settings.process_with == "scrib":
@@ -367,15 +368,15 @@ class scrib:
 				word = command_list[1]
 				if self.words.has_key(word):
 					c = len(self.words[word])
-					msg = "!%s is known (%d contexts)" % (word, c)
+					msg = "%s%s is known (%d contexts)" % (self.settings.pubsym, word, c)
 				else:
-					msg = "!%s is unknown." % word
+					msg = "%s%s is unknown." % (self.settings.pubsym, word)
 			elif len(command_list) > 2:
 				# multiple words.
 				words = []
 				for x in command_list[1:]:
 					words.append(x)
-				msg = "!Number of contexts: "
+				msg = "%sNumber of contexts: " % self.settings.pubsym
 				for x in words:
 					if self.words.has_key(x):
 						c = len(self.words[x])
@@ -388,7 +389,7 @@ class scrib:
 			# Save the brain
 			if command_list[0] == "!save":
 				self.save_all()
-				msg = "!Brain has been saved!"
+				msg = "%sBrain has been saved!" % self.settings.pubsym
 
 			# Command list
 			elif command_list[0] == "!help":
@@ -404,7 +405,7 @@ class scrib:
 						for i in dic[cmd].split("\n"):
 							io_module.output(i, args)
 					else:
-						msg = "!No help on command '%s'" % cmd
+						msg = "%sNo help on command '%s'" % (self.settings.pubsym, cmd)
 				else:
 					for i in self.commandlist.split("\n"):
 						io_module.output(i, args)
@@ -413,7 +414,7 @@ class scrib:
 
 			# Change the max_words setting
 			elif command_list[0] == "!limit" and self.settings.process_with == "scrib":
-				msg = "!The max limit is "
+				msg = "%sThe max limit is " % self.settings.pubsym
 				if len(command_list) == 1:
 					msg += str(self.settings.max_words)
 				else:
@@ -435,15 +436,16 @@ class scrib:
 
 						# Nasty critical error we should fix
 						if not self.lines.has_key(line_idx):
-							print "Removing broken link '%s' -> %d." % (w, line_idx)
+							print "%sRemoving broken link '%s' -> %d." % (self.settings.pubsym, w, line_idx)
 							num_broken = num_broken + 1
 							del wlist[i]
 						else:
 							# Check pointed to word is correct
 							split_line = self.lines[line_idx][0].split()
 							if split_line[word_num] != w:
-								print "Line '%s' word %d is not '%s' as expected." % \
-									(self.lines[line_idx][0],
+								print "%sLine '%s' word %d is not '%s' as expected." % \
+									(self.settings.pubsym, 
+									self.lines[line_idx][0],
 									word_num, w)
 								num_bad = num_bad + 1
 								del wlist[i]
@@ -452,8 +454,9 @@ class scrib:
 						self.settings.num_words = self.settings.num_words - 1
 						print "\"%s\" vaped totally" % w
 
-				msg = "!Checked my brain in %0.2fs. Fixed links: %d broken, %d bad." % \
-					(time.time()-t,
+				msg = "%Checked my brain in %0.2fs. Fixed links: %d broken, %d bad." % \
+					(self.settings.pubsym, 
+					time.time()-t,
 					num_broken,
 					num_bad)
 
@@ -475,8 +478,9 @@ class scrib:
 					for k in old_lines.keys():
 						self.learn(old_lines[k][0], old_lines[k][1])
 
-					msg = "!Rebuilt brain in %0.2fs. Words %d (%+d), contexts %d (%+d)." % \
-							(time.time()-t,
+					msg = "%sRebuilt brain in %0.2fs. Words %d (%+d), contexts %d (%+d)." % \
+							(self.settings.pubsym, 
+							time.time()-t,
 							old_num_words,
 							self.settings.num_words - old_num_words,
 							old_num_contexts,
@@ -525,8 +529,9 @@ class scrib:
 				for w in liste[0:]:
 					self.unlearn(w)
 
-				msg = "!Purged brain in %0.2fs. %d words removed." % \
-						(time.time()-t,
+				msg = "%sPurged brain in %0.2fs. %d words removed." % \
+						(self.settings.pubsym, 
+						time.time()-t,
 						compteur)
 				
 			# Change a typo in the brain
@@ -546,7 +551,7 @@ class scrib:
 				context = " ".join(command_list[1:])
 				if context == "":
 					return
-				io_module.output("!Contexts containing \""+context+"\":", args)
+				io_module.output("%sContexts containing \""+context+"\":", args) % self.settings.pubsym
 				# Build context list
 				# Pad it
 				context = " "+context+" "
@@ -567,17 +572,17 @@ class scrib:
 				x = 0
 				while x < 5:
 					if x < len(c):
-						io_module.output("!"+c[x], args)
+						io_module.output("%s"+c[x], args) % self.settings.pubsym
 					x += 1
 				if len(c) == 5:
 					return
 				if len(c) > 10:
-					io_module.output("!...("+`len(c)-10`+" skipped)...", args)
+					io_module.output("%s...("+`len(c)-10`+" skipped)...", args) % self.settings.pubsym
 				x = len(c) - 5
 				if x < 5:
 					x = 5
 				while x < len(c):
-					io_module.output("!"+c[x], args)
+					io_module.output("%s"+c[x], args) % self.settings.pubsym
 					x += 1
 
 			# Remove a word from the vocabulary [use with care]
@@ -593,11 +598,11 @@ class scrib:
 				self.unlearn(context)
 				# we don't actually check if anything was
 				# done..
-				msg = "!Unlearn done in %0.2fs" % (time.time()-t)
+				msg = "%sUnlearn done in %0.2fs" % (self.settings.pubsym, time.time()-t)
 
 			# Query/toggle bot learning
 			elif command_list[0] == "!learning":
-				msg = "!Learning mode "
+				msg = "%sLearning mode " % self.settings.pubsym
 				if len(command_list) == 1:
 					if self.settings.learning == 0:
 						msg += "off"
@@ -617,18 +622,18 @@ class scrib:
 				# no arguments. list censored words
 				if len(command_list) == 1:
 					if len(self.settings.censored) == 0:
-						msg = "!No words censored."
+						msg = "%sNo words censored." % self.settings.pubsym
 					else:
-						msg = "!I will not use the word(s) %s" % ", ".join(self.settings.censored)
+						msg = "%sI will not use the word(s) %s" % (self.settings.pubsym, ", ".join(self.settings.censored))
 				# add every word listed to censored list
 				else:
 					for x in xrange(1, len(command_list)):
 						if command_list[x] in self.settings.censored:
-							msg += "!%s is already censored." % command_list[x]
+							msg += "%s%s is already censored." % (self.settings.pubsym, command_list[x])
 						else:
 							self.settings.censored.append(command_list[x])
 							self.unlearn(command_list[x])
-							msg += "!%s is now censored." % command_list[x]
+							msg += "%s%s is now censored." % c(self.settings.pubsym, ommand_list[x])
 						msg += "\n"
 
 			# remove a word from the censored list
@@ -638,7 +643,7 @@ class scrib:
 				for x in xrange(1, len(command_list)):
 					try:
 						self.settings.censored.remove(command_list[x])
-						msg = "!%s is uncensored." % command_list[x]
+						msg = "%s%s is uncensored." % (self.settings.pubsym, command_list[x])
 					except ValueError, e:
 						pass
 
@@ -646,21 +651,21 @@ class scrib:
 				# no arguments. list aliases words
 				if len(command_list) == 1:
 					if len(self.settings.aliases) == 0:
-						msg = "!No aliases"
+						msg = "%sNo aliases" % self.settings.pubsym
 					else:
-						msg = "!I will alias the word(s) %s." \
-						% ", ".join(self.settings.aliases.keys())
+						msg = "%sI will alias the word(s) %s." \
+						% (self.settings.pubsym, ", ".join(self.settings.aliases.keys()))
 				# add every word listed to alias list
 				elif len(command_list) == 2:
 					if command_list[1][0] != '~': command_list[1] = '~' + command_list[1]
 					if command_list[1] in self.settings.aliases.keys():
-						msg = "!These words : %s are aliases to %s." \
-						% ( " ".join(self.settings.aliases[command_list[1]]), command_list[1] )
+						msg = "%sThese words : %s are aliases to %s." \
+						% (self.settings.pubsym, " ".join(self.settings.aliases[command_list[1]]), command_list[1] )
 					else:
-						msg = "!The alias %s is not known." % command_list[1][1:]
+						msg = "%sThe alias %s is not known." % (self.settings.pubsym, command_list[1][1:])
 				elif len(command_list) > 2:
 					#create the aliases
-					msg = "!The words : "
+					msg = "%sThe words : " % self.settings.pubsym
 					if command_list[1][0] != '~': command_list[1] = '~' + command_list[1]
 					if not(command_list[1] in self.settings.aliases.keys()):
 						self.settings.aliases[command_list[1]] = [command_list[1][1:]]
@@ -675,19 +680,19 @@ class scrib:
 
 			# Fortune command
 			elif command_list[0] == "!fortune":
-				msg = "!".join([i for i in os.popen('fortune').readlines()]).replace('\n\n', '\n').replace('\n', ' ')
+				msg = "%s".join([i for i in os.popen('fortune').readlines()]).replace('\n\n', '\n').replace('\n', ' ') %s self.settings.pubsym
 			
 			# Tweeter command
 			elif command_list[0] == "!tweet":
-				msg = '!test :3'
+				msg = '%stest :3' % self.settings.pubsym
 			# Date command
 			elif command_list[0] == "!date":
-				msg = "!It is ".join(i for i in os.popen('date').readlines())
+				msg = "%sIt is ".join(i for i in os.popen('date').readlines()) % self.settings.pubsym
 			# Quit
 			elif command_list[0] == "!quit":
 				# Close the brain
 				self.save_all()
-				print "Saved my brain. Goodbye!"
+				print "[#] Saved my brain. Goodbye!"
 				sys.exit()
 				
 			# Save changes
@@ -704,7 +709,7 @@ class scrib:
 		try:
 			pointers = self.words[old]
 		except KeyError, e:
-			return old+" not known."
+			return self.settings.pubsym+old+" not known."
 		changed = 0
 
 		for x in pointers:
@@ -714,7 +719,7 @@ class scrib:
 			number = self.lines[l][1]
 			if line[w] != old:
 				# fucked brain
-				print "Broken link: %s %s" % (x, self.lines[l][0] )
+				print "%sBroken link: %s %s" % (self.settings.pubsym, x, self.lines[l][0] )
 				continue
 			else:
 				line[w] = new
@@ -728,7 +733,7 @@ class scrib:
 		else:
 			self.words[new] = self.words[old]
 		del self.words[old]
-		return "!%d instances of %s replaced with %s" % ( changed, old, new )
+		return "%s%d instances of %s replaced with %s" % ( self.settings.pubsym, changed, old, new )
 
 	def unlearn(self, context):
 		"""

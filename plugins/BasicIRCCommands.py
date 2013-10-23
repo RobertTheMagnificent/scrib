@@ -120,7 +120,7 @@ class UnIgnorePlugin(ScribPlugin.ScribPlugin):
 		return msg
 
 replyignore_alias = "!replyignore"
-replyignore_command = { "unignore": "Owner command. Usage: !unignore nick1 [nick2 [...]]\nUnignores one or more nicknames." }
+replyignore_command = { "replyIgnored": "Owner command. Usage: !replyIgnored [on|off]\nAllow/disallow replying to ignored users. Without arguments shows the current setting." }
 
 class ReplyIgnorePlugin(ScribPlugin.ScribPlugin):
 	def action(self, command_list, scrib):

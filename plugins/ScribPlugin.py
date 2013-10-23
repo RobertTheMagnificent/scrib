@@ -1,3 +1,4 @@
+import time
 process_table = {}
 
 def get_time():

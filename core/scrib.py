@@ -19,6 +19,8 @@ def filter_message(message, bot):
 	message = message.replace("\"", "")
 	message = message.replace("\n", " ")
 	message = message.replace("\r", " ")
+	message = message.replace("'", "")
+	message = message.replace('"', '')
 
 	# remove matching brackets
 	index = 0
@@ -32,7 +34,7 @@ def filter_message(message, bot):
 			message = message[0:index]+message[index+1:]
 	except ValueError, e:
 		pass
-
+	
 	words = message.split()
 	for x in xrange(0, len(words)):
 		#is there aliases ?

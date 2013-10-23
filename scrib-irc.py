@@ -483,7 +483,7 @@ class ModIRC(SingleServerIRCBot):
 		elif e.eventtype() == "privmsg":
 			# normal private msg
 			if action == 0:
-				print "[%s] %s <%s> %s" % ( get_time(), source, self.settings.myname, message)
+				print "[%s][-] %s <%s> %s" % ( get_time(), source, self.settings.myname, message)
 				c.privmsg(source, message)
 				# send copy to owner
 				if not source in self.owners:

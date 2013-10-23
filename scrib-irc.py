@@ -414,12 +414,12 @@ class ModIRC(SingleServerIRCBot):
 			elif command_list[0] == "!quit":
 				sys.exit()
 			# Change reply rate
-			elif command_list[0] == "!replyrate":
-				try:
-					self.settings.reply_chance = int(command_list[1])
-					msg = "Now replying to %d%% of messages." % int(command_list[1])
-				except:
-					msg = "Reply rate is %d%%." % self.settings.reply_chance
+			# elif command_list[0] == "!replyrate":
+				# try:
+					# self.settings.reply_chance = int(command_list[1])
+					# msg = "Now replying to %d%% of messages." % int(command_list[1])
+				# except:
+					# msg = "Reply rate is %d%%." % self.settings.reply_chance
 
 			# Make the commands dynamic
 			# self.commanddict should eventually check self.commandlist

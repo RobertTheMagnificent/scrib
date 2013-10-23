@@ -61,24 +61,25 @@ class scrib:
 	# Main command list
 	commandlist = "Scrib commands:\n!checkdict, !contexts, !help, !known, !learning, !rebuilddict, !replace, !unlearn, !purge, !version, !words, !limit, !alias, !save, !censor, !uncensor, !owner, !fortune. !tweet, !date"
 	commanddict = {
-		"help": "Owner command. Usage: !help [command]\nPrints information about using a command, or a list of commands if no command is given",
-		"version": "Usage: !version\nDisplay what version of Scrib we are running",
-		"words": "Usage: !words\nDisplay how many words are known",
-		"known": "Usage: !known word1 [word2 [...]]\nDisplays if one or more words are known, and how many contexts are known",
-		"contexts": "Owner command. Usage: !contexts <phrase>\nPrint contexts containing <phrase>",
-		"unlearn": "Owner command. Usage: !unlearn <expression>\nRemove all occurances of a word or expression from the dictionary. For example '!unlearn of of' would remove all contexts containing double 'of's",
-		"purge": "Owner command. Usage: !purge [number]\nRemove all occurances of the words that appears in less than <number> contexts",
-		"replace": "Owner command. Usage: !replace <old> <new>\nReplace all occurances of word <old> in the dictionary with <new>",
-		"learning": "Owner command. Usage: !learning [on|off]\nToggle bot learning. Without arguments shows the current setting",
-		"checkdict": "Owner command. Usage: !checkdict\nChecks the dictionary for broken links. Shouldn't happen, but worth trying if you get KeyError crashes",
-		"rebuilddict": "Owner command. Usage: !rebuilddict\nRebuilds dictionary links from the lines of known text. Takes a while. You probably don't need to do it unless your dictionary is very screwed",
-		"censor": "Owner command. Usage: !censor [word1 [...]]\nPrevent the bot using one or more words. Without arguments lists the currently censored words",
-		"uncensor": "Owner command. Usage: !uncensor word1 [word2 [...]]\nRemove censorship on one or more words",
-		"limit": "Owner command. Usage: !limit [number]\nSet the number of words that pyBorg can learn",
-		"alias": "Owner command. Usage: !alias : Show the differents aliases\n!alias <alias> : show the words attached to this alias\n!alias <alias> <word> : link the word to the alias",
-		"owner": "Usage : !owner password\nAdd the user in the owner list",
-		"fortune": "Usage: tells you something.",
-		"date": "Tells you the date."
+		"help": "Owner command. Usage: !help [command]\nPrints information about using a command, or a list of commands if no command is given.",
+		"version": "Usage: !version\nDisplay what version of Scrib we are running.",
+		"words": "Usage: !words\nDisplay how many words are known.",
+		"known": "Usage: !known word1 [word2 [...]]\nDisplays if one or more words are known, and how many contexts are known.",
+		"contexts": "Owner command. Usage: !contexts <phrase>\nPrint contexts containing <phrase>.",
+		"unlearn": "Owner command. Usage: !unlearn <expression>\nRemove all occurances of a word or expression from the dictionary. For example '!unlearn of of' would remove all contexts containing double 'of's.",
+		"purge": "Owner command. Usage: !purge [number]\nRemove all occurances of the words that appears in less than <number> contexts.",
+		"replace": "Owner command. Usage: !replace <old> <new>\nReplace all occurances of word <old> in the dictionary with <new>.",
+		"learning": "Owner command. Usage: !learning [on|off]\nToggle bot learning. Without arguments shows the current setting.",
+		"checkdict": "Owner command. Usage: !checkdict\nChecks the dictionary for broken links. Shouldn't happen, but worth trying if you get KeyError crashes.",
+		"rebuilddict": "Owner command. Usage: !rebuilddict\nRebuilds dictionary links from the lines of known text. Takes a while. You probably don't need to do it unless your dictionary is very screwed.",
+		"censor": "Owner command. Usage: !censor [word1 [...]]\nPrevent the bot using one or more words. Without arguments lists the currently censored words.",
+		"uncensor": "Owner command. Usage: !uncensor word1 [word2 [...]]\nRemove censorship on one or more words.",
+		"limit": "Owner command. Usage: !limit [number]\nSet the number of words that pyBorg can learn.",
+		"alias": "Owner command. Usage: !alias : Show the differents aliases\n!alias <alias> : show the words attached to this alias\n!alias <alias> <word> : link the word to the alias.",
+		"owner": "Usage: !owner password\nAdd the user in the owner list.",
+        "tweet": "Usage: !tweet\nCurrently doesn't do anything useful.",
+		"fortune": "Usage: !fortune\nTells you something interesting.",
+		"date": "Usage: !date\nTells you the date."
 	}
 
 	def __init__(self):
@@ -96,8 +97,8 @@ class scrib:
 			  "censored":	("Don't learn the sentence if one of those words is found", []),
 			  "num_aliases":("Total of aliases known", 0),
 			  "aliases":	("A list of similars words", {}),
-			  "process_with":("Which module will we use to generate replies? ( scrib|megahal)", "scrib"),
-			  "no_save"	:("If True, Scrib don't saves the dictionary and configuration on disk", "False")
+			  "process_with":("Which module will we use to generate replies? (scrib|megahal)", "scrib"),
+			  "no_save"	:("If True, Scrib doesn't saves the dictionary and configuration on disk", "False")
 			} )
 
 		self.answers = self.cfgfile.cfgset()
@@ -124,7 +125,7 @@ class scrib:
 				s = f.read()
 				f.close()
 				if s != self.brainVer:
-					print "Error loading dictionary\nPlease convert it before launching scrib"
+					print "Error loading dictionary.\nPlease convert it before launching scrib."
 					sys.exit(1)
 
 				f = open("data/words.dat", "rb")
@@ -160,7 +161,7 @@ class scrib:
 			for x in self.settings.aliases.keys():
 				compteur += len(self.settings.aliases[x])
 			if compteur != self.settings.num_aliases:
-				print "check dictionary for new aliases"
+				print "Check dictionary for new aliases."
 				self.settings.num_aliases = compteur
 
 				for x in self.words.keys():
@@ -211,7 +212,7 @@ class scrib:
 					file.write(data)
 					file.close()
 			except (OSError, IOError), e:
-				print "no zip found. Is the program launch for first time ?"
+				print "No brain zip found. Is this the first time scrib has been launched?"
 
 
 			f = open("data/words.dat", "wb")
@@ -241,7 +242,7 @@ class scrib:
 				os.remove('data/lines.dat')
 				os.remove('data/version')
 			except (OSError, IOError), e:
-				print "could not remove the files"
+				print "Could not remove the files."
 
 			f = open("data/words.txt", "w")
 			# write each words known
@@ -357,7 +358,7 @@ class scrib:
 				num_cpw = num_c/float(num_w) # contexts per word
 			else:
 				num_cpw = 0.0
-			msg = "I know %d words (%d contexts, %.2f per word), 1%d lines." % (num_w, num_c, num_cpw, num_l)
+			msg = "!I know %d words (%d contexts, %.2f per word), 1%d lines." % (num_w, num_c, num_cpw, num_l)
 				
 		# Do I know this word
 		elif command_list[0] == "!known" and self.settings.process_with == "scrib":
@@ -366,15 +367,15 @@ class scrib:
 				word = command_list[1]
 				if self.words.has_key(word):
 					c = len(self.words[word])
-					msg = "%s is known (%d contexts)" % (word, c)
+					msg = "!%s is known (%d contexts)" % (word, c)
 				else:
-					msg = "%s is unknown." % word
+					msg = "!%s is unknown." % word
 			elif len(command_list) > 2:
 				# multiple words.
 				words = []
 				for x in command_list[1:]:
 					words.append(x)
-				msg = "Number of contexts: "
+				msg = "!Number of contexts: "
 				for x in words:
 					if self.words.has_key(x):
 						c = len(self.words[x])
@@ -387,7 +388,7 @@ class scrib:
 			# Save dictionary
 			if command_list[0] == "!save":
 				self.save_all()
-				msg = "Dictionary saved"
+				msg = "!Dictionary saved"
 
 			# Command list
 			elif command_list[0] == "!help":
@@ -403,7 +404,7 @@ class scrib:
 						for i in dic[cmd].split("\n"):
 							io_module.output(i, args)
 					else:
-						msg = "No help on command '%s'" % cmd
+						msg = "!No help on command '%s'" % cmd
 				else:
 					for i in self.commandlist.split("\n"):
 						io_module.output(i, args)
@@ -412,7 +413,7 @@ class scrib:
 
 			# Change the max_words setting
 			elif command_list[0] == "!limit" and self.settings.process_with == "scrib":
-				msg = "The max limit is "
+				msg = "!The max limit is "
 				if len(command_list) == 1:
 					msg += str(self.settings.max_words)
 				else:
@@ -434,7 +435,7 @@ class scrib:
 
 						# Nasty critical error we should fix
 						if not self.lines.has_key(line_idx):
-							print "Removing broken link '%s' -> %d" % (w, line_idx)
+							print "Removing broken link '%s' -> %d." % (w, line_idx)
 							num_broken = num_broken + 1
 							del wlist[i]
 						else:
@@ -451,7 +452,7 @@ class scrib:
 						self.settings.num_words = self.settings.num_words - 1
 						print "\"%s\" vaped totally" % w
 
-				msg = "Checked dictionary in %0.2fs. Fixed links: %d broken, %d bad." % \
+				msg = "!Checked dictionary in %0.2fs. Fixed links: %d broken, %d bad." % \
 					(time.time()-t,
 					num_broken,
 					num_bad)
@@ -474,7 +475,7 @@ class scrib:
 					for k in old_lines.keys():
 						self.learn(old_lines[k][0], old_lines[k][1])
 
-					msg = "Rebuilt dictionary in %0.2fs. Words %d (%+d), contexts %d (%+d)" % \
+					msg = "!Rebuilt dictionary in %0.2fs. Words %d (%+d), contexts %d (%+d)." % \
 							(time.time()-t,
 							old_num_words,
 							self.settings.num_words - old_num_words,
@@ -524,7 +525,7 @@ class scrib:
 				for w in liste[0:]:
 					self.unlearn(w)
 
-				msg = "Purge dictionary in %0.2fs. %d words removed" % \
+				msg = "!Purge dictionary in %0.2fs. %d words removed." % \
 						(time.time()-t,
 						compteur)
 				
@@ -593,11 +594,11 @@ class scrib:
 				self.unlearn(context)
 				# we don't actually check if anything was
 				# done..
-				msg = "Unlearn done in %0.2fs" % (time.time()-t)
+				msg = "!Unlearn done in %0.2fs" % (time.time()-t)
 
 			# Query/toggle bot learning
 			elif command_list[0] == "!learning":
-				msg = "Learning mode "
+				msg = "!Learning mode "
 				if len(command_list) == 1:
 					if self.settings.learning == 0:
 						msg += "off"
@@ -617,18 +618,18 @@ class scrib:
 				# no arguments. list censored words
 				if len(command_list) == 1:
 					if len(self.settings.censored) == 0:
-						msg = "No words censored"
+						msg = "No words censored."
 					else:
 						msg = "I will not use the word(s) %s" % ", ".join(self.settings.censored)
 				# add every word listed to censored list
 				else:
 					for x in xrange(1, len(command_list)):
 						if command_list[x] in self.settings.censored:
-							msg += "%s is already censored" % command_list[x]
+							msg += "%s is already censored." % command_list[x]
 						else:
 							self.settings.censored.append(command_list[x])
 							self.unlearn(command_list[x])
-							msg += "done"
+							msg += "Done."
 						msg += "\n"
 
 			# remove a word from the censored list
@@ -638,7 +639,7 @@ class scrib:
 				for x in xrange(1, len(command_list)):
 					try:
 						self.settings.censored.remove(command_list[x])
-						msg = "done"
+						msg = "Done."
 					except ValueError, e:
 						pass
 
@@ -648,16 +649,16 @@ class scrib:
 					if len(self.settings.aliases) == 0:
 						msg = "No aliases"
 					else:
-						msg = "I will alias the word(s) %s" \
+						msg = "I will alias the word(s) %s." \
 						% ", ".join(self.settings.aliases.keys())
 				# add every word listed to alias list
 				elif len(command_list) == 2:
 					if command_list[1][0] != '~': command_list[1] = '~' + command_list[1]
 					if command_list[1] in self.settings.aliases.keys():
-						msg = "These words : %s  are aliases to %s" \
+						msg = "These words : %s are aliases to %s." \
 						% ( " ".join(self.settings.aliases[command_list[1]]), command_list[1] )
 					else:
-						msg = "The alias %s is not known" % command_list[1][1:]
+						msg = "The alias %s is not known." % command_list[1][1:]
 				elif len(command_list) > 2:
 					#create the aliases
 					msg = "The words : "
@@ -671,7 +672,7 @@ class scrib:
 						self.settings.aliases[command_list[1]].append(command_list[x])
 						#replace each words by his alias
 						self.replace(command_list[x], command_list[1])
-					msg += "have been aliases to %s" % command_list[1]
+					msg += "have been aliased to %s." % command_list[1]
 
 			# Fortune command
 			elif command_list[0] == "!fortune":

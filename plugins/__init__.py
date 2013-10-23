@@ -13,12 +13,12 @@ for module in os.listdir(os.path.dirname(plugin_dir)):
 		if ext == '.py' and module_name != '__init__': # Important, ignore .pyc/other files.
 			try:
 				module = __import__(module_name)
-				print 'imported plugin:                %s' % (module_name)
+				print '[~] Imported plugin:                %s' % (module_name)
 				library_list.append(module)
 			except ImportError as e:
-				print "Failed to load plugin ( IE ):   %s" % (module_name)
+				print "[!] Failed to load plugin ( IE ):   %s" % (module_name)
 				print e
 
 			except NameError as e:
-				print "Failed to load plugin ( NE ):   %s" % (module_name)
+				print "[!] Failed to load plugin ( NE ):   %s" % (module_name)
 				print e

@@ -9,6 +9,7 @@ Email:          mashek [ at ] thescoundrels [ dot ] net
 What You'll Need
 ----------------
 * [python-irclib](http://python-irclib.sourceforge.net) Most distros: install python-irclib
+* [Python Twitter Tools](http://mike.verdone.ca/twitter/) Most distros: easy_install twitter
 
 Initial Setup
 -------------

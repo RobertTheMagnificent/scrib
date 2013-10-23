@@ -21,9 +21,9 @@ class WakePlugin(ScribPlugin.ScribPlugin):
 	def action(self, command_list):
 		if ModIRC.settings.speaking == 0:
 			ModIRC.settings.speaking = 1 
-				msg = "Whoohoo!"
-			else:
-				msg = "But I'm already awake..."
+			msg = "Whoohoo!"
+		else:
+			msg = "But I'm already awake..."
 		return msg
 
 ScribPlugin.addPlugin( sleep_command, sleep_alias, SleepPlugin() )

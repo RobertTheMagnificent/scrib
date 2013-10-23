@@ -10,8 +10,7 @@ try:
 	from ircbot import *
 	from irclib import *
 except:
-  # Dumbfuck alert!
-	print "Dearest Dumbass,\nircbot.py and irclib.py are not found. Please install them forthwith from\nhttp://python-irclib.sourceforge.net\n\nThank you,\nDumbassinator"
+	print "Dearest User,\nircbot.py and irclib.py are not found. Please install them forthwith from\nhttp://python-irclib.sourceforge.net\n\nThank you,\nscrib"
 	sys.exit(1)
 
 # Let's override some irclib function
@@ -126,7 +125,7 @@ class ModIRC(SingleServerIRCBot):
 					pass
 
 	def our_start(self):
-		print "[~] Connecting to %s " % self.settings.servers
+		print "[~][%s] Connecting to %s " % (get_time(), self.settings.servers)
 		SingleServerIRCBot.__init__(self, self.settings.servers, self.settings.myname, self.settings.realname, 2)
 
 		self.start()
@@ -181,7 +180,7 @@ class ModIRC(SingleServerIRCBot):
 
 	def _on_disconnect(self, c, e):
 		# self.channels = IRCDict()
-		print "[~] Disconnected.."
+		print "[%s][~] Disconnected.." % get_time()
 		self.connection.execute_delayed(self.reconnection_interval, self._connected_checker)
 
 
@@ -198,7 +197,7 @@ class ModIRC(SingleServerIRCBot):
 		# First message from owner 'locks' the owner host mask
 		if not e.source() in self.owner_mask and source in self.owners:
 			self.owner_mask.append(e.source())
-			print "My owner is %s" % e.source()
+			print "[%s][~] My owner is %s" % (get_time(), e.source())
 
 		# Message text
 		if len(e.arguments()) == 1:
@@ -227,7 +226,7 @@ class ModIRC(SingleServerIRCBot):
 
 		# WHOOHOOO!!
 		if target == self.settings.myname or source == self.settings.myname:
-			print "[%s] <%s> > %s> %s" % ( get_time(), source, target, body)
+			print "[%s] <%s> -> %s> %s" % ( get_time(), source, target, body)
 
 		# Ignore self.
 		#if source == self.settings.myname: return
@@ -242,16 +241,16 @@ class ModIRC(SingleServerIRCBot):
 		# Ignore selected nicks
 		if self.settings.ignorelist.count(source) > 0 \
 			and self.settings.replyIgnored == 1:
-			print "[~] Not learning from %s" % source
+			print "[%s][~] Not learning from %s" % (get_time(), source)
 			learn = 0
 		elif self.settings.ignorelist.count(source) > 0:
-			print "[~] Ignoring %s" % source
+			print "[%s][~] Ignoring %s" % (get_time(), source)
 			return
 
 		# private mode. disable commands for non owners
 		if (not source in self.owners) and self.settings.private:
 			while body[:1] == "!":
-				print "[!] Private mode is on, ignoring command: %s" %body
+				print "[%s][!] Private mode is on, ignoring command: %s" % (get_time(), body)
 				return
 
 		if body == "":
@@ -259,7 +258,7 @@ class ModIRC(SingleServerIRCBot):
 
 		# Ignore quoted messages
 		if body[0] == "<" or body[0:1] == "\"" or body[0:1] == " <":
-			print "[#] Ignoring quoted text."
+			print "[%s][#] Ignoring quoted text." % get_time()
 			return
 
 		# We want replies reply_chance%, if speaking is on
@@ -356,7 +355,7 @@ class ModIRC(SingleServerIRCBot):
 					msg = "Going to sleep.  Goodnight!"
 					self.settings.speaking = 0
 				else:
-					msg = "!Zzz.."
+					msg = "Zzz.."
 			# Wake up again
 			elif command_list[0] == "!wakeup":
 				if self.settings.speaking == 0:
@@ -456,7 +455,7 @@ class ModIRC(SingleServerIRCBot):
 		Output a line of text. args = (body, source, target, c, e)
 		"""
 		if not self.connection.is_connected():
-			print "Can't send reply : not connected to server"
+			print "[%s][!] Can't send reply : not connected to server" % get_time()
 			return
 
 		# Unwrap arguments
@@ -475,16 +474,16 @@ class ModIRC(SingleServerIRCBot):
 		# Joins replies and public messages
 		if e.eventtype() == "join" or e.eventtype() == "quit" or e.eventtype() == "part" or e.eventtype() == "pubmsg":
 			if action == 0:
-				print "[%s] <%s> > %s> %s" % ( get_time(), self.settings.myname, target, message)
+				print "[%s] <%s> -> %s: %s" % ( get_time(), self.settings.myname, target, message)
 				c.privmsg(target, message)
 			else:
-				print "[%s] <%s> > %s> /me %s" % ( get_time(), self.settings.myname, target, message)
+				print "[%s] <%s> -> %s: /me %s" % ( get_time(), self.settings.myname, target, message)
 				c.action(target, message)
 		# Private messages
 		elif e.eventtype() == "privmsg":
 			# normal private msg
 			if action == 0:
-				print "[%s] <%s> > %s> %s" % ( get_time(), self.settings.myname, source, message)
+				print "[%s] <%s> -> %s: %s" % ( get_time(), self.settings.myname, source, message)
 				c.privmsg(source, message)
 				# send copy to owner
 				if not source in self.owners:
@@ -492,7 +491,7 @@ class ModIRC(SingleServerIRCBot):
 					c.privmsg(','.join(self.owners), "(To   "+source+") "+message)
 			# ctcp action priv msg
 			else:
-				print "[%s] <%s> > %s> /me %s" % ( get_time(), self.settings.myname, target, message)
+				print "[%s] <%s> -> %s: /me %s" % ( get_time(), self.settings.myname, target, message)
 				c.action(source, message)
 				# send copy to owner
 				if not source in self.owners:
@@ -522,7 +521,7 @@ if __name__ == "__main__":
 		pass
 	except:
 		traceback.print_exc()
-		c = raw_input("[!] Oh no, I've crashed! Would you like to save my brain? (y/n)")
+		c = raw_input("[%s][!] Oh no, I've crashed! Would you like to save my brain? (y/n)") % get_time()
 		if c[:1] == 'n':
 			sys.exit(0)
 	bot.disconnect(bot.settings.quitmsg)

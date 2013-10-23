@@ -10,8 +10,6 @@ import time
 import zipfile
 import re
 
-# sys.path.append('../core')
-
 def filter_message(message, bot):
 	"""
 	Make easier to learn and reply to.
@@ -90,11 +88,10 @@ class scrib:
 		"help": "Usage: !help [command]\nPrints information about using a command, or a list of commands if no command is given.",
 		"known": "Usage: !known word1 [word2 [...]]\nDisplays if one or more words are known, and how many contexts are known.",
 		"owner": "Usage: !owner password\nAdd the user in the owner list.",
-		"tweet": "Usage: !tweet\nCurrently doesn't do anything useful.",
 		"version": "Usage: !version\nDisplay what version of Scrib we are running.",
 		"words": "Usage: !words\nDisplay how many words are known."
 	}
-
+	
 	def __init__(self):
 		"""
 		Open the brain. Resize as required.
@@ -954,7 +951,7 @@ class scrib:
 			list = post_words.items()
 			list.sort(lambda x,y: cmp(y[1],x[1]))
 			numbers = [list[0][1]]
-			
+		
 			for x in xrange(1, len(list) ):
 				numbers.append(list[x][1] + numbers[x-1])
 

@@ -25,16 +25,8 @@ import scrib
 import cfgfile
 import PluginManager
 import random
-import time
 import traceback
 import thread
-
-def get_time():
-	"""
-	Make time sexy
-	"""
-	return time.strftime("%H:%M:%S", time.localtime(time.time()))
-
 
 class ModIRC(SingleServerIRCBot):
 	"""
@@ -46,27 +38,15 @@ class ModIRC(SingleServerIRCBot):
 	# We are going to store the owner's host mask :3
 	owner_mask = []
 
-	# IRC Command list
-	commandlist =   "IRC Module Commands:\n!chans, !control, !ignore, !join, !nick, !part, !private, !quit, !quitmsg, !replyIgnored, !replyrate, !sleep, !talk, !unignore, !wake"
 	# IRC Command 
 	commanddict = {
-		"sleep":  "Owner command. Usage: !sleep\nStop the bot talking.",
-		"wake": "Owner command. Usage: !wake\nAllow the bot to talk.",
-		"join": "Owner command. Usage: !join #chan1 [#chan2 [...]]\nJoin one or more channels.",
-		"part": "Owner command. Usage: !part #chan1 [#chan2 [...]]\nLeave one or more channels.",
-		"chans": "Owner command. Usage: !chans\nList channels currently on.",
-		"nick": "Owner command. Usage: !nick nickname\nChange nickname.",
-		"ignore": "Owner command. Usage: !ignore [nick1 [nick2 [...]]]\nIgnore one or more nicknames. Without arguments it lists ignored nicknames.",
-		"unignore": "Owner command. Usage: !unignore nick1 [nick2 [...]]\nUnignores one or more nicknames.",
-		"replyrate": "Owner command. Usage: !replyrate [rate%]\nSet rate of bot replies to rate%. Without arguments (not an owner-only command) shows the current reply rate.",
 		"replyIgnored": "Owner command. Usage: !replyIgnored [on|off]\nAllow/disallow replying to ignored users. Without arguments shows the current setting.",
 		"private": "Owner command. Usage: !private [on|off]\nTurn private mode on or off (disable non-owner commands and don't return CTCP VERSION). Without arguments shows the current setting.",
-		"quitmsg": "Owner command. Usage: !quitmsg [message]\nSet the quit message. Without arguments show the current quit message.",
-		"talk": "Owner command. Usage !talk nick message\nmake the bot send the sentence 'message' to 'nick'.",
-		"quit": "Owner command. Usage: !quit\nMake the bot quit IRC.",
-		"control": "Usage: !control password\nAllow user to have access to bot commands."
 	}
 
+	commandlist = " "+PluginManager.ScribPlugin.plugin_aliases
+	commanddict = dict( commanddict.items() + PluginManager.ScribPlugin.plugin_commands.items() )
+	
 	def __init__(self, my_scrib, args):
 		"""
 		Args will be sys.argv (command prompt arguments)
@@ -125,13 +105,13 @@ class ModIRC(SingleServerIRCBot):
 					pass
 
 	def our_start(self):
-		print "[%s][~] Connecting to %s " % (get_time(), self.settings.servers)
+		print "[%s][~] Connecting to %s " % (scrib.get_time(), self.settings.servers)
 		SingleServerIRCBot.__init__(self, self.settings.servers, self.settings.myname, self.settings.realname, 2)
 
 		self.start()
 
 	def on_welcome(self, c, e):
-		print "[%s][~] %s" % (get_time(), self.chans)
+		print "[%s][~] %s" % (scrib.get_time(), self.chans)
 		for i in self.chans:
 			c.join(i)
 
@@ -163,7 +143,7 @@ class ModIRC(SingleServerIRCBot):
 			reason = ""
 
 		if kicked == self.settings.myname:
-			print "[%s][*] %s was kicked off %s by %s (%s)" % (get_time(), kicked, target, kicker, reason)
+			print "[%s][*] %s was kicked off %s by %s (%s)" % (scrib.get_time(), kicked, target, kicker, reason)
 
 	def on_privmsg(self, c, e):
 		self.on_msg(c, e)
@@ -180,7 +160,7 @@ class ModIRC(SingleServerIRCBot):
 
 	def _on_disconnect(self, c, e):
 		# self.channels = IRCDict()
-		print "[%s][~] Disconnected.." % get_time()
+		print "[%s][~] Disconnected.." % scrib.get_time()
 		self.connection.execute_delayed(self.reconnection_interval, self._connected_checker)
 
 
@@ -197,7 +177,7 @@ class ModIRC(SingleServerIRCBot):
 		# First message from owner 'locks' the owner host mask
 		if not e.source() in self.owner_mask and source in self.owners:
 			self.owner_mask.append(e.source())
-			print "[%s][~] My owner is %s" % (get_time(), e.source())
+			print "[%s][~] My owner is %s" % (scrib.get_time(), e.source())
 
 		# Message text
 		if len(e.arguments()) == 1:
@@ -226,7 +206,7 @@ class ModIRC(SingleServerIRCBot):
 
 		# WHOOHOOO!!
 		if target == self.settings.myname or source == self.settings.myname:
-			print "[%s][-] %s <%s> %s" % ( get_time(), target, source, body)
+			print "[%s][-] %s <%s> %s" % ( scrib.get_time(), target, source, body)
 
 		# Ignore self.
 		#if source == self.settings.myname: return
@@ -236,21 +216,21 @@ class ModIRC(SingleServerIRCBot):
 		if e.eventtype() == "pubmsg":
 			for x in self.channels[target].users():
 				body = body.replace(x, "#nick")
-		print "[%s][-] %s <%s> %s" % (get_time(), target, source, body)
+		print "[%s][-] %s <%s> %s" % (scrib.get_time(), target, source, body)
 
 		# Ignore selected nicks
 		if self.settings.ignorelist.count(source) > 0 \
 			and self.settings.replyIgnored == 1:
-			print "[%s][~] Not learning from %s" % (get_time(), source)
+			print "[%s][~] Not learning from %s" % (scrib.get_time(), source)
 			learn = 0
 		elif self.settings.ignorelist.count(source) > 0:
-			print "[%s][~] Ignoring %s" % (get_time(), source)
+			print "[%s][~] Ignoring %s" % (scrib.get_time(), source)
 			return
 
 		# private mode. disable commands for non owners
 		if (not source in self.owners) and self.settings.private:
 			while body[:1] == "!":
-				print "[%s][!] Private mode is on, ignoring command: %s" % (get_time(), body)
+				print "[%s][!] Private mode is on, ignoring command: %s" % (scrib.get_time(), body)
 				return
 
 		if body == "":
@@ -258,7 +238,7 @@ class ModIRC(SingleServerIRCBot):
 
 		# Ignore quoted messages
 		if body[0] == "<" or body[0:1] == "\"" or body[0:1] == " <":
-			print "[%s][#] Ignoring quoted text." % get_time()
+			print "[%s][#] Ignoring quoted text." % scrib.get_time()
 			return
 
 		# We want replies reply_chance%, if speaking is on
@@ -288,35 +268,17 @@ class ModIRC(SingleServerIRCBot):
 		"""
 		Special IRC commands.
 		"""
+		
 		msg = ""
 
 		command_list = body.split()
 		command_list[0] = command_list[0]
 
-		### User commands
-		# Query replyrate
-		if command_list[0] == "!replyrate" and len(command_list)==1:
-			msg = self.scrib.settings.pubsym+"Reply rate is "+`self.settings.reply_chance`+"%."
-
-		if command_list[0] == "!control" and len(command_list) > 1 and source not in self.owners:
-			if command_list[1] == self.settings.password:
-				self.owners.append(source)
-				self.output("You've been added to controllers list", ("", source, target, c, e))
-			else:
-				self.output("Try again", ("", source, target, c, e))
-
 		### Owner commands
 		if source in self.owners and e.source() in self.owner_mask:
 
-			# Change nick
-			if command_list[0] == "!nick":
-				try:
-					self.connection.nick(command_list[1])
-					self.settings.myname = command_list[1]
-				except:
-					pass
 			# private mode
-			elif command_list[0] == "!private":
+			if command_list[0] == "!private":
 				msg = "$sPrivate mode " % self.settings.pubsym
 				if len(command_list) == 1:
 					if self.settings.private == 0:
@@ -349,63 +311,7 @@ class ModIRC(SingleServerIRCBot):
 					else:
 						msg = msg + "off"
 						self.settings.replyIgnored = 0
-			# Stop talking
-			elif command_list[0] == "!sleep":
-				if self.settings.speaking == 1:
-					msg = "Going to sleep.  Goodnight!"
-					self.settings.speaking = 0
-				else:
-					msg = "Zzz.."
-			# Wake up again
-			elif command_list[0] == "!wake":
-				if self.settings.speaking == 0:
-					self.settings.speaking = 1
-					msg = "Whoohoo!"
-				else:
-					msg = "But I'm already awake..."
-						
-			# Join a channel or list of channels
-			elif command_list[0] == "!join":
-				for x in xrange(1, len(command_list)):
-					if not command_list[x] in self.chans:
-						msg = "Attempting to join channel %s" % command_list[x]
-						self.chans.append(command_list[x])
-						c.join(command_list[x])
 
-			# Part a channel or list of channels
-			elif command_list[0] == "!part":
-				for x in xrange(1, len(command_list)):
-					if command_list[x] in self.chans:
-						msg = "Leaving channel %s" % command_list[x]
-						self.chans.remove(command_list[x])
-						c.part(command_list[x])
-
-			# List channels currently on
-			elif command_list[0] == "!chans":
-				if len(self.channels.keys())==0:
-					msg = "I'm currently on no channels"
-				else:
-					msg = "I'm currently on "
-					channels = self.channels.keys()
-					for x in xrange(0, len(channels)):
-						msg = msg+channels[x]+" "
-			# add someone to the ignore list
-			elif command_list[0] == "!ignore":
-				# if no arguments are given say who we are
-				# ignoring
-				if len(command_list) == 1:
-					msg = "I'm ignoring "
-					if len(self.settings.ignorelist) == 0:
-						msg = msg + "nobody"
-					else:
-						for x in xrange(0, len(self.settings.ignorelist)):
-							msg = msg + self.settings.ignorelist[x] + " "
-				# Add everyone listed to the ignore list
-				# eg !ignore tom dick harry
-				else:
-					for x in xrange(1, len(command_list)):
-						self.settings.ignorelist.append(command_list[x])
-						msg = "!Done."
 			# remove someone from the ignore list
 			elif command_list[0] == "!unignore":
 				# Remove everyone listed from the ignore list
@@ -416,31 +322,14 @@ class ModIRC(SingleServerIRCBot):
 						msg = "Done."
 					except:
 						pass
-			# set the quit message
-			elif command_list[0] == "!quitmsg":
-				if len(command_list) > 1:
-					self.settings.quitmsg = body.split(" ", 1)[1]
-					msg = "New quit message is \"%s\"" % self.settings.quitmsg
-				else:
-					msg = "Quit message is \"%s\"" % self.settings.quitmsg
-			# make the scrib quit
-			elif command_list[0] == "!quit":
-				sys.exit()
-			# Change reply rate
-			elif command_list[0] == "!replyrate":
-				try:
-					self.settings.reply_chance = int(command_list[1])
-					msg = "Now replying to %d%% of messages." % int(command_list[1])
-				except:
-					msg = "Reply rate is %d%%." % self.settings.reply_chance
-			#make the bot talk
-			elif command_list[0] == "!talk":
-				if len(command_list) >= 2:
-					phrase=""
-					for x in xrange (2, len (command_list)):
-						phrase = phrase + str(command_list[x]) + " "
-					self.output(phrase, ("", command_list[1], "", c, e))
-		
+
+			# Make the commands dynamic
+			# self.commanddict should eventually check self.commandlist
+			# so we can stop doing [1:]
+			elif command_list[0][1:] in self.commanddict:
+				out = PluginManager.sendMessage(command_list[0][1:], command_list, self)
+				msg = out
+
 			self.scrib.settings.save()
 			self.settings.save()
 	
@@ -455,7 +344,7 @@ class ModIRC(SingleServerIRCBot):
 		Output a line of text. args = (body, source, target, c, e)
 		"""
 		if not self.connection.is_connected():
-			print "[%s][!] Can't send reply : not connected to server" % get_time()
+			print "[%s][!] Can't send reply : not connected to server" % scrib.get_time()
 			return
 
 		# Unwrap arguments
@@ -474,16 +363,16 @@ class ModIRC(SingleServerIRCBot):
 		# Joins replies and public messages
 		if e.eventtype() == "join" or e.eventtype() == "quit" or e.eventtype() == "part" or e.eventtype() == "pubmsg":
 			if action == 0:
-				print "[%s][-] %s <%s> %s" % ( get_time(), target, self.settings.myname, message)
+				print "[%s][-] %s <%s> %s" % ( scrib.get_time(), target, self.settings.myname, message)
 				c.privmsg(target, message)
 			else:
-				print "[%s][-] %s <%s> /me %s" % ( get_time(), target, self.settings.myname, message)
+				print "[%s][-] %s <%s> /me %s" % ( scrib.get_time(), target, self.settings.myname, message)
 				c.action(target, message)
 		# Private messages
 		elif e.eventtype() == "privmsg":
 			# normal private msg
 			if action == 0:
-				print "[%s][-] %s <%s> %s" % ( get_time(), source, self.settings.myname, message)
+				print "[%s][-] %s <%s> %s" % ( scrib.get_time(), source, self.settings.myname, message)
 				c.privmsg(source, message)
 				# send copy to owner
 				if not source in self.owners:
@@ -491,7 +380,7 @@ class ModIRC(SingleServerIRCBot):
 					c.privmsg(','.join(self.owners), "(To   "+source+") "+message)
 			# ctcp action priv msg
 			else:
-				print "[%s][-] %s <%s> /me %s" % ( get_time(), target, self.settings.myname, message)
+				print "[%s][-] %s <%s> /me %s" % ( scrib.get_time(), target, self.settings.myname, message)
 				c.action(source, message)
 				# send copy to owner
 				if not source in self.owners:
@@ -521,7 +410,7 @@ if __name__ == "__main__":
 		pass
 	except:
 		traceback.print_exc()
-		c = raw_input("["+get_time()+"][!] Oh no, I've crashed! Would you like to save my brain? (y/n)")
+		c = raw_input("["+scrib.get_time()+"][!] Oh no, I've crashed! Would you like to save my brain? (y/n)")
 		if c[:1] == 'n':
 			sys.exit(0)
 	bot.disconnect(bot.settings.quitmsg)

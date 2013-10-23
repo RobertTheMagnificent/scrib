@@ -47,11 +47,11 @@ class ModIRC(SingleServerIRCBot):
 	owner_mask = []
 
 	# IRC Command list
-	commandlist =   "IRC Module Commands:\n!chans, !ignore, !join, !nick, !part, !quit, !quitmsg, !replyIgnored, !replyrate, !sleep, !private, !unignore, !wakeup, !talk, !owner"
+	commandlist =   "IRC Module Commands:\n!chans, !ignore, !join, !nick, !part, !quit, !quitmsg, !replyIgnored, !replyrate, !sleep, !private, !unignore, !wake, !talk, !owner"
 	# IRC Command 
 	commanddict = {
 		"sleep":  "Owner command. Usage: !sleep\n!Stop the bot talking.",
-		"wakeup": "Owner command. Usage: !wakeup\n!Allow the bot to talk.",
+		"wake": "Owner command. Usage: !wake\n!Allow the bot to talk.",
 		"join": "Owner command. Usage: !join #chan1 [#chan2 [...]]\n!Join one or more channels.",
 		"part": "Owner command. Usage: !part #chan1 [#chan2 [...]]\n!Leave one or more channels.",
 		"chans": "Owner command. Usage: !chans\n!List channels currently on.",
@@ -357,7 +357,7 @@ class ModIRC(SingleServerIRCBot):
 				else:
 					msg = "Zzz.."
 			# Wake up again
-			elif command_list[0] == "!wakeup":
+			elif command_list[0] == "!wake":
 				if self.settings.speaking == 0:
 					self.settings.speaking = 1
 					msg = "Whoohoo!"

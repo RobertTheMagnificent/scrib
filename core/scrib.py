@@ -110,7 +110,7 @@ class scrib:
 
 		# Read the brain
 		if self.settings.process_with == "scrib":
-			print "Reading my brain..."
+			print "[#] Reading my brain..."
 			try:
 				zfile = zipfile.ZipFile('data/archive.zip','r')
 				for filename in zfile.namelist():

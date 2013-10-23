@@ -83,7 +83,7 @@ class QuitmsgPlugin(ScribPlugin.ScribPlugin):
 ignore_alias = "!ignore"
 ignore_command = { "ignore": "Owner command. Usage: !ignore [nick1 [nick2 [...]]]\nIgnore one or more nicknames. Without arguments it lists ignored nicknames." }
 
-class IgnorePlugin(ScribPlugin.ScribPlugin)
+class IgnorePlugin(ScribPlugin.ScribPlugin):
 	def action(self, command_list, scrib):
 		if command_list[0] == ignore_alias:
 			# if no arguments are given say who we are

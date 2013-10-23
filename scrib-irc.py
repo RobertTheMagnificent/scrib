@@ -51,14 +51,8 @@ class ModIRC(SingleServerIRCBot):
 	# We are going to store the owner's host mask :3
 	owner_mask = []
 
-	# IRC Command 
-	commanddict = {
-		"replyIgnored": "Owner command. Usage: !replyIgnored [on|off]\nAllow/disallow replying to ignored users. Without arguments shows the current setting.",
-		"private": "Owner command. Usage: !private [on|off]\nTurn private mode on or off (disable non-owner commands and don't return CTCP VERSION). Without arguments shows the current setting.",
-	}
-
-	commandlist = " "+PluginManager.ScribPlugin.plugin_aliases
-	commanddict = dict( commanddict.items() + PluginManager.ScribPlugin.plugin_commands.items() )
+	commandlist = PluginManager.ScribPlugin.plugin_aliases
+	commanddict = PluginManager.ScribPlugin.plugin_commands
 	
 	def __init__(self, my_scrib, args):
 		"""
@@ -279,7 +273,7 @@ class ModIRC(SingleServerIRCBot):
 
 	def irc_commands(self, body, source, target, c, e):
 		"""
-		Special IRC commands.
+		All IRC commands have been turned into plugins. :D
 		"""
 		
 		msg = ""
@@ -287,59 +281,12 @@ class ModIRC(SingleServerIRCBot):
 		command_list = body.split()
 		command_list[0] = command_list[0]
 
-		### Owner commands
+		### Owner commands (Which is all of them for now)
 		if source in self.owners and e.source() in self.owner_mask:
-
-			# private mode
-			if command_list[0] == "!private":
-				msg = "$sPrivate mode " % self.settings.pubsym
-				if len(command_list) == 1:
-					if self.settings.private == 0:
-						msg = msg + "off"
-					else:
-						msg = msg + "on"
-				else:
-					toggle = command_list[1]
-					if toggle == "on":
-						msg = msg + "on"
-						self.settings.private = 1
-					else:
-						msg = msg + "off"
-						self.settings.private = 0
-
-			# Allow/disallow replying to ignored nicks
-			# (they will never be learnt from)
-			elif command_list[0] == "!replyIgnored":
-				msg = "Replying to ignored users "
-				if len(command_list) == 1:
-					if self.settings.replyIgnored == 0:
-						msg = msg + "off"
-					else:
-						msg = msg + "on"
-				else:
-					toggle = command_list[1]
-					if toggle == "on":
-						msg = msg + "on"
-						self.settings.replyIgnored = 1
-					else:
-						msg = msg + "off"
-						self.settings.replyIgnored = 0
-
-			# remove someone from the ignore list
-			elif command_list[0] == "!unignore":
-				# Remove everyone listed from the ignore list
-				# eg !unignore tom dick harry
-				for x in xrange(1, len(command_list)):
-					try:
-						self.settings.ignorelist.remove(command_list[x])
-						msg = "Done."
-					except:
-						pass
-
 			# Make the commands dynamic
 			# self.commanddict should eventually check self.commandlist
 			# so we can stop doing [1:]
-			elif command_list[0][1:] in self.commanddict:
+			if command_list[0][1:] in self.commanddict:
 				out = PluginManager.sendMessage(command_list[0][1:], command_list, self)
 				msg = out
 

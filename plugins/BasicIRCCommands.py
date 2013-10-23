@@ -100,7 +100,7 @@ class IgnorePlugin(ScribPlugin.ScribPlugin):
 			else:
 				for x in xrange(1, len(command_list)):
 					scrib.settings.ignorelist.append(command_list[x])
-					msg = "Done."
+					msg = "Ignoring %s" % command_list[x]
 		return msg
 
 unignore_alias = "!unignore"
@@ -109,8 +109,36 @@ unignore_command = { "unignore": "Owner command. Usage: !unignore nick1 [nick2 [
 class UnIgnorePlugin(ScribPlugin.ScribPlugin):
 	def action(self, command_list, scrib):
 		if command_list[0] == unignore_alias:
-			#do stuff
-			msg = "derp"
+			# Remove everyone listed from the ignore list
+			# eg !unignore tom dick harry
+			for x in xrange(1, len(command_list)):
+				try:
+					scrib.settings.ignorelist.remove(command_list[x])
+					msg = "Unignoring %s" % command_list[x]
+				except:
+					pass
+		return msg
+
+replyignore_alias = "!replyignore"
+replyignore_command = { "replyIgnored": "Owner command. Usage: !replyIgnored [on|off]\nAllow/disallow replying to ignored users. Without arguments shows the current setting." }
+
+class ReplyIgnorePlugin(ScribPlugin.ScribPlugin):
+	def action(self, command_list, scrib):
+		if command_list[0] == replyignore_alias:
+			msg = "Replying to ignored users "
+			if len(command_list) == 1:
+				if scrib.settings.replyIgnored == 0:
+					msg = msg + "off"
+				else:
+					msg = msg + "on"
+			else:
+				toggle = command_list[1]
+				if toggle == "on":
+					msg = msg + "on"
+					scrib.settings.replyIgnored = 1
+				else:
+					msg = msg + "off"
+					scrib.settings.replyIgnored = 0
 		return msg
 
 ScribPlugin.addPlugin( nick_command, nick_alias, NickPlugin() )
@@ -121,3 +149,4 @@ ScribPlugin.addPlugin( quit_command, quit_alias, QuitPlugin() )
 ScribPlugin.addPlugin( quitmsg_command, quitmsg_alias, QuitmsgPlugin() )
 ScribPlugin.addPlugin( ignore_command, ignore_alias, IgnorePlugin() )
 ScribPlugin.addPlugin( unignore_command, unignore_alias, UnIgnorePlugin() )
+ScribPlugin.addPlugin( replyignore_command, replyignore_alias, ReplyIgnorePlugin() )

@@ -64,27 +64,27 @@ class scrib:
 	ver_string += " My braintechnology is at %s." % brainVer
 	
 	# Main command list
-	commandlist = "!Scrib commands:\n!check, !contexts, !help, !known, !learning, !rebuild, !replace, !unlearn, !purge, !version, !words, !limit, !alias, !save, !censor, !uncensor, !owner, !fortune. !tweet, !date"
+	commandlist = "Scrib commands:\n!check, !contexts, !help, !known, !learning, !rebuild, !replace, !unlearn, !purge, !version, !words, !limit, !alias, !save, !censor, !uncensor, !owner, !fortune. !tweet, !date"
 	commanddict = {
-		"help": "!Owner command. Usage: !help [command]\n!Prints information about using a command, or a list of commands if no command is given.",
-		"version": "!Usage: !version\n!Display what version of Scrib we are running.",
-		"words": "!Usage: !words\n!Display how many words are known.",
-		"known": "!Usage: !known word1 [word2 [...]]\n!Displays if one or more words are known, and how many contexts are known.",
-		"contexts": "!Owner command. Usage: !contexts <phrase>\n!Print contexts containing <phrase>.",
-		"unlearn": "!Owner command. Usage: !unlearn <expression>\n!Remove all occurances of a word or expression from the brain. For example '!unlearn of of' would remove all contexts containing double 'of's.",
-		"purge": "!Owner command. Usage: !purge [number]\n!Remove all occurances of the words that appears in less than <number> contexts.",
-		"replace": "!Owner command. Usage: !replace <old> <new>\n!Replace all occurances of word <old> in the brain with <new>.",
-		"learning": "!Owner command. Usage: !learning [on|off]\n!Toggle bot learning. Without arguments shows the current setting.",
-		"check": "!Owner command. Usage: !check\n!Checks the brain for broken links. Shouldn't happen, but worth trying if you get KeyError crashes.",
-		"rebuild": "!Owner command. Usage: !rebuild\n!Rebuilds brain links from the lines of known text. Takes a while. You probably don't need to do it unless the brain is very screwed.",
-		"censor": "!Owner command. Usage: !censor [word1 [...]]\n!Prevent the bot using one or more words. Without arguments lists the currently censored words.",
-		"uncensor": "!Owner command. Usage: !uncensor word1 [word2 [...]]\n!Remove censorship on one or more words.",
-		"limit": "!Owner command. Usage: !limit [number]\n!Set the number of words that pyBorg can learn.",
-		"alias": "!Owner command. Usage: !alias : Show the differents aliases\n!alias <alias> : show the words attached to this alias\n!alias <alias> <word> : link the word to the alias.",
-		"owner": "!Usage: !owner password\n!Add the user in the owner list.",
-		"tweet": "!Usage: !tweet\n!Currently doesn't do anything useful.",
-		"fortune": "!Usage: !fortune\n!Tells you something interesting.",
-		"date": "!Usage: !date\n!Tells you the date."
+		"help": "Owner command. Usage: !help [command]\nPrints information about using a command, or a list of commands if no command is given.",
+		"version": "Usage: !version\nDisplay what version of Scrib we are running.",
+		"words": "Usage: !words\nDisplay how many words are known.",
+		"known": "Usage: !known word1 [word2 [...]]\nDisplays if one or more words are known, and how many contexts are known.",
+		"contexts": "Owner command. Usage: !contexts <phrase>\nPrint contexts containing <phrase>.",
+		"unlearn": "Owner command. Usage: !unlearn <expression>\nRemove all occurances of a word or expression from the brain. For example '!unlearn of of' would remove all contexts containing double 'of's.",
+		"purge": "Owner command. Usage: !purge [number]\nRemove all occurances of the words that appears in less than <number> contexts.",
+		"replace": "Owner command. Usage: !replace <old> <new>\nReplace all occurances of word <old> in the brain with <new>.",
+		"learning": "Owner command. Usage: !learning [on|off]\nToggle bot learning. Without arguments shows the current setting.",
+		"check": "Owner command. Usage: !check\nChecks the brain for broken links. Shouldn't happen, but worth trying if you get KeyError crashes.",
+		"rebuild": "Owner command. Usage: !rebuild\nRebuilds brain links from the lines of known text. Takes a while. You probably don't need to do it unless the brain is very screwed.",
+		"censor": "Owner command. Usage: !censor [word1 [...]]\nPrevent the bot using one or more words. Without arguments lists the currently censored words.",
+		"uncensor": "Owner command. Usage: !uncensor word1 [word2 [...]]\nRemove censorship on one or more words.",
+		"limit": "Owner command. Usage: !limit [number]\nSet the number of words that pyBorg can learn.",
+		"alias": "Owner command. Usage: !alias : Show the differents aliases\n!alias <alias> : show the words attached to this alias\n!alias <alias> <word> : link the word to the alias.",
+		"owner": "Usage: !owner password\nAdd the user in the owner list.",
+		"tweet": "Usage: !tweet\nCurrently doesn't do anything useful.",
+		"fortune": "Usage: !fortune\nTells you something interesting.",
+		"date": "Usage: !date\nTells you the date."
 	}
 
 	def __init__(self):
@@ -408,14 +408,14 @@ class scrib:
 						dic = io_module.commanddict
 					if dic:
 						for i in dic[cmd].split("\n"):
-							io_module.output(i, args)
+							io_module.output(self.settings.pubsym+i, args)
 					else:
 						msg = "%sNo help on command '%s'" % (self.settings.pubsym, cmd)
 				else:
 					for i in self.commandlist.split("\n"):
-						io_module.output(i, args)
+						io_module.output(self.settings.pubsym+i, args)
 					for i in io_module.commandlist.split("\n"):
-						io_module.output(i, args)
+						io_module.output(self.settings.pubsym+i, args)
 
 			# Change the max_words setting
 			elif command_list[0] == "!limit" and self.settings.process_with == "scrib":

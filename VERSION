@@ -1,4 +1,4 @@
 # Core version of Scrib #
-coreVer= '0.6.6'
+core= '0.6.6'
 # Brain version of Scrib #
-brainVer= '0.0.1'
+brain= '0.0.1'

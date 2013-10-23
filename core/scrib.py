@@ -84,7 +84,7 @@ class scrib:
 
 	def __init__(self):
 		"""
-		Opening the brain. Resize as required.
+		Open the brain. Resize as required.
 		"""
 		# Attempt to load settings
 		self.settings = self.cfgfile.cfgset()
@@ -125,7 +125,7 @@ class scrib:
 				s = f.read()
 				f.close()
 				if s != self.brainVer:
-					print "Error loading brain.\nPlease convert it before launching scrib."
+					print "Error loading the brain.\nPlease convert it before launching scrib."
 					sys.exit(1)
 
 				f = open("data/words.dat", "rb")
@@ -146,7 +146,7 @@ class scrib:
 
 			# Is a resizing required?
 			if len(self.words) != self.settings.num_words:
-				print "Updating brain information..."
+				print "Updating my brain's information..."
 				self.settings.num_words = len(self.words)
 				num_contexts = 0
 				# Get number of contexts
@@ -202,7 +202,7 @@ class scrib:
 
 	def save_all(self):
 		if self.settings.process_with == "scrib" and self.settings.no_save != "True":
-			print "Writing to brain..."
+			print "Writing to my brain..."
 
 			try:
 				zfile = zipfile.ZipFile('data/archive.zip','r')
@@ -388,7 +388,7 @@ class scrib:
 			# Save the brain
 			if command_list[0] == "!save":
 				self.save_all()
-				msg = "!Brain saved!"
+				msg = "!Brain has been saved!"
 
 			# Command list
 			elif command_list[0] == "!help":
@@ -452,7 +452,7 @@ class scrib:
 						self.settings.num_words = self.settings.num_words - 1
 						print "\"%s\" vaped totally" % w
 
-				msg = "!Checked brain in %0.2fs. Fixed links: %d broken, %d bad." % \
+				msg = "!Checked my brain in %0.2fs. Fixed links: %d broken, %d bad." % \
 					(time.time()-t,
 					num_broken,
 					num_bad)
@@ -817,30 +817,30 @@ class scrib:
 		sentence = [word]
 		done = 0
 		while done == 0:
-			#create a brain which will contain all the words we can found before the "chosen" word
+			#create a brain which will contain all the words we can find before the "chosen" word
 			pre_words = {"" : 0}
-			#this is for prevent the case when we have an ignore_listed word
+			#this is to prevent a case where we have an ignore_listed word
 			word = str(sentence[0].split(" ")[0])
 			for x in xrange(0, len(self.words[word]) -1 ):
 				l, w = struct.unpack("iH", self.words[word][x])
 				context = self.lines[l][0]
 				num_context = self.lines[l][1]
 				cwords = context.split()
-				#if the word is not the first of the context, look the previous one
+				#if the word is not the first of the context, look to the previous one
 				if cwords[w] != word:
 					print context
 				if w:
-					#look if we can found a pair with the choosen word, and the previous one
+					#look if we can find a pair with the choosen word, and the previous one
 					if len(sentence) > 1 and len(cwords) > w+1:
 						if sentence[1] != cwords[w+1]:
 							continue
 
-					#if the word is in ignore_list, look the previous word
+					#if the word is in ignore_list, look to the previous word
 					look_for = cwords[w-1]
 					if look_for in self.settings.ignore_list and w > 1:
 						look_for = cwords[w-2]+" "+look_for
 
-					#saves how many times we can found each word
+					#saves how many times we can find each word
 					if not(pre_words.has_key(look_for)):
 						pre_words[look_for] = num_context
 					else :
@@ -858,7 +858,7 @@ class scrib:
 			for x in xrange(1, len(liste) ):
 				numbers.append(liste[x][1] + numbers[x-1])
 
-			#take one them from the list ( randomly )
+			#take one of them from the list (randomly)
 			mot = randint(0, numbers[len(numbers) -1])
 			for x in xrange(0, len(numbers)):
 				if mot <= numbers[x]:
@@ -894,7 +894,7 @@ class scrib:
 
 		done = 0
 		while done == 0:
-			#create a brain wich will contain all the words we can found before the "chosen" word
+			#create a brain which will contain all the words we can find before the "chosen" word
 			post_words = {"" : 0}
 			word = str(sentence[-1].split(" ")[-1])
 			for x in xrange(0, len(self.words[word]) ):
@@ -902,13 +902,13 @@ class scrib:
 				context = self.lines[l][0]
 				num_context = self.lines[l][1]
 				cwords = context.split()
-				#look if we can found a pair with the choosen word, and the next one
+				#look if we can find a pair with the choosen word, and the next one
 				if len(sentence) > 1:
 					if sentence[len(sentence)-2] != cwords[w-1]:
 						continue
 
 				if w < len(cwords)-1:
-					#if the word is in ignore_list, look the next word
+					#if the word is in ignore_list, look to the next word
 					look_for = cwords[w+1]
 					if look_for in self.settings.ignore_list and w < len(cwords) -2:
 						look_for = look_for+" "+cwords[w+2]
@@ -927,7 +927,7 @@ class scrib:
 			for x in xrange(1, len(liste) ):
 				numbers.append(liste[x][1] + numbers[x-1])
 
-			#take one them from the list ( randomly )
+			#take one of them from the list (randomly)
 			mot = randint(0, numbers[len(numbers) -1])
 			for x in xrange(0, len(numbers)):
 				if mot <= numbers[x]:
@@ -959,7 +959,7 @@ class scrib:
 		map( (lambda x: sentence.insert(1+x*2, " ") ), xrange(0, len(sentence)-1) ) 
 
 		#correct the ' & , spaces problem
-		#code is not very good and can be improve but does his job...
+		#the code is not very good and can be improved but it does the job...
 		for x in xrange(0, len(sentence)):
 			if sentence[x] == "'":
 				sentence[x-1] = ""
@@ -1031,7 +1031,7 @@ class scrib:
 			# Hash collisions we don't care about. 2^32 is big :-)
 			hashval = hash(cleanbody)
 
-			# Check context isn't already known
+			# Check that context isn't already known
 			if not self.lines.has_key(hashval):
 				if not(num_cpw > 100 and self.settings.learning == 0):
 					

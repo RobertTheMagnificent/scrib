@@ -110,7 +110,7 @@ class UnIgnorePlugin(ScribPlugin.ScribPlugin):
 	def action(self, command_list, scrib):
 		if command_list[0] == unignore_alias:
 			#do stuff
-			msg = "derp
+			msg = "derp"
 		return msg
 
 ScribPlugin.addPlugin( nick_command, nick_alias, NickPlugin() )

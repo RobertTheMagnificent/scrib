@@ -546,7 +546,7 @@ class scrib:
 				context = " ".join(command_list[1:])
 				if context == "":
 					return
-				io_module.output("Contexts containing \""+context+"\":", args)
+				io_module.output("!Contexts containing \""+context+"\":", args)
 				# Build context list
 				# Pad it
 				context = " "+context+" "
@@ -567,17 +567,17 @@ class scrib:
 				x = 0
 				while x < 5:
 					if x < len(c):
-						io_module.output(c[x], args)
+						io_module.output("!"+c[x], args)
 					x += 1
 				if len(c) == 5:
 					return
 				if len(c) > 10:
-					io_module.output("...("+`len(c)-10`+" skipped)...", args)
+					io_module.output("!...("+`len(c)-10`+" skipped)...", args)
 				x = len(c) - 5
 				if x < 5:
 					x = 5
 				while x < len(c):
-					io_module.output(c[x], args)
+					io_module.output("!"+c[x], args)
 					x += 1
 
 			# Remove a word from the vocabulary [use with care]
@@ -728,7 +728,7 @@ class scrib:
 		else:
 			self.words[new] = self.words[old]
 		del self.words[old]
-		return "%d instances of %s replaced with %s" % ( changed, old, new )
+		return "!%d instances of %s replaced with %s" % ( changed, old, new )
 
 	def unlearn(self, context):
 		"""

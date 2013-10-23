@@ -48,7 +48,7 @@ class ModIRC(SingleServerIRCBot):
 	owner_mask = []
 
 	# IRC Command list
-	commandlist =   "%sIRC Module Commands:\n!chans, !ignore, !join, !nick, !part, !quit, !quitmsg, !replyIgnored, !replyrate, !sleep, !private, !unignore, !wakeup, !talk, !owner" % self.scrib.settings.pubsym
+	commandlist =   self.scrib.settings.pubsym+"IRC Module Commands:\n!chans, !ignore, !join, !nick, !part, !quit, !quitmsg, !replyIgnored, !replyrate, !sleep, !private, !unignore, !wakeup, !talk, !owner"
 	# IRC Command 
 	commanddict = {
 		"sleep":  self.scrib.settings.pubsym+"Owner command. Usage: !sleep\n!Stop the bot talking.",

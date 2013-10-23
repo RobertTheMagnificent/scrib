@@ -543,7 +543,6 @@ class scrib:
 
 				# build context we are looking for
 				context = " ".join(command_list[1:])
-				context = context
 				if context == "":
 					return
 				io_module.output("Contexts containing \""+context+"\":", args)

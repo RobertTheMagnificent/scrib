@@ -47,7 +47,7 @@ class ModIRC(SingleServerIRCBot):
 	owner_mask = []
 
 	# IRC Command list
-	commandlist =   "IRC Module Commands:\n!chans, !ignore, !join, !nick, !part, !quit, !quitmsg, !replyIgnored, !replyrate, !sleep, !private, !unignore, !wake, !talk, !owner"
+	commandlist =   "IRC Module Commands:\n!chans, !control, !ignore, !join, !nick, !part, !private, !quit, !quitmsg, !replyIgnored, !replyrate, !sleep, !talk, !unignore, !wake"
 	# IRC Command 
 	commanddict = {
 		"sleep":  "Owner command. Usage: !sleep\nStop the bot talking.",
@@ -64,7 +64,7 @@ class ModIRC(SingleServerIRCBot):
 		"quitmsg": "Owner command. Usage: !quitmsg [message]\nSet the quit message. Without arguments show the current quit message.",
 		"talk": "Owner command. Usage !talk nick message\nmake the bot send the sentence 'message' to 'nick'.",
 		"quit": "Owner command. Usage: !quit\nMake the bot quit IRC.",
-		"owner": "Usage: !owner password\nAllow to become owner of the bot."
+		"control": "Usage: !control password\nAllow user to have access to bot commands."
 	}
 
 	def __init__(self, my_scrib, args):
@@ -298,10 +298,10 @@ class ModIRC(SingleServerIRCBot):
 		if command_list[0] == "!replyrate" and len(command_list)==1:
 			msg = self.scrib.settings.pubsym+"Reply rate is "+`self.settings.reply_chance`+"%."
 
-		if command_list[0] == "!owner" and len(command_list) > 1 and source not in self.owners:
+		if command_list[0] == "!control" and len(command_list) > 1 and source not in self.owners:
 			if command_list[1] == self.settings.password:
 				self.owners.append(source)
-				self.output("You've been added to owners list", ("", source, target, c, e))
+				self.output("You've been added to controllers list", ("", source, target, c, e))
 			else:
 				self.output("Try again", ("", source, target, c, e))
 

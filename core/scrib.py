@@ -111,8 +111,8 @@ class scrib:
 
 		self.version = self.cfgfile.cfgset()
 		self.version.load("VERSION",
-			{ "coreVer": ("Core version of Scrib", 0),
-			  "brainVer": ("Brain version of Scrib", 0),
+			{ "core": ("Core version of Scrib", 0),
+			  "brain": ("Brain version of Scrib", 0),
 			} )
 
 		# Read the brain
@@ -132,7 +132,7 @@ class scrib:
 				f = open("data/version", "rb")
 				s = f.read()
 				f.close()
-				if s != self.version.brainVer:
+				if s != self.version.brain:
 					print "[%s][!] Error loading the brain.\n[!]--> Please convert it before launching scrib." % get_time()
 					sys.exit(1)
 
@@ -234,7 +234,7 @@ class scrib:
 
 			#save the version
 			f = open("data/version", "w")
-			f.write(self.version.brainVer)
+			f.write(self.version.brain)
 			f.close()
 
 
@@ -355,9 +355,9 @@ class scrib:
 	
 		# Version string
 		if command_list[0] == "!version":
-			brainVer = self.version.brainVer
-			coreVer = self.version.coreVer
-			msg = "%sI am a version %s scrib. My braintechnology is at %s." % (self.settings.pubsym, coreVer, brainVer)
+			brain = self.version.brain
+			core = self.version.core
+			msg = "%sI am a version %s scrib. My braintechnology is at %s." % (self.settings.pubsym, core, brain)
 
 		# How many words do we know?
 		elif command_list[0] == "!words" and self.settings.process_with == "scrib":

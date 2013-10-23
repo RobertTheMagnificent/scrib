@@ -413,7 +413,7 @@ class scrib:
 					else:
 						msg = "%sNo help on command '%s'" % (self.settings.pubsym, cmd)
 				else:
-					msg = "%s" % ', '.join(str, self.commandlist)
+					msg = "%s" % ', '.join(self.commandlist)
 					#if cmd in self.commandlist.keys():
 					#	dic = self.commandlist
 					#elif cmd in io_module.commandlist.keys():

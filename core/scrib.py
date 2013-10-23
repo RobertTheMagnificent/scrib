@@ -298,7 +298,6 @@ class scrib:
 
 		# Filter out garbage and do some formatting
 		body = filter_message(body, self)
-		print "[DEBUG] %s" % body
 	
 		# Learn from input
 		if learn == 1:

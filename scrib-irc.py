@@ -226,7 +226,7 @@ class ModIRC(SingleServerIRCBot):
 
 		# WHOOHOOO!!
 		if target == self.settings.myname or source == self.settings.myname:
-			print "[%s] <%s> -> %s> %s" % ( get_time(), source, target, body)
+			print "[%s] %s <%s> %s" % ( get_time(), target, source, body)
 
 		# Ignore self.
 		#if source == self.settings.myname: return
@@ -236,7 +236,7 @@ class ModIRC(SingleServerIRCBot):
 		if e.eventtype() == "pubmsg":
 			for x in self.channels[target].users():
 				body = body.replace(x, "#nick")
-		print "[%s][~] %s" % (get_time(), body)
+		print "[%s][~] %s <%s> %s" % (get_time(), target, source, body)
 
 		# Ignore selected nicks
 		if self.settings.ignorelist.count(source) > 0 \
@@ -474,16 +474,16 @@ class ModIRC(SingleServerIRCBot):
 		# Joins replies and public messages
 		if e.eventtype() == "join" or e.eventtype() == "quit" or e.eventtype() == "part" or e.eventtype() == "pubmsg":
 			if action == 0:
-				print "[%s] <%s> -> %s: %s" % ( get_time(), self.settings.myname, target, message)
+				print "[%s] %s <%s> %s" % ( get_time(), target, self.settings.myname, message)
 				c.privmsg(target, message)
 			else:
-				print "[%s] <%s> -> %s: /me %s" % ( get_time(), self.settings.myname, target, message)
+				print "[%s] %s <%s> /me %s" % ( get_time(), target, self.settings.myname, message)
 				c.action(target, message)
 		# Private messages
 		elif e.eventtype() == "privmsg":
 			# normal private msg
 			if action == 0:
-				print "[%s] <%s> -> %s: %s" % ( get_time(), self.settings.myname, source, message)
+				print "[%s] %s <%s> %s" % ( get_time(), source, self.settings.myname, message)
 				c.privmsg(source, message)
 				# send copy to owner
 				if not source in self.owners:
@@ -491,7 +491,7 @@ class ModIRC(SingleServerIRCBot):
 					c.privmsg(','.join(self.owners), "(To   "+source+") "+message)
 			# ctcp action priv msg
 			else:
-				print "[%s] <%s> -> %s: /me %s" % ( get_time(), self.settings.myname, target, message)
+				print "[%s] %s <%s> /me %s" % ( get_time(), target, self.settings.myname, message)
 				c.action(source, message)
 				# send copy to owner
 				if not source in self.owners:

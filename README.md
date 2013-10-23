@@ -12,7 +12,32 @@ What You'll Need
 
 Initial Setup
 -------------
-* Please set conf/scrib-irc.cfg to taste before running.
+* Please edit the configuration files in conf/ before running.
+
+Configuration
+=============
+Here's an outline of configuration file options.
+
+scrib.cfg
+---------
+_(Internal options)_
+
+scrib-irc.cfg
+-------------
+_(IRC-specific options)_
+
+Commands
+========
+These are the currently built-in commands.
+
+Public/Private Commands
+---------------
+_(These are only public if private is set to 0)_
+
+Owner Commands
+----------------
+_(These are only available to listed bot owners)_
+
 
 Optional
 --------
@@ -23,6 +48,11 @@ MegaHAL is an alternative parser that is totally unsupported and kind of, well, 
 
 Notes
 -----
-
 * feedme.py lets you fill scrib's brain with text from a file.
 * Will be moving to using PyBrain. Maybe. Eventually.
+
+TODO
+====
+* Consolidate configuration to make easier to use
+* Break code into more manageable chunks
+* Adopt a better coding policy

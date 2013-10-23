@@ -10,6 +10,11 @@ class ReplyRatePlugin(ScribPlugin.ScribPlugin):
 		msg = ""
 		if command_list[0] == alias and len(command_list)==1:
 			msg = "Reply rate is "+`scrib.settings.reply_chance`+"%."
-		return msg
+			try:
+				scrib.settings.reply_chance = int(command_list[1])
+				msg = "Now replying to %d%% of messages." % int(command_list[1])
+			except:
+				msg = "Reply rate is %d%%." % scrib.settings.reply_chance
+			return msg
 
 ScribPlugin.addPlugin( command, alias, ReplyRatePlugin() )

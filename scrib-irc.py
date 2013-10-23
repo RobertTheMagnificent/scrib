@@ -48,23 +48,23 @@ class ModIRC(SingleServerIRCBot):
 	owner_mask = []
 
 	# IRC Command list
-	commandlist =   "!IRC Module Commands:\n!chans, !ignore, !join, !nick, !part, !quit, !quitmsg, !replyIgnored, !replyrate, !sleep, !private, !unignore, !wakeup, !talk, !owner"
+	commandlist =   "%sIRC Module Commands:\n!chans, !ignore, !join, !nick, !part, !quit, !quitmsg, !replyIgnored, !replyrate, !sleep, !private, !unignore, !wakeup, !talk, !owner" % self.scrib.settings.pubsym
 	# IRC Command 
 	commanddict = {
-		"sleep": "!Owner command. Usage: !sleep\n!Stop the bot talking.",
-		"wakeup": "!Owner command. Usage: !wakeup\n!Allow the bot to talk.",
-		"join": "!Owner command. Usage: !join #chan1 [#chan2 [...]]\n!Join one or more channels.",
-		"part": "!Owner command. Usage: !part #chan1 [#chan2 [...]]\n!Leave one or more channels.",
-		"chans": "!Owner command. Usage: !chans\n!List channels currently on.",
-		"nick": "!Owner command. Usage: !nick nickname\n!Change nickname.",
-		"ignore": "!Owner command. Usage: !ignore [nick1 [nick2 [...]]]\n!Ignore one or more nicknames. Without arguments it lists ignored nicknames.",
-		"unignore": "!Owner command. Usage: !unignore nick1 [nick2 [...]]\n!Unignores one or more nicknames.",
-		"replyrate": "!Owner command. Usage: !replyrate [rate%]\n!Set rate of bot replies to rate%. Without arguments (not an owner-only command) shows the current reply rate.",
-		"replyIgnored": "!Owner command. Usage: !replyIgnored [on|off]\n!Allow/disallow replying to ignored users. Without arguments shows the current setting.",
-		"private": "!Owner command. Usage: !private [on|off]\n!Turn private mode on or off (disable non-owner commands and don't return CTCP VERSION). Without arguments shows the current setting.",
-		"quitmsg": "!Owner command. Usage: !quitmsg [message]\n!Set the quit message. Without arguments show the current quit message.",
-		"talk": "!Owner command. Usage !talk nick message\n!make the bot send the sentence 'message' to 'nick'.",
-		"quit": "!Owner command. Usage: !quit\n!Make the bot quit IRC.",
+		"sleep":  self.scrib.settings.pubsym+"Owner command. Usage: !sleep\n!Stop the bot talking.",
+		"wakeup": self.scrib.settings.pubsym+"Owner command. Usage: !wakeup\n!Allow the bot to talk.",
+		"join": self.scrib.settings.pubsym+"Owner command. Usage: !join #chan1 [#chan2 [...]]\n!Join one or more channels.",
+		"part": self.scrib.settings.pubsym+"Owner command. Usage: !part #chan1 [#chan2 [...]]\n!Leave one or more channels.",
+		"chans": self.scrib.settings.pubsym+"Owner command. Usage: !chans\n!List channels currently on.",
+		"nick": self.scrib.settings.pubsym+"Owner command. Usage: !nick nickname\n!Change nickname.",
+		"ignore": self.scrib.settings.pubsym+"Owner command. Usage: !ignore [nick1 [nick2 [...]]]\n!Ignore one or more nicknames. Without arguments it lists ignored nicknames.",
+		"unignore": self.scrib.settings.pubsym+"Owner command. Usage: !unignore nick1 [nick2 [...]]\n!Unignores one or more nicknames.",
+		"replyrate": self.scrib.settings.pubsym+"Owner command. Usage: !replyrate [rate%]\n!Set rate of bot replies to rate%. Without arguments (not an owner-only command) shows the current reply rate.",
+		"replyIgnored": self.scrib.settings.pubsym+"Owner command. Usage: !replyIgnored [on|off]\n!Allow/disallow replying to ignored users. Without arguments shows the current setting.",
+		"private": self.scrib.settings.pubsym+"Owner command. Usage: !private [on|off]\n!Turn private mode on or off (disable non-owner commands and don't return CTCP VERSION). Without arguments shows the current setting.",
+		"quitmsg": self.scrib.settings.pubsym+"Owner command. Usage: !quitmsg [message]\n!Set the quit message. Without arguments show the current quit message.",
+		"talk": self.scrib.settings.pubsym+"Owner command. Usage !talk nick message\n!make the bot send the sentence 'message' to 'nick'.",
+		"quit": self.scrib.settings.pubsym+"Owner command. Usage: !quit\n!Make the bot quit IRC.",
 		"owner": "!Usage: !owner password\n!Allow to become owner of the bot."
 	}
 
@@ -297,7 +297,7 @@ class ModIRC(SingleServerIRCBot):
 		### User commands
 		# Query replyrate
 		if command_list[0] == "!replyrate" and len(command_list)==1:
-			msg = "%sReply rate is "+`self.settings.reply_chance`+"%." % self.settings.pubsym
+			msg = "%sReply rate is "+`self.settings.reply_chance`+"%." % self.scrib.settings.pubsym
 
 		if command_list[0] == "!owner" and len(command_list) > 1 and source not in self.owners:
 			if command_list[1] == self.settings.password:

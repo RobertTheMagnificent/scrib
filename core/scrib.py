@@ -680,7 +680,7 @@ class scrib:
 
 			# Fortune command
 			elif command_list[0] == "!fortune":
-				msg = "%s".join([i for i in os.popen('fortune').readlines()]).replace('\n\n', '\n').replace('\n', ' ') %s self.settings.pubsym
+				msg = "%s".join([i for i in os.popen('fortune').readlines()]).replace('\n\n', '\n').replace('\n', ' ') % self.settings.pubsym
 			
 			# Tweeter command
 			elif command_list[0] == "!tweet":

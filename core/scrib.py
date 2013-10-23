@@ -165,12 +165,12 @@ class scrib:
 				self.settings.save()
 				
 			# Is an aliases update required ?
-			compteur = 0
+			count = 0
 			for x in self.settings.aliases.keys():
-				compteur += len(self.settings.aliases[x])
-			if compteur != self.settings.num_aliases:
+				count += len(self.settings.aliases[x])
+			if count != self.settings.num_aliases:
 				print "[%s][~] Check brain for new aliases." % get_time()
-				self.settings.num_aliases = compteur
+				self.settings.num_aliases = count
 
 				for x in self.words.keys():
 					#is there aliases ?
@@ -495,15 +495,15 @@ class scrib:
 							old_num_contexts,
 							self.settings.num_contexts - old_num_contexts)
 
-			#Remove rare words
+			# Remove rare words
 			elif command_list[0] == "!purge" and self.settings.process_with == "scrib":
 				t = time.time()
 
-				liste = []
-				compteur = 0
+				list = []
+				count = 0
 
 				if len(command_list) == 2:
-				# limited occurences a effacer
+				# Occurences to erase
 					c_max = command_list[1]
 				else:
 					c_max = 0
@@ -521,27 +521,27 @@ class scrib:
 							digit += 1
 
 				
-				#Compte les mots inferieurs a cette limite
+					# If the word limit is lower than this
 					c = len(self.words[w])
 					if c < 2 or ( digit and char ):
-						liste.append(w)
-						compteur += 1
-						if compteur == c_max:
+						list.append(w)
+						count += 1
+						if count == c_max:
 							break
 
 				if c_max < 1:
-					#io_module.output(str(compteur)+" words to remove", args)
-					io_module.output("%s words to remove" %compteur, args)
+                    #io_module.output("%s words to remove" %count, args)
+					io_module.output(self.settings.pubsym+"%s words to remove" %count, args)
 					return
 
-				#supprime les mots
+				# Remove the words
 				for w in liste[0:]:
 					self.unlearn(w)
 
 				msg = "%sPurged brain in %0.2fs. %d words removed." % \
 						(self.settings.pubsym, 
 						time.time()-t,
-						compteur)
+						count)
 				
 			# Change a typo in the brain
 			elif command_list[0] == "!replace" and self.settings.process_with == "scrib":
@@ -553,6 +553,7 @@ class scrib:
 
 			# Print contexts [flooding...:-]
 			elif command_list[0] == "!contexts" and self.settings.process_with == "scrib":
+
 				# This is a large lump of data and should
 				# probably be printed, not module.output XXX
 
@@ -560,7 +561,14 @@ class scrib:
 				context = " ".join(command_list[1:])
 				if context == "":
 					return
-				io_module.output(self.settings.pubsym+"Contexts containing \""+context+"\":", args)
+
+				#io_module.output(self.settings.pubsym+"Contexts containing \""+context+"\":", args)
+				#print "[%s][-]Contexts containing %s" % (""+context+"", args)
+				context = " ".join(command_list[1:])
+				print "[%s][#] ========================" % get_time()
+				print "[%s][#] Printing contexts containing '%s'" % (get_time(), context)
+				print "[%s][#] ========================" % get_time()
+
 				# Build context list
 				# Pad it
 				context = " "+context+" "
@@ -581,18 +589,26 @@ class scrib:
 				x = 0
 				while x < 5:
 					if x < len(c):
-						io_module.output(self.settings.pubsym+c[x], args)
+						#io_module.output(self.settings.pubsym+c[x], args)
+						lines = c
+						print "[%s][#] %s" % (get_time(), lines[x])
 					x += 1
 				if len(c) == 5:
 					return
 				if len(c) > 10:
-					io_module.output(self.settings.pubsym+"...("+`len(c)-10`+" skipped)...", args)
+					#io_module.output(self.settings.pubsym+"...("+`len(c)-10`+" skipped)...", args)
+					number = len(c)-10
+					print "[%s][!] ...(%s lines skipped)..." % (get_time(), number)
 				x = len(c) - 5
 				if x < 5:
 					x = 5
 				while x < len(c):
-					io_module.output(self.settings.pubsym+c[x], args)
+					#io_module.output(self.settings.pubsym+c[x], args)
+					lines = c
+					print "[%s][#] %s" % (get_time(), lines[x])
 					x += 1
+
+				print "[%s][#] ========================" % get_time()
 
 			# Remove a word from the vocabulary [use with care]
 			elif command_list[0] == "!unlearn" and self.settings.process_with == "scrib":

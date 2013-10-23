@@ -454,7 +454,7 @@ class scrib:
 						self.settings.num_words = self.settings.num_words - 1
 						print "\"%s\" vaped totally" % w
 
-				msg = "%Checked my brain in %0.2fs. Fixed links: %d broken, %d bad." % \
+				msg = "%sChecked my brain in %0.2fs. Fixed links: %d broken, %d bad." % \
 					(self.settings.pubsym, 
 					time.time()-t,
 					num_broken,

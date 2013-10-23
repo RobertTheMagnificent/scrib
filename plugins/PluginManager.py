@@ -6,7 +6,7 @@ def sendMessage( event, text, scrib ):
 	else:
 		return ''
 
-def reloadPlugins( event ):
+def reloadPlugin( event ):
 	if ScribPlugin.process_table[event] != '':
 		reload(event)
 	else:

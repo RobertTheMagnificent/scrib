@@ -55,7 +55,7 @@ class scrib:
 
 	coreVer = "0.6.5"
 	brainVer = "0.0.1"
-	ver_string = "I am a version %s scrib." % coreVer
+	ver_string = "!I am a version %s scrib." % coreVer
 	ver_string += " My braintechnology is at %s." % brainVer
 
 	# Main command list
@@ -66,12 +66,12 @@ class scrib:
 		"words": "Usage: !words\nDisplay how many words are known.",
 		"known": "Usage: !known word1 [word2 [...]]\nDisplays if one or more words are known, and how many contexts are known.",
 		"contexts": "Owner command. Usage: !contexts <phrase>\nPrint contexts containing <phrase>.",
-		"unlearn": "Owner command. Usage: !unlearn <expression>\nRemove all occurances of a word or expression from the dictionary. For example '!unlearn of of' would remove all contexts containing double 'of's.",
+		"unlearn": "Owner command. Usage: !unlearn <expression>\nRemove all occurances of a word or expression from the brain. For example '!unlearn of of' would remove all contexts containing double 'of's.",
 		"purge": "Owner command. Usage: !purge [number]\nRemove all occurances of the words that appears in less than <number> contexts.",
-		"replace": "Owner command. Usage: !replace <old> <new>\nReplace all occurances of word <old> in the dictionary with <new>.",
+		"replace": "Owner command. Usage: !replace <old> <new>\nReplace all occurances of word <old> in the brain with <new>.",
 		"learning": "Owner command. Usage: !learning [on|off]\nToggle bot learning. Without arguments shows the current setting.",
-		"checkdict": "Owner command. Usage: !checkdict\nChecks the dictionary for broken links. Shouldn't happen, but worth trying if you get KeyError crashes.",
-		"rebuilddict": "Owner command. Usage: !rebuilddict\nRebuilds dictionary links from the lines of known text. Takes a while. You probably don't need to do it unless your dictionary is very screwed.",
+		"check": "Owner command. Usage: !check\nChecks the brain for broken links. Shouldn't happen, but worth trying if you get KeyError crashes.",
+		"rebuild": "Owner command. Usage: !rebuild\nRebuilds brain links from the lines of known text. Takes a while. You probably don't need to do it unless the brain is very screwed.",
 		"censor": "Owner command. Usage: !censor [word1 [...]]\nPrevent the bot using one or more words. Without arguments lists the currently censored words.",
 		"uncensor": "Owner command. Usage: !uncensor word1 [word2 [...]]\nRemove censorship on one or more words.",
 		"limit": "Owner command. Usage: !limit [number]\nSet the number of words that pyBorg can learn.",
@@ -84,7 +84,7 @@ class scrib:
 
 	def __init__(self):
 		"""
-		Open the dictionary. Resize as required.
+		Opening the brain. Resize as required.
 		"""
 		# Attempt to load settings
 		self.settings = self.cfgfile.cfgset()
@@ -98,7 +98,7 @@ class scrib:
 			  "num_aliases":("Total of aliases known", 0),
 			  "aliases":	("A list of similars words", {}),
 			  "process_with":("Which module will we use to generate replies? (scrib|megahal)", "scrib"),
-			  "no_save"	:("If True, Scrib doesn't saves the dictionary and configuration on disk", "False")
+			  "no_save"	:("If True, Scrib doesn't save his brain and configuration to disk", "False")
 			} )
 
 		self.answers = self.cfgfile.cfgset()
@@ -107,9 +107,9 @@ class scrib:
 			} )
 		self.unfilterd = {}
 
-		# Read the dictionary
+		# Read the brain
 		if self.settings.process_with == "scrib":
-			print "Reading dictionary..."
+			print "Reading my brain..."
 			try:
 				zfile = zipfile.ZipFile('data/archive.zip','r')
 				for filename in zfile.namelist():
@@ -125,7 +125,7 @@ class scrib:
 				s = f.read()
 				f.close()
 				if s != self.brainVer:
-					print "Error loading dictionary.\nPlease convert it before launching scrib."
+					print "Error loading brain.\nPlease convert it before launching scrib."
 					sys.exit(1)
 
 				f = open("data/words.dat", "rb")
@@ -139,14 +139,14 @@ class scrib:
 				self.lines = marshal.loads(s)
 				del s
 			except (EOFError, IOError), e:
-				# Create mew database
+				# Create new database
 				self.words = {}
 				self.lines = {}
 				print "Error reading saves. New database created."
 
 			# Is a resizing required?
 			if len(self.words) != self.settings.num_words:
-				print "Updating dictionary information..."
+				print "Updating brain information..."
 				self.settings.num_words = len(self.words)
 				num_contexts = 0
 				# Get number of contexts
@@ -161,7 +161,7 @@ class scrib:
 			for x in self.settings.aliases.keys():
 				compteur += len(self.settings.aliases[x])
 			if compteur != self.settings.num_aliases:
-				print "Check dictionary for new aliases."
+				print "Check brain for new aliases."
 				self.settings.num_aliases = compteur
 
 				for x in self.words.keys():
@@ -202,7 +202,7 @@ class scrib:
 
 	def save_all(self):
 		if self.settings.process_with == "scrib" and self.settings.no_save != "True":
-			print "Writing dictionary..."
+			print "Writing to brain..."
 
 			try:
 				zfile = zipfile.ZipFile('data/archive.zip','r')
@@ -385,10 +385,10 @@ class scrib:
 	
 		# Owner commands
 		if owner == 1:
-			# Save dictionary
+			# Save the brain
 			if command_list[0] == "!save":
 				self.save_all()
-				msg = "!Dictionary saved"
+				msg = "!Brain saved!"
 
 			# Command list
 			elif command_list[0] == "!help":
@@ -422,8 +422,8 @@ class scrib:
 					msg += "now " + command_list[1]
 
 			
-			# Check for broken links in the dictionary
-			elif command_list[0] == "!checkdict" and self.settings.process_with == "scrib":
+			# Check for broken links in the brain
+			elif command_list[0] == "!check" and self.settings.process_with == "scrib":
 				t = time.time()
 				num_broken = 0
 				num_bad = 0
@@ -452,14 +452,14 @@ class scrib:
 						self.settings.num_words = self.settings.num_words - 1
 						print "\"%s\" vaped totally" % w
 
-				msg = "!Checked dictionary in %0.2fs. Fixed links: %d broken, %d bad." % \
+				msg = "!Checked brain in %0.2fs. Fixed links: %d broken, %d bad." % \
 					(time.time()-t,
 					num_broken,
 					num_bad)
 
-			# Rebuild the dictionary by discarding the word links and
+			# Rebuild the brain by discarding the word links and
 			# re-parsing each line
-			elif command_list[0] == "!rebuilddict" and self.settings.process_with == "scrib":
+			elif command_list[0] == "!rebuild" and self.settings.process_with == "scrib":
 				if self.settings.learning == 1:
 					t = time.time()
 
@@ -475,7 +475,7 @@ class scrib:
 					for k in old_lines.keys():
 						self.learn(old_lines[k][0], old_lines[k][1])
 
-					msg = "!Rebuilt dictionary in %0.2fs. Words %d (%+d), contexts %d (%+d)." % \
+					msg = "!Rebuilt brain in %0.2fs. Words %d (%+d), contexts %d (%+d)." % \
 							(time.time()-t,
 							old_num_words,
 							self.settings.num_words - old_num_words,
@@ -525,11 +525,11 @@ class scrib:
 				for w in liste[0:]:
 					self.unlearn(w)
 
-				msg = "!Purge dictionary in %0.2fs. %d words removed." % \
+				msg = "!Purged brain in %0.2fs. %d words removed." % \
 						(time.time()-t,
 						compteur)
 				
-			# Change a typo in the dictionary
+			# Change a typo in the brain
 			elif command_list[0] == "!replace" and self.settings.process_with == "scrib":
 				if len(command_list) < 3:
 					return
@@ -685,9 +685,9 @@ class scrib:
 				msg = "It is ".join(i for i in os.popen('date').readlines())
 			# Quit
 			elif command_list[0] == "!quit":
-				# Close the dictionary
+				# Close the brain
 				self.save_all()
-				print "Saved. Goodbye!"
+				print "Saved my brain. Goodbye!"
 				sys.exit()
 				
 			# Save changes
@@ -698,7 +698,7 @@ class scrib:
 
 	def replace(self, old, new):
 		"""
-		Replace all occurrences of 'old' in the dictionary with
+		Replace all occurrences of 'old' in the brain with
 		'new'. Nice for fixing learnt typos.
 		"""
 		try:
@@ -713,7 +713,7 @@ class scrib:
 			line = self.lines[l][0].split()
 			number = self.lines[l][1]
 			if line[w] != old:
-				# fucked dictionary
+				# fucked brain
 				print "Broken link: %s %s" % (x, self.lines[l][0] )
 				continue
 			else:
@@ -817,7 +817,7 @@ class scrib:
 		sentence = [word]
 		done = 0
 		while done == 0:
-			#create a dictionary which will contain all the words we can found before the "chosen" word
+			#create a brain which will contain all the words we can found before the "chosen" word
 			pre_words = {"" : 0}
 			#this is for prevent the case when we have an ignore_listed word
 			word = str(sentence[0].split(" ")[0])
@@ -894,7 +894,7 @@ class scrib:
 
 		done = 0
 		while done == 0:
-			#create a dictionary wich will contain all the words we can found before the "chosen" word
+			#create a brain wich will contain all the words we can found before the "chosen" word
 			post_words = {"" : 0}
 			word = str(sentence[-1].split(" ")[-1])
 			for x in xrange(0, len(self.words[word]) ):

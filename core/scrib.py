@@ -47,16 +47,15 @@ def filter_message(message, bot):
 	message = " ".join(words)
 	return message
 
+class scrib:
+	import re
+	import cfgfile
+
 def get_time():
 	"""
 	Make time sexy
 	"""
 	return time.strftime("\033[0m[%H:%M:%S]", time.localtime(time.time()))
-
-class scrib:
-	import re
-	import cfgfile
-
 	# Message Codes
 	ACT = '\033[93m [~] '
 	MSG = '\033[94m [-] '
@@ -451,8 +450,8 @@ class scrib:
 							if split_line[word_num] != w:
 								self.barf(self.ACT, "Line '%s' word %d is not '%s' as expected." % \
 									(self.lines[line_idx][0],
-									word_num, w)
-								num_bad = num_bad + 1)
+									word_num, w))
+								num_bad = num_bad + 1
 								del wlist[i]
 					if len(wlist) == 0:
 						del self.words[w]

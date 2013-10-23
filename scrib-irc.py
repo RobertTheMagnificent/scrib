@@ -296,7 +296,8 @@ class ModIRC(SingleServerIRCBot):
 		if msg == "":
 			return 0
 		else:
-			self.output(msg, ("<none>", source, target, c, e))
+			#self.output(msg, ("<none>", source, target, c, e))
+			self.output(msg, ("", source, target, c, e))
 			return 1
 			
 	def output(self, message, args):

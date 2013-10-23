@@ -7,7 +7,7 @@ def get_time():
 
 def addPlugin( command, alias, action ):
 	process_table[alias] = action
-	plugin_commands = plugin_commands.items() + command.items()
+	plugin_commands = dict( plugin_commands.items() + command.items() )
 
 class ScribPlugin:
 	def action(self, stuff):

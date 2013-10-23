@@ -5,8 +5,9 @@ plugin_commands = {}
 def get_time():
 	return time.strftime("%H:%M:%S", time.localtime(time.time()))
 
-def addPlugin( alias, command ):
-	process_table[alias] = command
+def addPlugin( command, alias, action ):
+	process_table[alias] = action
+	plugin_commands = plugin_commands.items() + command.items()
 
 class ScribPlugin:
 	def action(self, stuff):

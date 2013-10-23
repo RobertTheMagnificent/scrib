@@ -58,7 +58,8 @@ class ModIRC(SingleServerIRCBot):
 		"quit": "Owner command. Usage: !quit\nMake the bot quit IRC.",
 		"control": "Usage: !control password\nAllow user to have access to bot commands."
 	}
-	
+
+	commandlist += " "+PluginManager.ScribPlugin.plugin_aliases
 	commanddict = dict( commanddict.items() + PluginManager.ScribPlugin.plugin_commands.items() )
 	
 	def __init__(self, my_scrib, args):

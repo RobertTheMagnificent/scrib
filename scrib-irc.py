@@ -31,9 +31,9 @@ import thread
 class ModIRC(SingleServerIRCBot):
 
 	# Message Codes
-	ACT = '\033[92m [~] '
+	ACT = '\033[93m [~] '
 	MSG = '\033[94m [-] '
-	SAV = '\033[93m [#] '
+	SAV = '\033[92m [#] '
 	ERR = '\033[91m [!] '
 
 	def disable(self):
@@ -287,7 +287,8 @@ class ModIRC(SingleServerIRCBot):
 			# self.commanddict should eventually check self.commandlist
 			# so we can stop doing [1:]
 			if command_list[0][1:] in self.commanddict:
-				msg = PluginManager.sendMessage(command_list[0][1:], command_list, self)
+				out = PluginManager.sendMessage(command_list[0][1:], command_list, self)
+				msg = out
 
 			self.scrib.settings.save()
 			self.settings.save()

@@ -19,7 +19,7 @@ wake_command = { "wake": "Owner command. Usage: !wake\nAllow the bot to talk." }
 
 class WakePlugin(ScribPlugin.ScribPlugin):
 	def action(self, command_list, scrib):
-		if command_list[0] = wake_alias and scrib.settings.speaking == 0:
+		if command_list[0] == wake_alias and scrib.settings.speaking == 0:
 			scrib.settings.speaking = 1 
 			msg = "Whoohoo!"
 		else:

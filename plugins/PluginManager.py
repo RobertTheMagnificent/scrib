@@ -5,3 +5,9 @@ def sendMessage( event, text, scrib ):
 		return ScribPlugin.process_table[event].action(text, scrib)
 	else:
 		return ''
+
+def reloadPlugins( event ):
+	if ScribPlugin.process_table[event] != '':
+		reload(event)
+	else:
+		return 'Reloading error'

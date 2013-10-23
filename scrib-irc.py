@@ -226,7 +226,7 @@ class ModIRC(SingleServerIRCBot):
 
 		# WHOOHOOO!!
 		if target == self.settings.myname or source == self.settings.myname:
-			print "[%s] %s <%s> %s" % ( get_time(), target, source, body)
+			print "[%s][-] %s <%s> %s" % ( get_time(), target, source, body)
 
 		# Ignore self.
 		#if source == self.settings.myname: return
@@ -236,7 +236,7 @@ class ModIRC(SingleServerIRCBot):
 		if e.eventtype() == "pubmsg":
 			for x in self.channels[target].users():
 				body = body.replace(x, "#nick")
-		print "[%s][~] %s <%s> %s" % (get_time(), target, source, body)
+		print "[%s][-] %s <%s> %s" % (get_time(), target, source, body)
 
 		# Ignore selected nicks
 		if self.settings.ignorelist.count(source) > 0 \

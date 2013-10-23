@@ -48,24 +48,24 @@ class ModIRC(SingleServerIRCBot):
 	owner_mask = []
 
 	# IRC Command list
-	commandlist =   "IRC Module Commands:\n!chans, !ignore, !join, !nick, !part, !quit, !quitmsg, !replyIgnored, !replyrate, !sleep, !private, !unignore, !wakeup, !talk, !owner"
+	commandlist =   "!IRC Module Commands:\n!chans, !ignore, !join, !nick, !part, !quit, !quitmsg, !replyIgnored, !replyrate, !sleep, !private, !unignore, !wakeup, !talk, !owner"
 	# IRC Command 
 	commanddict = {
-		"sleep": "Owner command. Usage: !sleep\nStop the bot talking.",
-		"wakeup": "Owner command. Usage: !wakeup\nAllow the bot to talk.",
-		"join": "Owner command. Usage: !join #chan1 [#chan2 [...]]\nJoin one or more channels.",
-		"part": "Owner command. Usage: !part #chan1 [#chan2 [...]]\nLeave one or more channels.",
-		"chans": "Owner command. Usage: !chans\nList channels currently on.",
-		"nick": "Owner command. Usage: !nick nickname\nChange nickname.",
-		"ignore": "Owner command. Usage: !ignore [nick1 [nick2 [...]]]\nIgnore one or more nicknames. Without arguments it lists ignored nicknames.",
-		"unignore": "Owner command. Usage: !unignore nick1 [nick2 [...]]\nUnignores one or more nicknames.",
-		"replyrate": "Owner command. Usage: !replyrate [rate%]\nSet rate of bot replies to rate%. Without arguments (not an owner-only command) shows the current reply rate.",
-		"replyIgnored": "Owner command. Usage: !replyIgnored [on|off]\nAllow/disallow replying to ignored users. Without arguments shows the current setting.",
-		"private": "Owner command. Usage: !private [on|off]\nTurn private mode on or off (disable non-owner commands and don't return CTCP VERSION). Without arguments shows the current setting.",
-		"quitmsg": "Owner command. Usage: !quitmsg [message]\nSet the quit message. Without arguments show the current quit message.",
-		"talk": "Owner command. Usage !talk nick message\nmake the bot send the sentence 'message' to 'nick'.",
-		"quit": "Owner command. Usage: !quit\nMake the bot quit IRC.",
-		"owner": "Usage: !owner password\nAllow to become owner of the bot."
+		"sleep": "!Owner command. Usage: !sleep\n!Stop the bot talking.",
+		"wakeup": "!Owner command. Usage: !wakeup\n!Allow the bot to talk.",
+		"join": "!Owner command. Usage: !join #chan1 [#chan2 [...]]\n!Join one or more channels.",
+		"part": "!Owner command. Usage: !part #chan1 [#chan2 [...]]\n!Leave one or more channels.",
+		"chans": "!Owner command. Usage: !chans\n!List channels currently on.",
+		"nick": "!Owner command. Usage: !nick nickname\n!Change nickname.",
+		"ignore": "!Owner command. Usage: !ignore [nick1 [nick2 [...]]]\n!Ignore one or more nicknames. Without arguments it lists ignored nicknames.",
+		"unignore": "!Owner command. Usage: !unignore nick1 [nick2 [...]]\n!Unignores one or more nicknames.",
+		"replyrate": "!Owner command. Usage: !replyrate [rate%]\n!Set rate of bot replies to rate%. Without arguments (not an owner-only command) shows the current reply rate.",
+		"replyIgnored": "!Owner command. Usage: !replyIgnored [on|off]\n!Allow/disallow replying to ignored users. Without arguments shows the current setting.",
+		"private": "!Owner command. Usage: !private [on|off]\n!Turn private mode on or off (disable non-owner commands and don't return CTCP VERSION). Without arguments shows the current setting.",
+		"quitmsg": "!Owner command. Usage: !quitmsg [message]\n!Set the quit message. Without arguments show the current quit message.",
+		"talk": "!Owner command. Usage !talk nick message\n!make the bot send the sentence 'message' to 'nick'.",
+		"quit": "!Owner command. Usage: !quit\n!Make the bot quit IRC.",
+		"owner": "!Usage: !owner password\n!Allow to become owner of the bot."
 	}
 
 	def __init__(self, my_scrib, args):
@@ -318,7 +318,7 @@ class ModIRC(SingleServerIRCBot):
 					pass
 			# private mode
 			elif command_list[0] == "!private":
-				msg = "private mode "
+				msg = "!Private mode "
 				if len(command_list) == 1:
 					if self.settings.private == 0:
 						msg = msg + "off"
@@ -336,7 +336,7 @@ class ModIRC(SingleServerIRCBot):
 			# Allow/disallow replying to ignored nicks
 			# (they will never be learnt from)
 			elif command_list[0] == "!replyIgnored":
-				msg = "Replying to ignored users "
+				msg = "!Replying to ignored users "
 				if len(command_list) == 1:
 					if self.settings.replyIgnored == 0:
 						msg = msg + "off"
@@ -353,23 +353,23 @@ class ModIRC(SingleServerIRCBot):
 			# Stop talking
 			elif command_list[0] == "!sleep":
 				if self.settings.speaking == 1:
-					msg = "Going to sleep.  Goodnight!"
+					msg = "!Going to sleep.  Goodnight!"
 					self.settings.speaking = 0
 				else:
-					msg = "Zzz.."
+					msg = "!Zzz.."
 			# Wake up again
 			elif command_list[0] == "!wakeup":
 				if self.settings.speaking == 0:
 					self.settings.speaking = 1
-					msg = "Whoohoo!"
+					msg = "!Whoohoo!"
 				else:
-					msg = "But I'm already awake..."
+					msg = "!But I'm already awake..."
 						
 			# Join a channel or list of channels
 			elif command_list[0] == "!join":
 				for x in xrange(1, len(command_list)):
 					if not command_list[x] in self.chans:
-						msg = "Attempting to join channel %s" % command_list[x]
+						msg = "!Attempting to join channel %s" % command_list[x]
 						self.chans.append(command_list[x])
 						c.join(command_list[x])
 
@@ -377,16 +377,16 @@ class ModIRC(SingleServerIRCBot):
 			elif command_list[0] == "!part":
 				for x in xrange(1, len(command_list)):
 					if command_list[x] in self.chans:
-						msg = "Leaving channel %s" % command_list[x]
+						msg = "!Leaving channel %s" % command_list[x]
 						self.chans.remove(command_list[x])
 						c.part(command_list[x])
 
 			# List channels currently on
 			elif command_list[0] == "!chans":
 				if len(self.channels.keys())==0:
-					msg = "I'm currently on no channels"
+					msg = "!I'm currently on no channels"
 				else:
-					msg = "I'm currently on "
+					msg = "!I'm currently on "
 					channels = self.channels.keys()
 					for x in xrange(0, len(channels)):
 						msg = msg+channels[x]+" "
@@ -395,7 +395,7 @@ class ModIRC(SingleServerIRCBot):
 				# if no arguments are given say who we are
 				# ignoring
 				if len(command_list) == 1:
-					msg = "I'm ignoring "
+					msg = "!I'm ignoring "
 					if len(self.settings.ignorelist) == 0:
 						msg = msg + "nobody"
 					else:
@@ -406,7 +406,7 @@ class ModIRC(SingleServerIRCBot):
 				else:
 					for x in xrange(1, len(command_list)):
 						self.settings.ignorelist.append(command_list[x])
-						msg = "done"
+						msg = "!Done."
 			# remove someone from the ignore list
 			elif command_list[0] == "!unignore":
 				# Remove everyone listed from the ignore list
@@ -421,9 +421,9 @@ class ModIRC(SingleServerIRCBot):
 			elif command_list[0] == "!quitmsg":
 				if len(command_list) > 1:
 					self.settings.quitmsg = body.split(" ", 1)[1]
-					msg = "New quit message is \"%s\"" % self.settings.quitmsg
+					msg = "!New quit message is \"%s\"" % self.settings.quitmsg
 				else:
-					msg = "Quit message is \"%s\"" % self.settings.quitmsg
+					msg = "!Quit message is \"%s\"" % self.settings.quitmsg
 			# make the scrib quit
 			elif command_list[0] == "!quit":
 				sys.exit()
@@ -431,9 +431,9 @@ class ModIRC(SingleServerIRCBot):
 			elif command_list[0] == "!replyrate":
 				try:
 					self.settings.reply_chance = int(command_list[1])
-					msg = "Now replying to %d%% of messages." % int(command_list[1])
+					msg = "!Now replying to %d%% of messages." % int(command_list[1])
 				except:
-					msg = "Reply rate is %d%%." % self.settings.reply_chance
+					msg = "!Reply rate is %d%%." % self.settings.reply_chance
 			#make the bot talk
 			elif command_list[0] == "!talk":
 				if len(command_list) >= 2:

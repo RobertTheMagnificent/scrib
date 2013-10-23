@@ -9,7 +9,6 @@ import struct
 import time
 import zipfile
 import re
-import cfgfile
 
 # sys.path.append('../core')
 

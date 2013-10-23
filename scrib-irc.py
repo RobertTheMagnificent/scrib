@@ -249,7 +249,7 @@ class ModIRC(SingleServerIRCBot):
 			return
 
 		# private mode. disable commands for non owners
-		if (not source in self.owners) and self.settings.stealth:
+		if (not source in self.owners) and self.settings.private:
 			while body[:1] == "!":
 				print "[!] Private mode is on, ignoring command: %s" %body
 				return

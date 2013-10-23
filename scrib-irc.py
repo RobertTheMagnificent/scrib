@@ -44,7 +44,10 @@ class ModIRC(SingleServerIRCBot):
 	join_msg = "%s"# is here"
 	part_msg = "%s"# has left"
 
-  # We are going to store the owner's host mask :3
+	# DIS IS BAD OMG HOW CAN YOU
+	self.scrib = my_scrib
+	
+	# We are going to store the owner's host mask :3
 	owner_mask = []
 
 	# IRC Command list
@@ -65,7 +68,7 @@ class ModIRC(SingleServerIRCBot):
 		"quitmsg": self.scrib.settings.pubsym+"Owner command. Usage: !quitmsg [message]\n!Set the quit message. Without arguments show the current quit message.",
 		"talk": self.scrib.settings.pubsym+"Owner command. Usage !talk nick message\n!make the bot send the sentence 'message' to 'nick'.",
 		"quit": self.scrib.settings.pubsym+"Owner command. Usage: !quit\n!Make the bot quit IRC.",
-		"owner": "!Usage: !owner password\n!Allow to become owner of the bot."
+		"owner": self.scrib.settings.pubsym+"Usage: !owner password\n!Allow to become owner of the bot."
 	}
 
 	def __init__(self, my_scrib, args):

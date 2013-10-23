@@ -50,21 +50,21 @@ class ModIRC(SingleServerIRCBot):
 	commandlist =   "IRC Module Commands:\n!chans, !ignore, !join, !nick, !part, !quit, !quitmsg, !replyIgnored, !replyrate, !sleep, !private, !unignore, !wake, !talk, !owner"
 	# IRC Command 
 	commanddict = {
-		"sleep":  "Owner command. Usage: !sleep\n!Stop the bot talking.",
-		"wake": "Owner command. Usage: !wake\n!Allow the bot to talk.",
-		"join": "Owner command. Usage: !join #chan1 [#chan2 [...]]\n!Join one or more channels.",
-		"part": "Owner command. Usage: !part #chan1 [#chan2 [...]]\n!Leave one or more channels.",
-		"chans": "Owner command. Usage: !chans\n!List channels currently on.",
-		"nick": "Owner command. Usage: !nick nickname\n!Change nickname.",
-		"ignore": "Owner command. Usage: !ignore [nick1 [nick2 [...]]]\n!Ignore one or more nicknames. Without arguments it lists ignored nicknames.",
-		"unignore": "Owner command. Usage: !unignore nick1 [nick2 [...]]\n!Unignores one or more nicknames.",
-		"replyrate": "Owner command. Usage: !replyrate [rate%]\n!Set rate of bot replies to rate%. Without arguments (not an owner-only command) shows the current reply rate.",
-		"replyIgnored": "Owner command. Usage: !replyIgnored [on|off]\n!Allow/disallow replying to ignored users. Without arguments shows the current setting.",
-		"private": "Owner command. Usage: !private [on|off]\n!Turn private mode on or off (disable non-owner commands and don't return CTCP VERSION). Without arguments shows the current setting.",
-		"quitmsg": "Owner command. Usage: !quitmsg [message]\n!Set the quit message. Without arguments show the current quit message.",
-		"talk": "Owner command. Usage !talk nick message\n!make the bot send the sentence 'message' to 'nick'.",
-		"quit": "Owner command. Usage: !quit\n!Make the bot quit IRC.",
-		"owner": "Usage: !owner password\n!Allow to become owner of the bot."
+		"sleep":  "Owner command. Usage: !sleep\nStop the bot talking.",
+		"wake": "Owner command. Usage: !wake\nAllow the bot to talk.",
+		"join": "Owner command. Usage: !join #chan1 [#chan2 [...]]\nJoin one or more channels.",
+		"part": "Owner command. Usage: !part #chan1 [#chan2 [...]]\nLeave one or more channels.",
+		"chans": "Owner command. Usage: !chans\nList channels currently on.",
+		"nick": "Owner command. Usage: !nick nickname\nChange nickname.",
+		"ignore": "Owner command. Usage: !ignore [nick1 [nick2 [...]]]\nIgnore one or more nicknames. Without arguments it lists ignored nicknames.",
+		"unignore": "Owner command. Usage: !unignore nick1 [nick2 [...]]\nUnignores one or more nicknames.",
+		"replyrate": "Owner command. Usage: !replyrate [rate%]\nSet rate of bot replies to rate%. Without arguments (not an owner-only command) shows the current reply rate.",
+		"replyIgnored": "Owner command. Usage: !replyIgnored [on|off]\nAllow/disallow replying to ignored users. Without arguments shows the current setting.",
+		"private": "Owner command. Usage: !private [on|off]\nTurn private mode on or off (disable non-owner commands and don't return CTCP VERSION). Without arguments shows the current setting.",
+		"quitmsg": "Owner command. Usage: !quitmsg [message]\nSet the quit message. Without arguments show the current quit message.",
+		"talk": "Owner command. Usage !talk nick message\nmake the bot send the sentence 'message' to 'nick'.",
+		"quit": "Owner command. Usage: !quit\nMake the bot quit IRC.",
+		"owner": "Usage: !owner password\nAllow to become owner of the bot."
 	}
 
 	def __init__(self, my_scrib, args):

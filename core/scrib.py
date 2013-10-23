@@ -80,8 +80,6 @@ class scrib:
 		"words": "Usage: !words\nDisplay how many words are known."
 	}
 	
-	commanddict = commanddict.items() + PluginManager.ScribPlugin.plugin_commands.items()
-	
 	def __init__(self):
 		"""
 		Open the brain. Resize as required.

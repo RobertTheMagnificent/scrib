@@ -491,7 +491,7 @@ class ModIRC(SingleServerIRCBot):
 					c.privmsg(','.join(self.owners), "(To   "+source+") "+message)
 			# ctcp action priv msg
 			else:
-				print "[%s] %s <%s> /me %s" % ( get_time(), target, self.settings.myname, message)
+				print "[%s][-] %s <%s> /me %s" % ( get_time(), target, self.settings.myname, message)
 				c.action(source, message)
 				# send copy to owner
 				if not source in self.owners:

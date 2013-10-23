@@ -296,7 +296,7 @@ class ModIRC(SingleServerIRCBot):
 		### User commands
 		# Query replyrate
 		if command_list[0] == "!replyrate" and len(command_list)==1:
-			msg = "%sReply rate is "+`self.settings.reply_chance`+"%." % self.scrib.settings.pubsym
+			msg = self.scrib.settings.pubsym+"Reply rate is "+`self.settings.reply_chance`+"%."
 
 		if command_list[0] == "!owner" and len(command_list) > 1 and source not in self.owners:
 			if command_list[1] == self.settings.password:
@@ -483,7 +483,7 @@ class ModIRC(SingleServerIRCBot):
 		elif e.eventtype() == "privmsg":
 			# normal private msg
 			if action == 0:
-				print "[%s] %s <%s> %s" % ( get_time(), source, self.settings.myname, message)
+				print "[%s][-] %s <%s> %s" % ( get_time(), source, self.settings.myname, message)
 				c.privmsg(source, message)
 				# send copy to owner
 				if not source in self.owners:
@@ -491,7 +491,7 @@ class ModIRC(SingleServerIRCBot):
 					c.privmsg(','.join(self.owners), "(To   "+source+") "+message)
 			# ctcp action priv msg
 			else:
-				print "[%s] %s <%s> /me %s" % ( get_time(), target, self.settings.myname, message)
+				print "[%s][-] %s <%s> /me %s" % ( get_time(), target, self.settings.myname, message)
 				c.action(source, message)
 				# send copy to owner
 				if not source in self.owners:

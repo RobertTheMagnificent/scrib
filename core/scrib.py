@@ -617,18 +617,18 @@ class scrib:
 				# no arguments. list censored words
 				if len(command_list) == 1:
 					if len(self.settings.censored) == 0:
-						msg = "No words censored."
+						msg = "!No words censored."
 					else:
-						msg = "I will not use the word(s) %s" % ", ".join(self.settings.censored)
+						msg = "!I will not use the word(s) %s" % ", ".join(self.settings.censored)
 				# add every word listed to censored list
 				else:
 					for x in xrange(1, len(command_list)):
 						if command_list[x] in self.settings.censored:
-							msg += "%s is already censored." % command_list[x]
+							msg += "!%s is already censored." % command_list[x]
 						else:
 							self.settings.censored.append(command_list[x])
 							self.unlearn(command_list[x])
-							msg += "%s is now censored." % command_list[x]
+							msg += "!%s is now censored." % command_list[x]
 						msg += "\n"
 
 			# remove a word from the censored list
@@ -638,7 +638,7 @@ class scrib:
 				for x in xrange(1, len(command_list)):
 					try:
 						self.settings.censored.remove(command_list[x])
-						msg = "%s is uncensored." % command_list[x]
+						msg = "!%s is uncensored." % command_list[x]
 					except ValueError, e:
 						pass
 
@@ -646,21 +646,21 @@ class scrib:
 				# no arguments. list aliases words
 				if len(command_list) == 1:
 					if len(self.settings.aliases) == 0:
-						msg = "No aliases"
+						msg = "!No aliases"
 					else:
-						msg = "I will alias the word(s) %s." \
+						msg = "!I will alias the word(s) %s." \
 						% ", ".join(self.settings.aliases.keys())
 				# add every word listed to alias list
 				elif len(command_list) == 2:
 					if command_list[1][0] != '~': command_list[1] = '~' + command_list[1]
 					if command_list[1] in self.settings.aliases.keys():
-						msg = "These words : %s are aliases to %s." \
+						msg = "!These words : %s are aliases to %s." \
 						% ( " ".join(self.settings.aliases[command_list[1]]), command_list[1] )
 					else:
-						msg = "The alias %s is not known." % command_list[1][1:]
+						msg = "!The alias %s is not known." % command_list[1][1:]
 				elif len(command_list) > 2:
 					#create the aliases
-					msg = "The words : "
+					msg = "!The words : "
 					if command_list[1][0] != '~': command_list[1] = '~' + command_list[1]
 					if not(command_list[1] in self.settings.aliases.keys()):
 						self.settings.aliases[command_list[1]] = [command_list[1][1:]]
@@ -675,14 +675,14 @@ class scrib:
 
 			# Fortune command
 			elif command_list[0] == "!fortune":
-				msg = "".join([i for i in os.popen('fortune').readlines()]).replace('\n\n', '\n').replace('\n', ' ')
+				msg = "!".join([i for i in os.popen('fortune').readlines()]).replace('\n\n', '\n').replace('\n', ' ')
 			
 			# Tweeter command
 			elif command_list[0] == "!tweet":
-				msg = 'test :3'
+				msg = '!test :3'
 			# Date command
 			elif command_list[0] == "!date":
-				msg = "It is ".join(i for i in os.popen('date').readlines())
+				msg = "!It is ".join(i for i in os.popen('date').readlines())
 			# Quit
 			elif command_list[0] == "!quit":
 				# Close the brain

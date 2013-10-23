@@ -116,7 +116,7 @@ class UnIgnorePlugin(ScribPlugin.ScribPlugin):
 ScribPlugin.addPlugin( nick_command, nick_alias, NickPlugin() )
 ScribPlugin.addPlugin( join_command, join_alias, JoinPlugin() )
 ScribPlugin.addPlugin( part_command, part_alias, PartPlugin() )
-ScribPlugin.addPlugin( chans_command, chans_alais, ChansPlugin() )
+ScribPlugin.addPlugin( chans_command, chans_alias, ChansPlugin() )
 ScribPlugin.addPlugin( quit_command, quit_alias, QuitPlugin() )
 ScribPlugin.addPlugin( quitmsg_command, quitmsg_alias, QuitmsgPlugin() )
 ScribPlugin.addPlugin( ignore_command, ignore_alias, IgnorePlugin() )

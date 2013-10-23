@@ -59,7 +59,7 @@ class scrib:
 	ver_string += " My braintechnology is at %s." % brainVer
 
 	# Main command list
-	commandlist = "Scrib commands:\n!checkdict, !contexts, !help, !known, !learning, !rebuilddict, !replace, !unlearn, !purge, !version, !words, !limit, !alias, !save, !censor, !uncensor, !owner, !fortune. !tweet, !date"
+	commandlist = "Scrib commands:\n!check, !contexts, !help, !known, !learning, !rebuild, !replace, !unlearn, !purge, !version, !words, !limit, !alias, !save, !censor, !uncensor, !owner, !fortune. !tweet, !date"
 	commanddict = {
 		"help": "Owner command. Usage: !help [command]\nPrints information about using a command, or a list of commands if no command is given.",
 		"version": "Usage: !version\nDisplay what version of Scrib we are running.",

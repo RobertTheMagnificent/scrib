@@ -530,7 +530,6 @@ class scrib:
 							break
 
 				if c_max < 1:
-					#io_module.output(str(compteur)+" words to remove", args)
 					io_module.output("%s words to remove" %compteur, args)
 					return
 

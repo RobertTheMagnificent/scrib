@@ -1,16 +1,14 @@
 from plugins import ScribPlugin
 
 # User Alias and Command
-alias = "!echo"
-command = { "echo": "Usage: !echo message\nMake the bot mimic your message." }
+alias = "!replyrate"
+command = { "replyrate": "Usage: !echo message\nMake the bot mimic your message." }
 
 # Plugin Action
-class EchoPlugin(ScribPlugin.ScribPlugin):
+class ReplyRatePlugin(ScribPlugin.ScribPlugin):
 	def action(self, command_list):
-		if len(command_list) >= 1:
-			phrase=""
-			for x in xrange (1, len (command_list)):
-				phrase = phrase + str(command_list[x]) + " "
-			return phrase
+		if command_list[0] == "!replyrate" and len(command_list)==1:
+			msg = ModIRC.scrib.settings.pubsym+"Reply rate is "+`self.settings.reply_chance`+"%."
+		return msg
 
-ScribPlugin.addPlugin( command, alias, EchoPlugin() )
+ScribPlugin.addPlugin( command, alias, ReplyRatePlugin() )

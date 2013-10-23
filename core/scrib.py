@@ -53,24 +53,24 @@ def get_time():
 	"""
 	return time.strftime("\033[0m[%H:%M:%S]", time.localtime(time.time()))
 
-def barf(self, msg_code, message):
+def barf(msg_code, message):
 		print get_time() + msg_code + message
-	
+
+# Message Codes
+ACT = '\033[93m [~] '
+MSG = '\033[94m [-] '
+SAV = '\033[92m [#] '
+ERR = '\033[91m [!] '
+
+def disable(self):
+	ACT = ''
+	MSG = ''
+	SAV = ''
+	ERR = ''
+
 class scrib:
 	import re
 	import cfgfile
-
-	# Message Codes
-	ACT = '\033[93m [~] '
-	MSG = '\033[94m [-] '
-	SAV = '\033[92m [#] '
-	ERR = '\033[91m [!] '
-
-	def disable(self):
-		self.ACT = ''
-		self.MSG = ''
-		self.SAV = ''
-		self.ERR = ''
 
 	# Main command list
 	commandlist = "Owner commands:\n!alias, !censor, !check, !contexts, !learning, !limit, !purge, !rebuild, !replace, !save, !uncensor, !unlearn\nPublic commands:\n!date, !fortune, !help, !known, !owner, !tweet, !version, !words"
@@ -129,7 +129,7 @@ class scrib:
 			} )
 
 		# Read the brain
-		barf(self.SAV, "Reading my brain...")
+		barf(SAV, "Reading my brain...")
 		try:
 			zfile = zipfile.ZipFile('data/archive.zip','r')
 			for filename in zfile.namelist():
@@ -138,14 +138,14 @@ class scrib:
 				file.write(data)
 				file.close()
 		except (EOFError, IOError), e:
-			barf(self.ERR + "No zip found")
+			barf(ERR + "No zip found")
 		try:
 
 			f = open("data/version", "rb")
 			s = f.read()
 			f.close()
 			if s != self.version.brain:
-				barf(self.ERR, "Error loading the brain.\n[!]--> Please convert it before launching scrib.")
+				barf(ERR, "Error loading the brain.\n[!]--> Please convert it before launching scrib.")
 				sys.exit(1)
 
 			f = open("data/words.dat", "rb")
@@ -162,11 +162,11 @@ class scrib:
 			# Create new database
 			self.words = {}
 			self.lines = {}
-			barf(self.ERR, "Error reading saves. New database created.")
+			barf(ERR, "Error reading saves. New database created.")
 
 		# Is a resizing required?
 		if len(self.words) != self.settings.num_words:
-			barf(self.ACT + "Updating my brain's information...")
+			barf(ACT + "Updating my brain's information...")
 			self.settings.num_words = len(self.words)
 			num_contexts = 0
 			# Get number of contexts
@@ -181,7 +181,7 @@ class scrib:
 		for x in self.settings.aliases.keys():
 			count += len(self.settings.aliases[x])
 		if count != self.settings.num_aliases:
-			barf(self.ACT + "Check brain for new aliases.")
+			barf(ACT + "Check brain for new aliases.")
 			self.settings.num_aliases = count
 
 			for x in self.words.keys():
@@ -222,7 +222,7 @@ class scrib:
 
 	def save_all(self):
 		if self.settings.no_save != "True":
-			barf(self.SAV + "Writing to my brain...\033[0m")
+			barf(SAV + "Writing to my brain...\033[0m")
 
 			try:
 				zfile = zipfile.ZipFile('data/archive.zip','r')
@@ -232,7 +232,7 @@ class scrib:
 					file.write(data)
 					file.close()
 			except (OSError, IOError), e:
-				barf(self.ERR, "No brain zip found. Is this the first time scrib has been launched?")
+				barf(ERR, "No brain zip found. Is this the first time scrib has been launched?")
 
 
 			f = open("data/words.dat", "wb")
@@ -262,7 +262,7 @@ class scrib:
 				os.remove('data/lines.dat')
 				os.remove('data/version')
 			except (OSError, IOError), e:
-				barf(self.ERR + "Could not remove the files.")
+				barf(ERR + "Could not remove the files.")
 
 			f = open("data/words.txt", "w")
 			# write each words known
@@ -395,7 +395,7 @@ class scrib:
 		if owner == 1:
 			# Save the brain
 			if command_list[0] == "!save":
-				self.save_all()
+				SAVe_all()
 				msg = "%sBrain has been saved!" % self.settings.pubsym
 
 			# Command list
@@ -442,14 +442,14 @@ class scrib:
 
 						# Nasty critical error we should fix
 						if not self.lines.has_key(line_idx):
-							barf(self.ACT, "Removing broken link '%s' -> %d." % (w, line_idx))
+							barf(ACT, "Removing broken link '%s' -> %d." % (w, line_idx))
 							num_broken = num_broken + 1
 							del wlist[i]
 						else:
 							# Check pointed to word is correct
 							split_line = self.lines[line_idx][0].split()
 							if split_line[word_num] != w:
-								barf(self.ACT, "Line '%s' word %d is not '%s' as expected." % \
+								barf(ACT, "Line '%s' word %d is not '%s' as expected." % \
 									(self.lines[line_idx][0],
 									word_num, w))
 								num_bad = num_bad + 1
@@ -457,7 +457,7 @@ class scrib:
 					if len(wlist) == 0:
 						del self.words[w]
 						self.settings.num_words = self.settings.num_words - 1
-						barf(self.ACT, "\"%s\" vaped totally" %w)
+						barf(ACT, "\"%s\" vaped totally" %w)
 
 				msg = "%sChecked my brain in %0.2fs. Fixed links: %d broken, %d bad." % \
 					(self.settings.pubsym, 
@@ -558,9 +558,9 @@ class scrib:
 					return
 
 				context = " ".join(command_list[1:])
-				barf(self.ACT, "========================")
-				barf(self.ACT, "Printing contexts containing '%s'" % context)
-				barf(self.ACT, "========================")
+				barf(ACT, "========================")
+				barf(ACT, "Printing contexts containing '%s'" % context)
+				barf(ACT, "========================")
 
 				# Build context list
 				# Pad it
@@ -583,22 +583,22 @@ class scrib:
 				while x < 5:
 					if x < len(c):
 						lines = c
-						barf(self.ACT, "%s" %lines[x])
+						barf(ACT, "%s" %lines[x])
 					x += 1
 				if len(c) == 5:
 					return
 				if len(c) > 10:
 					number = len(c)-10
-					barf(self.ACT, "...(%s lines skipped)..." % number)
+					barf(ACT, "...(%s lines skipped)..." % number)
 				x = len(c) - 5
 				if x < 5:
 					x = 5
 				while x < len(c):
 					lines = c
-					barf(self.ACT, "%s" % lines[x])
+					barf(ACT, "%s" % lines[x])
 					x += 1
 
-				barf(self.ACT, "========================")
+				barf(ACT, "========================")
 
 			# Remove a word from the vocabulary [use with care]
 			elif command_list[0] == "!unlearn":
@@ -607,7 +607,7 @@ class scrib:
 				
 				if context == "":
 					return
-				barf(self.ACT, "Looking for: %s" % context)
+				barf(ACT, "Looking for: %s" % context)
 				# Unlearn contexts containing 'context'
 				t = time.time()
 				self.unlearn(context)
@@ -702,8 +702,8 @@ class scrib:
 			# Quit
 			elif command_list[0] == "!quit":
 				# Close the brain
-				self.save_all()
-				barf(self.SAV, "Saved my brain. Goodbye!")
+				SAVe_all()
+				barf(SAV, "Saved my brain. Goodbye!")
 				sys.exit()
 				
 			# Save changes
@@ -730,7 +730,7 @@ class scrib:
 			number = self.lines[l][1]
 			if line[w] != old:
 				# fucked brain
-				barf(self.ERR, "Broken link: %s %s" % (x, self.lines[l][0] ) )
+				barf(ERR, "Broken link: %s %s" % (x, self.lines[l][0] ) )
 				continue
 			else:
 				line[w] = new
@@ -786,7 +786,7 @@ class scrib:
 			if len(words[x]) == 0:
 				del words[x]
 				self.settings.num_words = self.settings.num_words - 1
-				barf(self.ACT, "\"%s\" vaporized from brain." % x)
+				barf(ACT, "\"%s\" vaporized from brain." % x)
 
 	def reply(self, body):
 		"""
@@ -1004,7 +1004,7 @@ class scrib:
 
 			# Ignore if the sentence starts with an exclamation
 			if body[0:1] == "!":
-				barf(self.ERR + "Not learning: %s" % words)
+				barf(ERR + "Not learning: %s" % words)
 				return
 			
 			vowels = "aÃ Ã¢eÃ©Ã¨ÃªiÃ®Ã¯oÃ¶Ã´uÃ¼Ã»y"
@@ -1024,7 +1024,7 @@ class scrib:
 				for censored in self.settings.censored:
 					pattern = "^%s$" % censored
 					if re.search(pattern, words[x]):
-						barf(self.ACT + "Censored word %s" %words[x])
+						barf(ACT + "Censored word %s" %words[x])
 						return
 
 				if len(words[x]) > 13 \

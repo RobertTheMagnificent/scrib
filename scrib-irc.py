@@ -297,7 +297,7 @@ class ModIRC(SingleServerIRCBot):
 		### User commands
 		# Query replyrate
 		if command_list[0] == "!replyrate" and len(command_list)==1:
-			msg = "Reply rate is "+`self.settings.reply_chance`+"%."
+			msg = "!Reply rate is "+`self.settings.reply_chance`+"%."
 
 		if command_list[0] == "!owner" and len(command_list) > 1 and source not in self.owners:
 			if command_list[1] == self.settings.password:
@@ -414,7 +414,7 @@ class ModIRC(SingleServerIRCBot):
 				for x in xrange(1, len(command_list)):
 					try:
 						self.settings.ignorelist.remove(command_list[x])
-						msg = "done"
+						msg = "!Done."
 					except:
 						pass
 			# set the quit message

@@ -131,7 +131,7 @@ class ModIRC(SingleServerIRCBot):
 		self.start()
 
 	def on_welcome(self, c, e):
-		print self.chans
+		print "[%s][~] %s" % (get_time(), self.chans)
 		for i in self.chans:
 			c.join(i)
 

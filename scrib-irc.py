@@ -31,8 +31,8 @@ import thread
 class ModIRC(SingleServerIRCBot):
 
 	# Message Codes
-	ACT = '\033[94m [~] '
-	MSG = '\033[92m [-] '
+	ACT = '\033[92m [~] '
+	MSG = '\033[94m [-] '
 	SAV = '\033[93m [#] '
 	ERR = '\033[91m [!] '
 

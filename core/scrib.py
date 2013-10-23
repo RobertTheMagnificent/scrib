@@ -562,8 +562,6 @@ class scrib:
 				if context == "":
 					return
 
-				#io_module.output(self.settings.pubsym+"Contexts containing \""+context+"\":", args)
-				#print "[%s][-]Contexts containing %s" % (""+context+"", args)
 				context = " ".join(command_list[1:])
 				print "[%s][#] ========================" % get_time()
 				print "[%s][#] Printing contexts containing '%s'" % (get_time(), context)
@@ -589,21 +587,18 @@ class scrib:
 				x = 0
 				while x < 5:
 					if x < len(c):
-						#io_module.output(self.settings.pubsym+c[x], args)
 						lines = c
 						print "[%s][#] %s" % (get_time(), lines[x])
 					x += 1
 				if len(c) == 5:
 					return
 				if len(c) > 10:
-					#io_module.output(self.settings.pubsym+"...("+`len(c)-10`+" skipped)...", args)
 					number = len(c)-10
 					print "[%s][!] ...(%s lines skipped)..." % (get_time(), number)
 				x = len(c) - 5
 				if x < 5:
 					x = 5
 				while x < len(c):
-					#io_module.output(self.settings.pubsym+c[x], args)
 					lines = c
 					print "[%s][#] %s" % (get_time(), lines[x])
 					x += 1

@@ -440,7 +440,7 @@ class ModIRC(SingleServerIRCBot):
 			# self.commanddict should eventually check self.commandlist
 			# so we can stop doing [1:]
 			elif command_list[0][1:] in self.commanddict:
-				PluginManager.ScribPlugin(self, command_list)
+				PluginManager.ScribPlugin.ScribPlugin.action(self, command_list)
 
 			self.scrib.settings.save()
 			self.settings.save()

@@ -59,8 +59,6 @@ class ModIRC(SingleServerIRCBot):
 		"control": "Usage: !control password\nAllow user to have access to bot commands."
 	}
 	
-	print "[DEBUG] %s" % PluginManager.ScribPlugin.process_table
-	
 	def __init__(self, my_scrib, args):
 		"""
 		Args will be sys.argv (command prompt arguments)

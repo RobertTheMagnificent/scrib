@@ -51,12 +51,13 @@ class scrib:
 	import re
 	import cfgfile
 
-def get_time():
-	"""
-	Make time sexy
-	"""
-	return time.strftime("\033[0m[%H:%M:%S]", time.localtime(time.time()))
-	# Message Codes
+	def get_time():
+		"""
+		Make time sexy
+		"""
+		return time.strftime("\033[0m[%H:%M:%S]", time.localtime(time.time()))
+
+		# Message Codes
 	ACT = '\033[93m [~] '
 	MSG = '\033[94m [-] '
 	SAV = '\033[92m [#] '

@@ -38,23 +38,13 @@ class ModIRC(SingleServerIRCBot):
 	# We are going to store the owner's host mask :3
 	owner_mask = []
 
-	# IRC Command list
-	commandlist =   "IRC Module Commands:\n!chans, !ignore, !join, !nick, !part, !private, !quit, !quitmsg, !replyIgnored, !unignore"
 	# IRC Command 
 	commanddict = {
-		"join": "Owner command. Usage: !join #chan1 [#chan2 [...]]\nJoin one or more channels.",
-		"part": "Owner command. Usage: !part #chan1 [#chan2 [...]]\nLeave one or more channels.",
-		"chans": "Owner command. Usage: !chans\nList channels currently on.",
-		"nick": "Owner command. Usage: !nick nickname\nChange nickname.",
-		"ignore": "Owner command. Usage: !ignore [nick1 [nick2 [...]]]\nIgnore one or more nicknames. Without arguments it lists ignored nicknames.",
-		"unignore": "Owner command. Usage: !unignore nick1 [nick2 [...]]\nUnignores one or more nicknames.",
 		"replyIgnored": "Owner command. Usage: !replyIgnored [on|off]\nAllow/disallow replying to ignored users. Without arguments shows the current setting.",
 		"private": "Owner command. Usage: !private [on|off]\nTurn private mode on or off (disable non-owner commands and don't return CTCP VERSION). Without arguments shows the current setting.",
-		"quitmsg": "Owner command. Usage: !quitmsg [message]\nSet the quit message. Without arguments show the current quit message.",
-		"quit": "Owner command. Usage: !quit\nMake the bot quit IRC."
 	}
 
-	commandlist += " "+PluginManager.ScribPlugin.plugin_aliases
+	commandlist = " "+PluginManager.ScribPlugin.plugin_aliases
 	commanddict = dict( commanddict.items() + PluginManager.ScribPlugin.plugin_commands.items() )
 	
 	def __init__(self, my_scrib, args):
@@ -284,24 +274,9 @@ class ModIRC(SingleServerIRCBot):
 		command_list = body.split()
 		command_list[0] = command_list[0]
 
-		### User commands
-		#if command_list[0] == "!control" and len(command_list) > 1 and source not in self.owners:
-		#	if command_list[1] == self.settings.password:
-		#		self.owners.append(source)
-		#		self.output("You've been added to controllers list", ("", source, target, c, e))
-		#	else:
-		#		self.output("Try again", ("", source, target, c, e))
-
 		### Owner commands
 		if source in self.owners and e.source() in self.owner_mask:
 
-			# Change nick
-			if command_list[0] == "!nick":
-				try:
-					self.connection.nick(command_list[1])
-					self.settings.myname = command_list[1]
-				except:
-					pass
 			# private mode
 			elif command_list[0] == "!private":
 				msg = "$sPrivate mode " % self.settings.pubsym
@@ -336,63 +311,7 @@ class ModIRC(SingleServerIRCBot):
 					else:
 						msg = msg + "off"
 						self.settings.replyIgnored = 0
-			# Stop talking
-			# elif command_list[0] == "!sleep":
-				# if self.settings.speaking == 1:
-					# msg = "Going to sleep.  Goodnight!"
-					# self.settings.speaking = 0
-				# else:
-					# msg = "Zzz.."
-			# Wake up again
-			# elif command_list[0] == "!wake":
-				# if self.settings.speaking == 0:
-					# self.settings.speaking = 1
-					# msg = "Whoohoo!"
-				# else:
-					# msg = "But I'm already awake..."
-						
-			# Join a channel or list of channels
-			elif command_list[0] == "!join":
-				for x in xrange(1, len(command_list)):
-					if not command_list[x] in self.chans:
-						msg = "Attempting to join channel %s" % command_list[x]
-						self.chans.append(command_list[x])
-						c.join(command_list[x])
 
-			# Part a channel or list of channels
-			elif command_list[0] == "!part":
-				for x in xrange(1, len(command_list)):
-					if command_list[x] in self.chans:
-						msg = "Leaving channel %s" % command_list[x]
-						self.chans.remove(command_list[x])
-						c.part(command_list[x])
-
-			# List channels currently on
-			elif command_list[0] == "!chans":
-				if len(self.channels.keys())==0:
-					msg = "I'm currently on no channels"
-				else:
-					msg = "I'm currently on "
-					channels = self.channels.keys()
-					for x in xrange(0, len(channels)):
-						msg = msg+channels[x]+" "
-			# add someone to the ignore list
-			elif command_list[0] == "!ignore":
-				# if no arguments are given say who we are
-				# ignoring
-				if len(command_list) == 1:
-					msg = "I'm ignoring "
-					if len(self.settings.ignorelist) == 0:
-						msg = msg + "nobody"
-					else:
-						for x in xrange(0, len(self.settings.ignorelist)):
-							msg = msg + self.settings.ignorelist[x] + " "
-				# Add everyone listed to the ignore list
-				# eg !ignore tom dick harry
-				else:
-					for x in xrange(1, len(command_list)):
-						self.settings.ignorelist.append(command_list[x])
-						msg = "!Done."
 			# remove someone from the ignore list
 			elif command_list[0] == "!unignore":
 				# Remove everyone listed from the ignore list
@@ -403,23 +322,6 @@ class ModIRC(SingleServerIRCBot):
 						msg = "Done."
 					except:
 						pass
-			# set the quit message
-			elif command_list[0] == "!quitmsg":
-				if len(command_list) > 1:
-					self.settings.quitmsg = body.split(" ", 1)[1]
-					msg = "New quit message is \"%s\"" % self.settings.quitmsg
-				else:
-					msg = "Quit message is \"%s\"" % self.settings.quitmsg
-			# make the scrib quit
-			elif command_list[0] == "!quit":
-				sys.exit()
-			# Change reply rate
-			# elif command_list[0] == "!replyrate":
-				# try:
-					# self.settings.reply_chance = int(command_list[1])
-					# msg = "Now replying to %d%% of messages." % int(command_list[1])
-				# except:
-					# msg = "Reply rate is %d%%." % self.settings.reply_chance
 
 			# Make the commands dynamic
 			# self.commanddict should eventually check self.commandlist

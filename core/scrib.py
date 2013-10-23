@@ -597,7 +597,7 @@ class scrib:
 				
 				if context == "":
 					return
-				print "%sLooking for: %s" % (get_time(), context) 
+				print "[%s][-] Looking for: %s" % (get_time(), context) 
 				# Unlearn contexts containing 'context'
 				t = time.time()
 				self.unlearn(context)

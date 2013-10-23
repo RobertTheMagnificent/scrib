@@ -131,7 +131,7 @@ class scrib:
 				s = f.read()
 				f.close()
 				if s != self.brainVer:
-					print "[%s][!] Error loading the brain.\nPlease convert it before launching scrib." % get_time()
+					print "[%s][!] Error loading the brain.\n[!]--> Please convert it before launching scrib." % get_time()
 					sys.exit(1)
 
 				f = open("data/words.dat", "rb")
@@ -298,6 +298,7 @@ class scrib:
 
 		# Filter out garbage and do some formatting
 		body = filter_message(body, self)
+		print "[DEBUG] %s" % body
 	
 		# Learn from input
 		if learn == 1:

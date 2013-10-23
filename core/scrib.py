@@ -101,7 +101,7 @@ class scrib:
 			  "pubsym": ("Symbol to append to cmd msgs in public", "!"),
 			  "no_save"	:("If True, Scrib doesn't save his brain and configuration to disk", "False")
 			} )
-
+		print "OMGDEBUG: %s" % self.settings.pubsym
 		self.answers = self.cfgfile.cfgset()
 		self.answers.load("data/answers.txt",
 			{ "sentences":	("A list of prepared answers", {})
@@ -110,7 +110,7 @@ class scrib:
 
 		# Read the brain
 		if self.settings.process_with == "scrib":
-			print "[#] Reading my brain..."
+			print "Reading my brain..."
 			try:
 				zfile = zipfile.ZipFile('data/archive.zip','r')
 				for filename in zfile.namelist():

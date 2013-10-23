@@ -126,7 +126,7 @@ class ModIRC(SingleServerIRCBot):
 					pass
 
 	def our_start(self):
-		print "Connecting to %s " % self.settings.servers
+		print "[~] Connecting to %s " % self.settings.servers
 		SingleServerIRCBot.__init__(self, self.settings.servers, self.settings.myname, self.settings.realname, 2)
 
 		self.start()
@@ -181,7 +181,7 @@ class ModIRC(SingleServerIRCBot):
 
 	def _on_disconnect(self, c, e):
 		# self.channels = IRCDict()
-		print "Disconnected.."
+		print "[~] Disconnected.."
 		self.connection.execute_delayed(self.reconnection_interval, self._connected_checker)
 
 
@@ -522,7 +522,7 @@ if __name__ == "__main__":
 		pass
 	except:
 		traceback.print_exc()
-		c = raw_input("Oh no, I've crashed! Would you like to save my brain? (y/n)")
+		c = raw_input("[!] Oh no, I've crashed! Would you like to save my brain? (y/n)")
 		if c[:1] == 'n':
 			sys.exit(0)
 	bot.disconnect(bot.settings.quitmsg)

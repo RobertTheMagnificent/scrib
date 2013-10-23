@@ -39,7 +39,7 @@ class ModIRC(SingleServerIRCBot):
 	owner_mask = []
 
 	# IRC Command list
-	commandlist =   "IRC Module Commands:\n!chans, !control, !ignore, !join, !nick, !part, !private, !quit, !quitmsg, !replyIgnored, !replyrate, !sleep, !unignore, !wake"
+	commandlist =   "IRC Module Commands:\n!chans, !control, !ignore, !join, !nick, !part, !private, !quit, !quitmsg, !replyIgnored, !sleep, !unignore, !wake"
 	# IRC Command 
 	commanddict = {
 		"sleep":  "Owner command. Usage: !sleep\nStop the bot talking.",
@@ -50,7 +50,6 @@ class ModIRC(SingleServerIRCBot):
 		"nick": "Owner command. Usage: !nick nickname\nChange nickname.",
 		"ignore": "Owner command. Usage: !ignore [nick1 [nick2 [...]]]\nIgnore one or more nicknames. Without arguments it lists ignored nicknames.",
 		"unignore": "Owner command. Usage: !unignore nick1 [nick2 [...]]\nUnignores one or more nicknames.",
-		"replyrate": "Owner command. Usage: !replyrate [rate%]\nSet rate of bot replies to rate%. Without arguments (not an owner-only command) shows the current reply rate.",
 		"replyIgnored": "Owner command. Usage: !replyIgnored [on|off]\nAllow/disallow replying to ignored users. Without arguments shows the current setting.",
 		"private": "Owner command. Usage: !private [on|off]\nTurn private mode on or off (disable non-owner commands and don't return CTCP VERSION). Without arguments shows the current setting.",
 		"quitmsg": "Owner command. Usage: !quitmsg [message]\nSet the quit message. Without arguments show the current quit message.",

@@ -43,7 +43,7 @@ class ModIRC(SingleServerIRCBot):
 		self.ERR = ''
 	
 	def barf(self, msg_code, message):
-		print self.get_time() msg_code + message
+		print self.get_time() + msg_code + message
 
 	"""
 	Interfacing some IRC I/O with scrib learn/reply modules!

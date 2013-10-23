@@ -38,13 +38,7 @@ class ModIRC(SingleServerIRCBot):
 	# We are going to store the owner's host mask :3
 	owner_mask = []
 
-	# IRC Command 
-	commanddict = {
-		"replyIgnored": "Owner command. Usage: !replyIgnored [on|off]\nAllow/disallow replying to ignored users. Without arguments shows the current setting.",
-		"private": "Owner command. Usage: !private [on|off]\nTurn private mode on or off (disable non-owner commands and don't return CTCP VERSION). Without arguments shows the current setting.",
-	}
-
-	commandlist = " "+PluginManager.ScribPlugin.plugin_aliases
+	commandlist = dict( commandlist.items() + PluginManager.ScribPlugin.plugin_aliases.items() )
 	commanddict = dict( commanddict.items() + PluginManager.ScribPlugin.plugin_commands.items() )
 	
 	def __init__(self, my_scrib, args):

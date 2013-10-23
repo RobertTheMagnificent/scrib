@@ -219,7 +219,7 @@ class scrib:
 
 	def save_all(self):
 		if self.settings.process_with == "scrib" and self.settings.no_save != "True":
-			print get_time() + self.SAV + "Writing to my brain..."
+			print get_time() + self.SAV + "Writing to my brain...\033[0m"
 
 			try:
 				zfile = zipfile.ZipFile('data/archive.zip','r')

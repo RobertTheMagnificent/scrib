@@ -39,11 +39,9 @@ class ModIRC(SingleServerIRCBot):
 	owner_mask = []
 
 	# IRC Command list
-	commandlist =   "IRC Module Commands:\n!chans, !ignore, !join, !nick, !part, !private, !quit, !quitmsg, !replyIgnored, !sleep, !unignore, !wake"
+	commandlist =   "IRC Module Commands:\n!chans, !ignore, !join, !nick, !part, !private, !quit, !quitmsg, !replyIgnored, !unignore"
 	# IRC Command 
 	commanddict = {
-		"sleep":  "Owner command. Usage: !sleep\nStop the bot talking.",
-		"wake": "Owner command. Usage: !wake\nAllow the bot to talk.",
 		"join": "Owner command. Usage: !join #chan1 [#chan2 [...]]\nJoin one or more channels.",
 		"part": "Owner command. Usage: !part #chan1 [#chan2 [...]]\nLeave one or more channels.",
 		"chans": "Owner command. Usage: !chans\nList channels currently on.",
@@ -339,19 +337,19 @@ class ModIRC(SingleServerIRCBot):
 						msg = msg + "off"
 						self.settings.replyIgnored = 0
 			# Stop talking
-			elif command_list[0] == "!sleep":
-				if self.settings.speaking == 1:
-					msg = "Going to sleep.  Goodnight!"
-					self.settings.speaking = 0
-				else:
-					msg = "Zzz.."
+			# elif command_list[0] == "!sleep":
+				# if self.settings.speaking == 1:
+					# msg = "Going to sleep.  Goodnight!"
+					# self.settings.speaking = 0
+				# else:
+					# msg = "Zzz.."
 			# Wake up again
-			elif command_list[0] == "!wake":
-				if self.settings.speaking == 0:
-					self.settings.speaking = 1
-					msg = "Whoohoo!"
-				else:
-					msg = "But I'm already awake..."
+			# elif command_list[0] == "!wake":
+				# if self.settings.speaking == 0:
+					# self.settings.speaking = 1
+					# msg = "Whoohoo!"
+				# else:
+					# msg = "But I'm already awake..."
 						
 			# Join a channel or list of channels
 			elif command_list[0] == "!join":
@@ -416,12 +414,12 @@ class ModIRC(SingleServerIRCBot):
 			elif command_list[0] == "!quit":
 				sys.exit()
 			# Change reply rate
-			elif command_list[0] == "!replyrate":
-				try:
-					self.settings.reply_chance = int(command_list[1])
-					msg = "Now replying to %d%% of messages." % int(command_list[1])
-				except:
-					msg = "Reply rate is %d%%." % self.settings.reply_chance
+			# elif command_list[0] == "!replyrate":
+				# try:
+					# self.settings.reply_chance = int(command_list[1])
+					# msg = "Now replying to %d%% of messages." % int(command_list[1])
+				# except:
+					# msg = "Reply rate is %d%%." % self.settings.reply_chance
 
 			# Make the commands dynamic
 			# self.commanddict should eventually check self.commandlist

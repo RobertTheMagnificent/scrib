@@ -1,5 +1,6 @@
 import time
 process_table = {}
+plugin_commands = []
 
 def get_time():
 	return time.strftime("%H:%M:%S", time.localtime(time.time()))

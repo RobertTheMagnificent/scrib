@@ -110,7 +110,7 @@ class scrib:
 
 		# Read the brain
 		if self.settings.process_with == "scrib":
-			print "Reading my brain..."
+			print "[#] Reading my brain..."
 			try:
 				zfile = zipfile.ZipFile('data/archive.zip','r')
 				for filename in zfile.namelist():
@@ -680,7 +680,7 @@ class scrib:
 
 			# Fortune command
 			elif command_list[0] == "!fortune":
-				msg = "%s".join([i for i in os.popen('fortune').readlines()]).replace('\n\n', '\n').replace('\n', ' ') %s self.settings.pubsym
+				msg = "%s".join([i for i in os.popen('fortune').readlines()]).replace('\n\n', '\n').replace('\n', ' ') % self.settings.pubsym
 			
 			# Tweeter command
 			elif command_list[0] == "!tweet":

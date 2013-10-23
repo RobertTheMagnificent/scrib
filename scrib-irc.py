@@ -29,6 +29,19 @@ import traceback
 import thread
 
 class ModIRC(SingleServerIRCBot):
+
+	# Message Codes
+	ACT = '\033[94m [~] '
+	MSG = '\033[92m [-] '
+	SAV = '\033[93m [#] '
+	ERR = '\033[91m [!] '
+
+	def disable(self):
+		self.ACT = ''
+		self.MSG = ''
+		self.SAV = ''
+		self.ERR = ''
+
 	"""
 	Interfacing some IRC I/O with scrib learn/reply modules!
 	"""
@@ -99,13 +112,13 @@ class ModIRC(SingleServerIRCBot):
 					pass
 
 	def our_start(self):
-		print "[%s][~] Connecting to %s " % (scrib.get_time(), self.settings.servers)
+		print scrib.get_time() + self.ACT + "Connecting to %s " %self.settings.servers
 		SingleServerIRCBot.__init__(self, self.settings.servers, self.settings.myname, self.settings.realname, 2)
 
 		self.start()
 
 	def on_welcome(self, c, e):
-		print "[%s][~] %s" % (scrib.get_time(), self.chans)
+		print scrib.get_time() + self.ACT + "%s" %self.chans
 		for i in self.chans:
 			c.join(i)
 
@@ -137,7 +150,7 @@ class ModIRC(SingleServerIRCBot):
 			reason = ""
 
 		if kicked == self.settings.myname:
-			print "[%s][*] %s was kicked off %s by %s (%s)" % (scrib.get_time(), kicked, target, kicker, reason)
+			print scrib.get_time() + self.ACT + "%s was kicked off %s by %s (%s)" % (kicked, target, kicker, reason)
 
 	def on_privmsg(self, c, e):
 		self.on_msg(c, e)
@@ -154,7 +167,7 @@ class ModIRC(SingleServerIRCBot):
 
 	def _on_disconnect(self, c, e):
 		# self.channels = IRCDict()
-		print "[%s][~] Disconnected.." % scrib.get_time()
+		print scrib.get_time() + self.ACT + "Disconnected.."
 		self.connection.execute_delayed(self.reconnection_interval, self._connected_checker)
 
 
@@ -171,7 +184,7 @@ class ModIRC(SingleServerIRCBot):
 		# First message from owner 'locks' the owner host mask
 		if not e.source() in self.owner_mask and source in self.owners:
 			self.owner_mask.append(e.source())
-			print "[%s][~] My owner is %s" % (scrib.get_time(), e.source())
+			print scrib.get_time() + self.ACT + "My owner is %s" %e.source()
 
 		# Message text
 		if len(e.arguments()) == 1:
@@ -200,7 +213,7 @@ class ModIRC(SingleServerIRCBot):
 
 		# WHOOHOOO!!
 		if target == self.settings.myname or source == self.settings.myname:
-			print "[%s][-] %s <%s> %s" % ( scrib.get_time(), target, source, body)
+			print scrib.get_time() + self.MSG + "%s <%s> %s" % (target, source, body)
 
 		# Ignore self.
 		#if source == self.settings.myname: return
@@ -210,21 +223,21 @@ class ModIRC(SingleServerIRCBot):
 		if e.eventtype() == "pubmsg":
 			for x in self.channels[target].users():
 				body = body.replace(x, "#nick")
-		print "[%s][-] %s <%s> %s" % (scrib.get_time(), target, source, body)
+		print scrib.get_time() + self.MSG + "%s <%s> %s" % (target, source, body)
 
 		# Ignore selected nicks
 		if self.settings.ignorelist.count(source) > 0 \
 			and self.settings.replyIgnored == 1:
-			print "[%s][~] Not learning from %s" % (scrib.get_time(), source)
+			print scrib.get_time() + self.ACT + "Not learning from %s" %source
 			learn = 0
 		elif self.settings.ignorelist.count(source) > 0:
-			print "[%s][~] Ignoring %s" % (scrib.get_time(), source)
+			print scrib.get_time() + self.ACT + "Ignoring %s" %source
 			return
 
 		# private mode. disable commands for non owners
 		if (not source in self.owners) and self.settings.private:
 			while body[:1] == "!":
-				print "[%s][!] Private mode is on, ignoring command: %s" % (scrib.get_time(), body)
+				print scrib.get_time() + self.ERR + "Private mode is on, ignoring command: %s" %body
 				return
 
 		if body == "":
@@ -232,7 +245,7 @@ class ModIRC(SingleServerIRCBot):
 
 		# Ignore quoted messages
 		if body[0] == "<" or body[0:1] == "\"" or body[0:1] == " <":
-			print "[%s][#] Ignoring quoted text." % scrib.get_time()
+			print scrib.get_time() + self.SAV + "Ignoring quoted text."
 			return
 
 		# We want replies reply_chance%, if speaking is on
@@ -291,7 +304,7 @@ class ModIRC(SingleServerIRCBot):
 		Output a line of text. args = (body, source, target, c, e)
 		"""
 		if not self.connection.is_connected():
-			print "[%s][!] Can't send reply : not connected to server" % scrib.get_time()
+			print scrib.get_time() + self.ERR + "Can't send reply : not connected to server"
 			return
 
 		# Unwrap arguments
@@ -310,16 +323,16 @@ class ModIRC(SingleServerIRCBot):
 		# Joins replies and public messages
 		if e.eventtype() == "join" or e.eventtype() == "quit" or e.eventtype() == "part" or e.eventtype() == "pubmsg":
 			if action == 0:
-				print "[%s][-] %s <%s> %s" % ( scrib.get_time(), target, self.settings.myname, message)
+				print scrib.get_time() + self.MSG + "%s <%s> %s" % ( target, self.settings.myname, message)
 				c.privmsg(target, message)
 			else:
-				print "[%s][-] %s <%s> /me %s" % ( scrib.get_time(), target, self.settings.myname, message)
+				print scrib.get_time() + self.MSG + "%s <%s> /me %s" % ( target, self.settings.myname, message)
 				c.action(target, message)
 		# Private messages
 		elif e.eventtype() == "privmsg":
 			# normal private msg
 			if action == 0:
-				print "[%s][-] %s <%s> %s" % ( scrib.get_time(), source, self.settings.myname, message)
+				print scrib.get_time() + self.MSG + "%s <%s> %s" % ( source, self.settings.myname, message)
 				c.privmsg(source, message)
 				# send copy to owner
 				if not source in self.owners:
@@ -327,7 +340,7 @@ class ModIRC(SingleServerIRCBot):
 					c.privmsg(','.join(self.owners), "(To   "+source+") "+message)
 			# ctcp action priv msg
 			else:
-				print "[%s][-] %s <%s> /me %s" % ( scrib.get_time(), target, self.settings.myname, message)
+				print scrib.get_time() + self.MSG + "%s <%s> /me %s" % ( target, self.settings.myname, message)
 				c.action(source, message)
 				# send copy to owner
 				if not source in self.owners:

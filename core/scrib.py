@@ -9,6 +9,7 @@ import struct
 import time
 import zipfile
 import re
+import cfgfile
 
 # sys.path.append('../core')
 
@@ -57,11 +58,6 @@ def get_time():
 class scrib:
 	import re
 	import cfgfile
-
-	coreVer = "0.6.6"
-	brainVer = "0.0.1"
-	ver_string = "!I am a version %s scrib." % coreVer
-	ver_string += " My braintechnology is at %s." % brainVer
 	
 	# Main command list
 	commandlist = "Owner commands:\n!alias, !censor, !check, !contexts, !learning, !limit, !purge, !rebuild, !replace, !save, !uncensor, !unlearn\nPublic commands:\n!date, !fortune, !help, !known, !owner, !tweet, !version, !words"
@@ -114,6 +110,12 @@ class scrib:
 			} )
 		self.unfilterd = {}
 
+		self.version = self.cfgfile.cfgset()
+		self.version.load("VERSION",
+			{ "coreVer": ("Core version of Scrib", 0),
+			  "brainVer": ("Brain version of Scrib", 0),
+			} )
+
 		# Read the brain
 		if self.settings.process_with == "scrib":
 			print "[%s][#] Reading my brain..." % get_time()
@@ -131,7 +133,7 @@ class scrib:
 				f = open("data/version", "rb")
 				s = f.read()
 				f.close()
-				if s != self.brainVer:
+				if s != self.version.brainVer:
 					print "[%s][!] Error loading the brain.\n[!]--> Please convert it before launching scrib." % get_time()
 					sys.exit(1)
 
@@ -233,7 +235,7 @@ class scrib:
 
 			#save the version
 			f = open("data/version", "w")
-			f.write(self.brainVer)
+			f.write(self.version.brainVer)
 			f.close()
 
 
@@ -354,7 +356,9 @@ class scrib:
 	
 		# Version string
 		if command_list[0] == "!version":
-			msg = self.ver_string
+			brainVer = self.version.brainVer
+			coreVer = self.version.coreVer
+			msg = "%sI am a version %s scrib. My braintechnology is at %s." % (self.settings.pubsym, coreVer, brainVer)
 
 		# How many words do we know?
 		elif command_list[0] == "!words" and self.settings.process_with == "scrib":

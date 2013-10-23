@@ -16,7 +16,10 @@ Initial Setup
 
 Optional
 --------
+* [megahal](http://megahal.alioth.debian.org/) Most distros: install megahal
 * [espeak](http://espeak.sourceforge.net/) Most distros: install espeak
+
+MegaHAL is an alternative parser that is totally unsupported and kind of, well, deprecated. At some point, it should probably be decoupled from scrib.
 
 Notes
 -----

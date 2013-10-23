@@ -51,21 +51,21 @@ class ModIRC(SingleServerIRCBot):
 	commandlist =   "IRC Module Commands:\n!chans, !ignore, !join, !nick, !part, !quit, !quitmsg, !replyIgnored, !replyrate, !sleep, !private, !unignore, !wakeup, !talk, !owner"
 	# IRC Command 
 	commanddict = {
-		"sleep": "Owner command. Usage: !sleep\nStop the bot talking",
-		"wakeup": "Owner command. Usage: !wakeup\nAllow the bot to talk",
-		"join": "Owner command. Usage: !join #chan1 [#chan2 [...]]\nJoin one or more channels",
-		"part": "Owner command. Usage: !part #chan1 [#chan2 [...]]\nLeave one or more channels",
-		"chans": "Owner command. Usage: !chans\nList channels currently on",
-		"nick": "Owner command. Usage: !nick nickname\nChange nickname",
-		"ignore": "Owner command. Usage: !ignore [nick1 [nick2 [...]]]\nIgnore one or more nicknames. Without arguments it lists ignored nicknames",
-		"unignore": "Owner command. Usage: !unignore nick1 [nick2 [...]]\nUnignores one or more nicknames",
-		"replyrate": "Owner command. Usage: !replyrate [rate%]\nSet rate of bot replies to rate%. Without arguments (not an owner-only command) shows the current reply rate",
-		"replyIgnored": "Owner command. Usage: !replyIgnored [on|off]\nAllow/disallow replying to ignored users. Without arguments shows the current setting",
-		"private": "Owner command. Usage: !private [on|off]\nTurn private mode on or off (disable non-owner commands and don't return CTCP VERSION). Without arguments shows the current setting",
-		"quitmsg": "Owner command. Usage: !quitmsg [message]\nSet the quit message. Without arguments show the current quit message",
-		"talk": "Owner command. Usage !talk nick message\nmake the bot send the sentence 'message' to 'nick'",
-		"quit": "Owner command. Usage: !quit\nMake the bot quit IRC",
-		"owner": "Usage: !owner password\nAllow to become owner of the bot"
+		"sleep": "Owner command. Usage: !sleep\nStop the bot talking.",
+		"wakeup": "Owner command. Usage: !wakeup\nAllow the bot to talk.",
+		"join": "Owner command. Usage: !join #chan1 [#chan2 [...]]\nJoin one or more channels.",
+		"part": "Owner command. Usage: !part #chan1 [#chan2 [...]]\nLeave one or more channels.",
+		"chans": "Owner command. Usage: !chans\nList channels currently on.",
+		"nick": "Owner command. Usage: !nick nickname\nChange nickname.",
+		"ignore": "Owner command. Usage: !ignore [nick1 [nick2 [...]]]\nIgnore one or more nicknames. Without arguments it lists ignored nicknames.",
+		"unignore": "Owner command. Usage: !unignore nick1 [nick2 [...]]\nUnignores one or more nicknames.",
+		"replyrate": "Owner command. Usage: !replyrate [rate%]\nSet rate of bot replies to rate%. Without arguments (not an owner-only command) shows the current reply rate.",
+		"replyIgnored": "Owner command. Usage: !replyIgnored [on|off]\nAllow/disallow replying to ignored users. Without arguments shows the current setting.",
+		"private": "Owner command. Usage: !private [on|off]\nTurn private mode on or off (disable non-owner commands and don't return CTCP VERSION). Without arguments shows the current setting.",
+		"quitmsg": "Owner command. Usage: !quitmsg [message]\nSet the quit message. Without arguments show the current quit message.",
+		"talk": "Owner command. Usage !talk nick message\nmake the bot send the sentence 'message' to 'nick'.",
+		"quit": "Owner command. Usage: !quit\nMake the bot quit IRC.",
+		"owner": "Usage: !owner password\nAllow to become owner of the bot."
 	}
 
 	def __init__(self, my_scrib, args):
@@ -522,7 +522,7 @@ if __name__ == "__main__":
 		pass
 	except:
 		traceback.print_exc()
-		c = raw_input("I crashed. Save dictionary? (y/n) ")
+		c = raw_input("Oh no, I've crashed! Would you like to save my brain? (y/n)")
 		if c[:1] == 'n':
 			sys.exit(0)
 	bot.disconnect(bot.settings.quitmsg)

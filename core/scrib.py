@@ -77,7 +77,7 @@ class scrib:
 		"limit": "Owner command. Usage: !limit [number]\nSet the number of words that pyBorg can learn.",
 		"alias": "Owner command. Usage: !alias : Show the differents aliases\n!alias <alias> : show the words attached to this alias\n!alias <alias> <word> : link the word to the alias.",
 		"owner": "Usage: !owner password\nAdd the user in the owner list.",
-        "tweet": "Usage: !tweet\nCurrently doesn't do anything useful.",
+		"tweet": "Usage: !tweet\nCurrently doesn't do anything useful.",
 		"fortune": "Usage: !fortune\nTells you something interesting.",
 		"date": "Usage: !date\nTells you the date."
 	}

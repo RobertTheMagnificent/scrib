@@ -116,7 +116,7 @@ class ModIRC(SingleServerIRCBot):
 
 	def our_start(self):
 		#print scrib.get_time() + self.ACT + "Connecting to %s " %self.settings.servers
-		barf(self, ACT, "Connecting to %s " % self.settings.servers)
+		self.barf(self, ACT, "Connecting to %s " % self.settings.servers)
 		SingleServerIRCBot.__init__(self, self.settings.servers, self.settings.myname, self.settings.realname, 2)
 
 		self.start()

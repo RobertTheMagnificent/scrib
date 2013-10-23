@@ -287,8 +287,7 @@ class ModIRC(SingleServerIRCBot):
 			# self.commanddict should eventually check self.commandlist
 			# so we can stop doing [1:]
 			if command_list[0][1:] in self.commanddict:
-				out = PluginManager.sendMessage(command_list[0][1:], command_list, self)
-				msg = out
+				msg = PluginManager.sendMessage(command_list[0][1:], command_list, self)
 
 			self.scrib.settings.save()
 			self.settings.save()
@@ -296,8 +295,7 @@ class ModIRC(SingleServerIRCBot):
 		if msg == "":
 			return 0
 		else:
-			#self.output(msg, ("<none>", source, target, c, e))
-			self.output(msg, ("", source, target, c, e))
+			self.output(msg, ("<none>", source, target, c, e))
 			return 1
 			
 	def output(self, message, args):
@@ -312,7 +310,7 @@ class ModIRC(SingleServerIRCBot):
 		body, source, target, c, e = args
 		
 		# replace by the good nickname
-		message = message.replace("#nick", source)
+		message = str(message.replace("#nick", source))
 
 		# Decide. should we do a ctcp action?
 		if message.find(self.settings.myname+" ") == 0:

@@ -64,7 +64,7 @@ class ModIRC(SingleServerIRCBot):
 		"quitmsg": "Owner command. Usage: !quitmsg [message]\nSet the quit message. Without arguments show the current quit message.",
 		"talk": "Owner command. Usage !talk nick message\nmake the bot send the sentence 'message' to 'nick'.",
 		"quit": "Owner command. Usage: !quit\nMake the bot quit IRC.",
-		"owner": "Usage: !owner password\n!Allow to become owner of the bot."
+		"owner": "Usage: !owner password\nAllow user to become owner of the bot."
 	}
 
 	def __init__(self, my_scrib, args):

@@ -39,7 +39,7 @@ class ModIRC(SingleServerIRCBot):
 	owner_mask = []
 
 	# IRC Command list
-	commandlist =   "IRC Module Commands:\n!chans, !control, !ignore, !join, !nick, !part, !private, !quit, !quitmsg, !replyIgnored, !sleep, !unignore, !wake"
+	commandlist =   "IRC Module Commands:\n!chans, !ignore, !join, !nick, !part, !private, !quit, !quitmsg, !replyIgnored, !sleep, !unignore, !wake"
 	# IRC Command 
 	commanddict = {
 		"sleep":  "Owner command. Usage: !sleep\nStop the bot talking.",
@@ -53,8 +53,7 @@ class ModIRC(SingleServerIRCBot):
 		"replyIgnored": "Owner command. Usage: !replyIgnored [on|off]\nAllow/disallow replying to ignored users. Without arguments shows the current setting.",
 		"private": "Owner command. Usage: !private [on|off]\nTurn private mode on or off (disable non-owner commands and don't return CTCP VERSION). Without arguments shows the current setting.",
 		"quitmsg": "Owner command. Usage: !quitmsg [message]\nSet the quit message. Without arguments show the current quit message.",
-		"quit": "Owner command. Usage: !quit\nMake the bot quit IRC.",
-		"control": "Usage: !control password\nAllow user to have access to bot commands."
+		"quit": "Owner command. Usage: !quit\nMake the bot quit IRC."
 	}
 
 	commandlist += " "+PluginManager.ScribPlugin.plugin_aliases
@@ -288,16 +287,12 @@ class ModIRC(SingleServerIRCBot):
 		command_list[0] = command_list[0]
 
 		### User commands
-		# Query replyrate
-		#if command_list[0] == "!replyrate" and len(command_list)==1:
-		#	msg = self.scrib.settings.pubsym+"Reply rate is "+`self.settings.reply_chance`+"%."
-
-		if command_list[0] == "!control" and len(command_list) > 1 and source not in self.owners:
-			if command_list[1] == self.settings.password:
-				self.owners.append(source)
-				self.output("You've been added to controllers list", ("", source, target, c, e))
-			else:
-				self.output("Try again", ("", source, target, c, e))
+		#if command_list[0] == "!control" and len(command_list) > 1 and source not in self.owners:
+		#	if command_list[1] == self.settings.password:
+		#		self.owners.append(source)
+		#		self.output("You've been added to controllers list", ("", source, target, c, e))
+		#	else:
+		#		self.output("Try again", ("", source, target, c, e))
 
 		### Owner commands
 		if source in self.owners and e.source() in self.owner_mask:

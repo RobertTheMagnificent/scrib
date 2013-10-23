@@ -14,12 +14,12 @@ for module in os.listdir(os.path.dirname(plugin_dir)):
 		if ext == '.py' and module_name != '__init__': # Important, ignore .pyc/other files.
 			try:
 				module = __import__(module_name)
-				print '[%s][~] Imported plugin:                %s' % (get_time(), module_name)
+				print '[%s][~] Imported plugin:                %s' % (ScribPlugin.get_time(), module_name)
 				library_list.append(module)
 			except ImportError as e:
-				print "[%s][!] Failed to load plugin ( IE ):   %s" % (get_time(), module_name)
+				print "[%s][!] Failed to load plugin ( IE ):   %s" % (ScribPlugin.get_time(), module_name)
 				print e
 
 			except NameError as e:
-				print "[%s][!] Failed to load plugin ( NE ):   %s" % (get_time(), module_name)
+				print "[%s][!] Failed to load plugin ( NE ):   %s" % (ScribPlugin.get_time(), module_name)
 				print e

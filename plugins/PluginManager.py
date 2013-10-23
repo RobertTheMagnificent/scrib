@@ -1,4 +1,4 @@
-froms import ScribPlugin
+from import ScribPlugin
 
 def sendMessage( event, text ):
 	if ScribPlugin.process_table[event] != '':

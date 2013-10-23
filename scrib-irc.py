@@ -278,7 +278,7 @@ class ModIRC(SingleServerIRCBot):
 		if source in self.owners and e.source() in self.owner_mask:
 
 			# private mode
-			elif command_list[0] == "!private":
+			if command_list[0] == "!private":
 				msg = "$sPrivate mode " % self.settings.pubsym
 				if len(command_list) == 1:
 					if self.settings.private == 0:

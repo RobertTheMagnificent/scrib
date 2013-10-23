@@ -3,10 +3,17 @@ process_table = {}
 plugin_commands = {}
 plugin_aliases = []
 
-# I don't like this... Should be using
-# the one in scrib.py...
 def get_time():
 	return time.strftime("\033[0m[%H:%M:%S]", time.localtime(time.time()))
+
+def barf(msg_code, message):
+		print get_time() + msg_code + message
+
+# Message Codes
+ACT = '\033[93m [~] '
+MSG = '\033[94m [-] '
+SAV = '\033[92m [#] '
+ERR = '\033[91m [!] '
 
 def addPlugin( command, alias, action ):
 	global plugin_commands, plugin_aliases

@@ -57,8 +57,8 @@ class scrib:
 	import cfgfile
 
 	# Message Codes
-	ACT = '\033[92m [~] '
-	MSG = '\033[94m [-] '
+	ACT = '\033[94m [~] '
+	MSG = '\033[92m [-] '
 	SAV = '\033[93m [#] '
 	ERR = '\033[91m [!] '
 
@@ -425,7 +425,9 @@ class scrib:
 					else:
 						msg = "%sNo help on command '%s'" % (self.settings.pubsym, cmd)
 				else:
-					io_module.output(self.settings.pubsym+', '.join(self.commandlist))
+					dic = self.commandlist
+					for i in dic.split("\n"):
+						io_module.output(self.settings.pubsym+" "+i, args)
 
 			# Change the max_words setting
 			elif command_list[0] == "!limit" and self.settings.process_with == "scrib":

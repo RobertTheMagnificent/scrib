@@ -34,14 +34,13 @@ def filter_message(message, bot):
 		pass
 
 	words = message.split()
-	if bot.settings.process_with == "scrib":
-		for x in xrange(0, len(words)):
-			#is there aliases ?
-			for z in bot.settings.aliases.keys():
-				for alias in bot.settings.aliases[z]:
-					pattern = "^%s$" % alias
-					if re.search(pattern, words[x]):
-						words[x] = z
+	for x in xrange(0, len(words)):
+		#is there aliases ?
+		for z in bot.settings.aliases.keys():
+			for alias in bot.settings.aliases[z]:
+				pattern = "^%s$" % alias
+				if re.search(pattern, words[x]):
+					words[x] = z
 
 	message = " ".join(words)
 	return message
@@ -107,7 +106,7 @@ class scrib:
 			  "censored":	("Don't learn the sentence if one of those words is found", []),
 			  "num_aliases":("Total of aliases known", 0),
 			  "aliases":	("A list of similars words", {}),
-			  "process_with":("Which module will we use to generate replies? (scrib|megahal)", "scrib"),
+			  "process_with":("No longer used."),
 			  "pubsym": ("Symbol to append to cmd msgs in public", "!"),
 			  "no_save"	:("If True, Scrib doesn't save his brain and configuration to disk", "False")
 			} )
@@ -125,100 +124,99 @@ class scrib:
 			} )
 
 		# Read the brain
-		if self.settings.process_with == "scrib":
-			print get_time() + self.SAV + "Reading my brain..."
-			try:
-				zfile = zipfile.ZipFile('data/archive.zip','r')
-				for filename in zfile.namelist():
-					data = zfile.read(filename)
-					file = open(filename, 'w+b')
-					file.write(data)
-					file.close()
-			except (EOFError, IOError), e:
-				print get_time() + self.ERR + "No zip found"
-			try:
+		print get_time() + self.SAV + "Reading my brain..."
+		try:
+			zfile = zipfile.ZipFile('data/archive.zip','r')
+			for filename in zfile.namelist():
+				data = zfile.read(filename)
+				file = open(filename, 'w+b')
+				file.write(data)
+				file.close()
+		except (EOFError, IOError), e:
+			print get_time() + self.ERR + "No zip found"
+		try:
 
-				f = open("data/version", "rb")
-				s = f.read()
-				f.close()
-				if s != self.version.brain:
-					print get_time() + self.ERR + "Error loading the brain.\n[!]--> Please convert it before launching scrib."
-					sys.exit(1)
+			f = open("data/version", "rb")
+			s = f.read()
+			f.close()
+			if s != self.version.brain:
+				print get_time() + self.ERR + "Error loading the brain.\n[!]--> Please convert it before launching scrib."
+				sys.exit(1)
 
-				f = open("data/words.dat", "rb")
-				s = f.read()
-				f.close()
-				self.words = marshal.loads(s)
-				del s
-				f = open("data/lines.dat", "rb")
-				s = f.read()
-				f.close()
-				self.lines = marshal.loads(s)
-				del s
-			except (EOFError, IOError), e:
-				# Create new database
-				self.words = {}
-				self.lines = {}
-				print get_time() + self.ERR + "Error reading saves. New database created."
+			f = open("data/words.dat", "rb")
+			s = f.read()
+			f.close()
+			self.words = marshal.loads(s)
+			del s
+			f = open("data/lines.dat", "rb")
+			s = f.read()
+			f.close()
+			self.lines = marshal.loads(s)
+			del s
+		except (EOFError, IOError), e:
+			# Create new database
+			self.words = {}
+			self.lines = {}
+			print get_time() + self.ERR + "Error reading saves. New database created."
 
-			# Is a resizing required?
-			if len(self.words) != self.settings.num_words:
-				print get_time() + self.ACT + "Updating my brain's information..."
-				self.settings.num_words = len(self.words)
-				num_contexts = 0
-				# Get number of contexts
-				for x in self.lines.keys():
-					num_contexts += len(self.lines[x][0].split())
-				self.settings.num_contexts = num_contexts
-				# Save new values
-				self.settings.save()
-				
-			# Is an aliases update required ?
-			count = 0
-			for x in self.settings.aliases.keys():
-				count += len(self.settings.aliases[x])
-			if count != self.settings.num_aliases:
-				print get_time() + self.ACT + "Check brain for new aliases."
-				self.settings.num_aliases = count
+		# Is a resizing required?
+		if len(self.words) != self.settings.num_words:
+			print get_time() + self.ACT + "Updating my brain's information..."
+			self.settings.num_words = len(self.words)
+			num_contexts = 0
+			# Get number of contexts
+			for x in self.lines.keys():
+				num_contexts += len(self.lines[x][0].split())
+			self.settings.num_contexts = num_contexts
+			# Save new values
+			self.settings.save()
+			
+		# Is an aliases update required ?
+		count = 0
+		for x in self.settings.aliases.keys():
+			count += len(self.settings.aliases[x])
+		if count != self.settings.num_aliases:
+			print get_time() + self.ACT + "Check brain for new aliases."
+			self.settings.num_aliases = count
 
-				for x in self.words.keys():
-					#is there aliases ?
-					if x[0] != '~':
-						for z in self.settings.aliases.keys():
-							for alias in self.settings.aliases[z]:
-								pattern = "^%s$" % alias
-								if self.re.search(pattern, x):
-									print "replace %s with %s" %(x, z)
-									self.replace(x, z)
+			for x in self.words.keys():
+				#is there aliases ?
+				if x[0] != '~':
+					for z in self.settings.aliases.keys():
+						for alias in self.settings.aliases[z]:
+							pattern = "^%s$" % alias
+							if self.re.search(pattern, x):
+								print "replace %s with %s" %(x, z)
+								self.replace(x, z)
 
-				for x in self.words.keys():
-					if not (x in self.settings.aliases.keys()) and x[0] == '~':
-						print "unlearn %s" % x
-						self.settings.num_aliases -= 1
-						self.unlearn(x)
-						print "unlearned aliases %s" % x
+			for x in self.words.keys():
+				if not (x in self.settings.aliases.keys()) and x[0] == '~':
+					print "unlearn %s" % x
+					self.settings.num_aliases -= 1
+					self.unlearn(x)
+					print "unlearned aliases %s" % x
 
 
-			#unlearn words in the unlearn.txt file.
-			try:
-				f = open("data/unlearn.txt", "r")
-				while 1:
-					word = f.readline().strip('\n')
-					if word == "":
-						break
-					if self.words.has_key(word):
-						self.unlearn(word)
-				f.close()
-			except (EOFError, IOError), e:
-				# No words to unlearn
-				pass
+		#unlearn words in the unlearn.txt file.
+		try:
+			f = open("data/unlearn.txt", "r")
+			while 1:
+				word = f.readline().strip('\n')
+				if word == "":
+					break
+				if self.words.has_key(word):
+					self.unlearn(word)
+			f.close()
+		except (EOFError, IOError), e:
+			# No words to unlearn
+			pass
 
 		self.settings.save()
 
 
 
 	def save_all(self):
-		if self.settings.process_with == "scrib" and self.settings.no_save != "True":
+		if self.settings.no_save != "True":
 			print get_time() + self.SAV + "Writing to my brain...\033[0m"
 
 			try:
@@ -291,14 +289,6 @@ class scrib:
 		If owner==1 allow owner commands.
 		"""
 
-		try:
-			if self.settings.process_with == "megahal": import mh_python
-		except:
-			self.settings.process_with = "scrib"
-			self.settings.save()
-			print get_time() + self.ERR + "Could not find megahal python library\nProgram ending"
-			sys.exit(1)
-
 		# add trailing space so sentences are broken up correctly
 		body = body + " "
 
@@ -312,10 +302,7 @@ class scrib:
 	
 		# Learn from input
 		if learn == 1:
-			if self.settings.process_with == "scrib":
-				self.learn(body)
-			elif self.settings.process_with == "megahal" and self.settings.learning == 1:
-				mh_python.learn(body)
+			self.learn(body)
 
 		# Make a reply if desired
 		if randint(0, 99) < replyrate:
@@ -335,10 +322,7 @@ class scrib:
 						self.unfilterd[body] = 0
 
 			if message == "":
-				if self.settings.process_with == "scrib":
-					message = self.reply(body)
-				elif self.settings.process_with == "megahal":
-					message = mh_python.doreply(body)
+				message = self.reply(body)
 
 			# single word reply: always output
 			if len(message.split()) == 1:
@@ -369,7 +353,7 @@ class scrib:
 			msg = "%sI am a version %s scrib. My braintechnology is at %s." % (self.settings.pubsym, core, brain)
 
 		# How many words do we know?
-		elif command_list[0] == "!words" and self.settings.process_with == "scrib":
+		elif command_list[0] == "!words":
 			num_w = self.settings.num_words
 			num_c = self.settings.num_contexts
 			num_l = len(self.lines)
@@ -380,7 +364,7 @@ class scrib:
 			msg = "%sI know %d words (%d contexts, %.2f per word), 1%d lines." % ( self.settings.pubsym, num_w, num_c, num_cpw, num_l)
 				
 		# Do I know this word
-		elif command_list[0] == "!known" and self.settings.process_with == "scrib":
+		elif command_list[0] == "!known":
 			if len(command_list) == 2:
 				# single word specified
 				word = command_list[1]
@@ -430,7 +414,7 @@ class scrib:
 						io_module.output(self.settings.pubsym+" "+i, args)
 
 			# Change the max_words setting
-			elif command_list[0] == "!limit" and self.settings.process_with == "scrib":
+			elif command_list[0] == "!limit":
 				msg = "%sThe max limit is " % self.settings.pubsym
 				if len(command_list) == 1:
 					msg += str(self.settings.max_words)
@@ -441,7 +425,7 @@ class scrib:
 
 			
 			# Check for broken links in the brain
-			elif command_list[0] == "!check" and self.settings.process_with == "scrib":
+			elif command_list[0] == "!check":
 				t = time.time()
 				num_broken = 0
 				num_bad = 0
@@ -478,7 +462,7 @@ class scrib:
 
 			# Rebuild the brain by discarding the word links and
 			# re-parsing each line
-			elif command_list[0] == "!rebuild" and self.settings.process_with == "scrib":
+			elif command_list[0] == "!rebuild":
 				if self.settings.learning == 1:
 					t = time.time()
 
@@ -503,7 +487,7 @@ class scrib:
 							self.settings.num_contexts - old_num_contexts)
 
 			# Remove rare words
-			elif command_list[0] == "!purge" and self.settings.process_with == "scrib":
+			elif command_list[0] == "!purge":
 				t = time.time()
 
 				list = []
@@ -550,7 +534,7 @@ class scrib:
 						count)
 				
 			# Change a typo in the brain
-			elif command_list[0] == "!replace" and self.settings.process_with == "scrib":
+			elif command_list[0] == "!replace":
 				if len(command_list) < 3:
 					return
 				old = command_list[1]
@@ -558,7 +542,7 @@ class scrib:
 				msg = self.replace(old, new)
 
 			# Print contexts [flooding...:-]
-			elif command_list[0] == "!contexts" and self.settings.process_with == "scrib":
+			elif command_list[0] == "!contexts":
 
 				# This is a large lump of data and should
 				# probably be printed, not module.output XXX
@@ -612,7 +596,7 @@ class scrib:
 				print get_time() + self.ACT + "========================"
 
 			# Remove a word from the vocabulary [use with care]
-			elif command_list[0] == "!unlearn" and self.settings.process_with == "scrib":
+			elif command_list[0] == "!unlearn":
 				# build context we are looking for
 				context = " ".join(command_list[1:])
 				
@@ -644,7 +628,7 @@ class scrib:
 						self.settings.learning = 0
 
 			# add a word to the 'censored' list
-			elif command_list[0] == "!censor" and self.settings.process_with == "scrib":
+			elif command_list[0] == "!censor":
 				# no arguments. list censored words
 				if len(command_list) == 1:
 					if len(self.settings.censored) == 0:
@@ -663,7 +647,7 @@ class scrib:
 						msg += "\n"
 
 			# remove a word from the censored list
-			elif command_list[0] == "!uncensor" and self.settings.process_with == "scrib":
+			elif command_list[0] == "!uncensor":
 				# Remove everyone listd from the ignore list
 				# eg !unignore tom dick harry
 				for x in xrange(1, len(command_list)):
@@ -673,7 +657,7 @@ class scrib:
 					except ValueError, e:
 						pass
 
-			elif command_list[0] == "!alias" and self.settings.process_with == "scrib":
+			elif command_list[0] == "!alias":
 				# no arguments. list aliases words
 				if len(command_list) == 1:
 					if len(self.settings.aliases) == 0:

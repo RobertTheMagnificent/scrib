@@ -41,6 +41,9 @@ class ModIRC(SingleServerIRCBot):
 		self.MSG = ''
 		self.SAV = ''
 		self.ERR = ''
+	
+	def barf(self, msg_code, message):
+		print scrib.get_time() + self.msg_code + message
 
 	"""
 	Interfacing some IRC I/O with scrib learn/reply modules!
@@ -112,7 +115,8 @@ class ModIRC(SingleServerIRCBot):
 					pass
 
 	def our_start(self):
-		print scrib.get_time() + self.ACT + "Connecting to %s " %self.settings.servers
+		#print scrib.get_time() + self.ACT + "Connecting to %s " %self.settings.servers
+		barf(self, ACT, "Connecting to %s " % self.settings.servers
 		SingleServerIRCBot.__init__(self, self.settings.servers, self.settings.myname, self.settings.realname, 2)
 
 		self.start()

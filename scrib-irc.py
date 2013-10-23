@@ -39,7 +39,7 @@ class ModIRC(SingleServerIRCBot):
 	owner_mask = []
 
 	# IRC Command list
-	commandlist =   "IRC Module Commands:\n!chans, !control, !ignore, !join, !nick, !part, !private, !quit, !quitmsg, !replyIgnored, !replyrate, !sleep, !talk, !unignore, !wake"
+	commandlist =   "IRC Module Commands:\n!chans, !control, !ignore, !join, !nick, !part, !private, !quit, !quitmsg, !replyIgnored, !replyrate, !sleep, !unignore, !wake"
 	# IRC Command 
 	commanddict = {
 		"sleep":  "Owner command. Usage: !sleep\nStop the bot talking.",
@@ -54,7 +54,6 @@ class ModIRC(SingleServerIRCBot):
 		"replyIgnored": "Owner command. Usage: !replyIgnored [on|off]\nAllow/disallow replying to ignored users. Without arguments shows the current setting.",
 		"private": "Owner command. Usage: !private [on|off]\nTurn private mode on or off (disable non-owner commands and don't return CTCP VERSION). Without arguments shows the current setting.",
 		"quitmsg": "Owner command. Usage: !quitmsg [message]\nSet the quit message. Without arguments show the current quit message.",
-		"talk": "Owner command. Usage !talk nick message\nmake the bot send the sentence 'message' to 'nick'.",
 		"quit": "Owner command. Usage: !quit\nMake the bot quit IRC.",
 		"control": "Usage: !control password\nAllow user to have access to bot commands."
 	}
@@ -291,8 +290,8 @@ class ModIRC(SingleServerIRCBot):
 
 		### User commands
 		# Query replyrate
-		if command_list[0] == "!replyrate" and len(command_list)==1:
-			msg = self.scrib.settings.pubsym+"Reply rate is "+`self.settings.reply_chance`+"%."
+		#if command_list[0] == "!replyrate" and len(command_list)==1:
+		#	msg = self.scrib.settings.pubsym+"Reply rate is "+`self.settings.reply_chance`+"%."
 
 		if command_list[0] == "!control" and len(command_list) > 1 and source not in self.owners:
 			if command_list[1] == self.settings.password:
@@ -429,13 +428,7 @@ class ModIRC(SingleServerIRCBot):
 					msg = "Now replying to %d%% of messages." % int(command_list[1])
 				except:
 					msg = "Reply rate is %d%%." % self.settings.reply_chance
-			#make the bot talk
-			elif command_list[0] == "!talk":
-				if len(command_list) >= 2:
-					phrase=""
-					for x in xrange (2, len (command_list)):
-						phrase = phrase + str(command_list[x]) + " "
-					self.output(phrase, ("", command_list[1], "", c, e))
+
 			# Make the commands dynamic
 			# self.commanddict should eventually check self.commandlist
 			# so we can stop doing [1:]

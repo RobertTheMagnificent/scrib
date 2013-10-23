@@ -53,7 +53,7 @@ class scrib:
 	import re
 	import cfgfile
 
-	coreVer = "0.6.5"
+	coreVer = "0.6.6"
 	brainVer = "0.0.1"
 	ver_string = "!I am a version %s scrib." % coreVer
 	ver_string += " My braintechnology is at %s." % brainVer

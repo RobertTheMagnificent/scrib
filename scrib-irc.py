@@ -296,7 +296,7 @@ class ModIRC(SingleServerIRCBot):
 		### User commands
 		# Query replyrate
 		if command_list[0] == "!replyrate" and len(command_list)==1:
-			msg = "%sReply rate is "+`self.settings.reply_chance`+"%." % self.scrib.settings.pubsym
+			msg = self.scrib.settings.pubsym+"Reply rate is "+`self.settings.reply_chance`+"%."
 
 		if command_list[0] == "!owner" and len(command_list) > 1 and source not in self.owners:
 			if command_list[1] == self.settings.password:

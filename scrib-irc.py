@@ -474,10 +474,10 @@ class ModIRC(SingleServerIRCBot):
 		# Joins replies and public messages
 		if e.eventtype() == "join" or e.eventtype() == "quit" or e.eventtype() == "part" or e.eventtype() == "pubmsg":
 			if action == 0:
-				print "[%s] %s <%s> %s" % ( get_time(), target, self.settings.myname, message)
+				print "[%s][-] %s <%s> %s" % ( get_time(), target, self.settings.myname, message)
 				c.privmsg(target, message)
 			else:
-				print "[%s] %s <%s> /me %s" % ( get_time(), target, self.settings.myname, message)
+				print "[%s][-] %s <%s> /me %s" % ( get_time(), target, self.settings.myname, message)
 				c.action(target, message)
 		# Private messages
 		elif e.eventtype() == "privmsg":

@@ -316,11 +316,11 @@ class ModIRC(SingleServerIRCBot):
 					self.settings.myname = command_list[1]
 				except:
 					pass
-			# stealth mode
-			elif command_list[0] == "!stealth":
-				msg = "Stealth mode "
+			# private mode
+			elif command_list[0] == "!private":
+				msg = "private mode "
 				if len(command_list) == 1:
-					if self.settings.stealth == 0:
+					if self.settings.private == 0:
 						msg = msg + "off"
 					else:
 						msg = msg + "on"
@@ -328,10 +328,10 @@ class ModIRC(SingleServerIRCBot):
 					toggle = command_list[1]
 					if toggle == "on":
 						msg = msg + "on"
-						self.settings.stealth = 1
+						self.settings.private = 1
 					else:
 						msg = msg + "off"
-						self.settings.stealth = 0
+						self.settings.private = 0
 
 			# Allow/disallow replying to ignored nicks
 			# (they will never be learnt from)

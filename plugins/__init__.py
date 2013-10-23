@@ -7,12 +7,6 @@ plugin_dir = os.path.abspath(os.path.dirname(__file__ )) + "/"
 
 sys.path.append(plugin_dir)
 
-def get_time():
-	"""
-	Make time sexy
-	"""
-	return time.strftime("%H:%M:%S", time.localtime(time.time()))
-
 for module in os.listdir(os.path.dirname(plugin_dir)):
 	if os.path.isfile( plugin_dir + "/" + module ):
 		module_name, ext = os.path.splitext(module)

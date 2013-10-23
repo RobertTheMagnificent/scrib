@@ -11,7 +11,6 @@ class EchoPlugin(ScribPlugin.ScribPlugin):
 			phrase=""
 			for x in xrange (2, len (command_list)):
 				phrase = phrase + str(command_list[x]) + " "
-			self.output(phrase, ("", command_list[1], "", c, e))
-		
+			return phrase
 
 ScribPlugin.addPlugin( command, alias, EchoPlugin() )

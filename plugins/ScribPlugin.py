@@ -8,7 +8,7 @@ def get_time():
 
 def addPlugin( command, alias, action ):
 	global plugin_commands, plugin_aliases
-	process_table[alias] = action[1:]
+	process_table[alias[1:]] = action
 	plugin_commands = dict( plugin_commands.items() + command.items() )
 	plugin_aliases += " "+alias 
 

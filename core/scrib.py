@@ -110,7 +110,7 @@ class scrib:
 
 		# Read the brain
 		if self.settings.process_with == "scrib":
-			print "Reading my brain..."
+			print "[#] Reading my brain..."
 			try:
 				zfile = zipfile.ZipFile('data/archive.zip','r')
 				for filename in zfile.namelist():
@@ -119,7 +119,7 @@ class scrib:
 					file.write(data)
 					file.close()
 			except (EOFError, IOError), e:
-				print "no zip found"
+				print "[!] No zip found"
 			try:
 
 				f = open("data/version", "rb")
@@ -454,7 +454,7 @@ class scrib:
 						self.settings.num_words = self.settings.num_words - 1
 						print "\"%s\" vaped totally" % w
 
-				msg = "%Checked my brain in %0.2fs. Fixed links: %d broken, %d bad." % \
+				msg = "%sChecked my brain in %0.2fs. Fixed links: %d broken, %d bad." % \
 					(self.settings.pubsym, 
 					time.time()-t,
 					num_broken,

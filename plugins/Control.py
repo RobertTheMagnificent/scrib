@@ -14,6 +14,6 @@ class ControlPlugin(ScribPlugin.ScribPlugin):
 				msg = "You've been added to controllers list."
 			else:
 				msg = "Try again."
-		return msg
+			return msg
 
 ScribPlugin.addPlugin( command, alias, ControlPlugin() )

@@ -64,7 +64,7 @@ class scrib:
 	ver_string += " My braintechnology is at %s." % brainVer
 	
 	# Main command list
-	commandlist = "!Scrib commands:\n!check, !contexts, !help, !known, !learning, !rebuild, !replace, !unlearn, !purge, !version, !words, !limit, !alias, !save, !censor, !uncensor, !owner, !fortune. !tweet, !date"
+	commandlist = "Scrib commands:\n!check, !contexts, !help, !known, !learning, !rebuild, !replace, !unlearn, !purge, !version, !words, !limit, !alias, !save, !censor, !uncensor, !owner, !fortune. !tweet, !date"
 	commanddict = {
 		"help": "!Owner command. Usage: !help [command]\n!Prints information about using a command, or a list of commands if no command is given.",
 		"version": "!Usage: !version\n!Display what version of Scrib we are running.",
@@ -408,14 +408,14 @@ class scrib:
 						dic = io_module.commanddict
 					if dic:
 						for i in dic[cmd].split("\n"):
-							io_module.output(i, args)
+							io_module.output(self.settings.pubsym+i, args)
 					else:
 						msg = "%sNo help on command '%s'" % (self.settings.pubsym, cmd)
 				else:
 					for i in self.commandlist.split("\n"):
-						io_module.output(i, args)
+						io_module.output(self.settings.pubsym+i, args)
 					for i in io_module.commandlist.split("\n"):
-						io_module.output(i, args)
+						io_module.output(self.settings.pubsym+i, args)
 
 			# Change the max_words setting
 			elif command_list[0] == "!limit" and self.settings.process_with == "scrib":

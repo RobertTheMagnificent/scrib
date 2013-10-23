@@ -48,6 +48,11 @@ def filter_message(message, bot):
 	message = " ".join(words)
 	return message
 
+def get_time():
+	"""
+	Make time sexy
+	"""
+	return time.strftime("%H:%M:%S", time.localtime(time.time()))
 
 class scrib:
 	import re
@@ -57,7 +62,7 @@ class scrib:
 	brainVer = "0.0.1"
 	ver_string = "!I am a version %s scrib." % coreVer
 	ver_string += " My braintechnology is at %s." % brainVer
-
+	
 	# Main command list
 	commandlist = "!Scrib commands:\n!check, !contexts, !help, !known, !learning, !rebuild, !replace, !unlearn, !purge, !version, !words, !limit, !alias, !save, !censor, !uncensor, !owner, !fortune. !tweet, !date"
 	commanddict = {

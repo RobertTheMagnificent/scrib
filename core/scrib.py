@@ -162,12 +162,12 @@ class scrib:
 				self.settings.save()
 				
 			# Is an aliases update required ?
-			compteur = 0
+			count = 0
 			for x in self.settings.aliases.keys():
-				compteur += len(self.settings.aliases[x])
-			if compteur != self.settings.num_aliases:
+				count += len(self.settings.aliases[x])
+			if count != self.settings.num_aliases:
 				print "[%s][~] Check brain for new aliases." % get_time()
-				self.settings.num_aliases = compteur
+				self.settings.num_aliases = count
 
 				for x in self.words.keys():
 					#is there aliases ?
@@ -492,15 +492,15 @@ class scrib:
 							old_num_contexts,
 							self.settings.num_contexts - old_num_contexts)
 
-			#Remove rare words
+			# Remove rare words
 			elif command_list[0] == "!purge" and self.settings.process_with == "scrib":
 				t = time.time()
 
-				liste = []
-				compteur = 0
+				list = []
+				count = 0
 
 				if len(command_list) == 2:
-				# limited occurences a effacer
+				# Occurences to erase
 					c_max = command_list[1]
 				else:
 					c_max = 0
@@ -518,26 +518,26 @@ class scrib:
 							digit += 1
 
 				
-				#Compte les mots inferieurs a cette limite
+					# If the word limit is lower than this
 					c = len(self.words[w])
 					if c < 2 or ( digit and char ):
-						liste.append(w)
-						compteur += 1
-						if compteur == c_max:
+						list.append(w)
+						count += 1
+						if count == c_max:
 							break
 
 				if c_max < 1:
-					io_module.output("%s words to remove" %compteur, args)
+					io_module.output(self.settings.pubsym+"%s words to remove" %count, args)
 					return
 
-				#supprime les mots
-				for w in liste[0:]:
+				# Remove the words
+				for w in list[0:]:
 					self.unlearn(w)
 
 				msg = "%sPurged brain in %0.2fs. %d words removed." % \
 						(self.settings.pubsym, 
 						time.time()-t,
-						compteur)
+						count)
 				
 			# Change a typo in the brain
 			elif command_list[0] == "!replace" and self.settings.process_with == "scrib":
@@ -549,6 +549,7 @@ class scrib:
 
 			# Print contexts [flooding...:-]
 			elif command_list[0] == "!contexts" and self.settings.process_with == "scrib":
+
 				# This is a large lump of data and should
 				# probably be printed, not module.output XXX
 
@@ -556,7 +557,12 @@ class scrib:
 				context = " ".join(command_list[1:])
 				if context == "":
 					return
-				io_module.output(self.settings.pubsym+"Contexts containing \""+context+"\":", args)
+
+				context = " ".join(command_list[1:])
+				print "[%s][#] ========================" % get_time()
+				print "[%s][#] Printing contexts containing '%s'" % (get_time(), context)
+				print "[%s][#] ========================" % get_time()
+
 				# Build context list
 				# Pad it
 				context = " "+context+" "
@@ -577,18 +583,23 @@ class scrib:
 				x = 0
 				while x < 5:
 					if x < len(c):
-						io_module.output(self.settings.pubsym+c[x], args)
+						lines = c
+						print "[%s][#] %s" % (get_time(), lines[x])
 					x += 1
 				if len(c) == 5:
 					return
 				if len(c) > 10:
-					io_module.output(self.settings.pubsym+"...("+`len(c)-10`+" skipped)...", args)
+					number = len(c)-10
+					print "[%s][!] ...(%s lines skipped)..." % (get_time(), number)
 				x = len(c) - 5
 				if x < 5:
 					x = 5
 				while x < len(c):
-					io_module.output(self.settings.pubsym+c[x], args)
+					lines = c
+					print "[%s][#] %s" % (get_time(), lines[x])
 					x += 1
+
+				print "[%s][#] ========================" % get_time()
 
 			# Remove a word from the vocabulary [use with care]
 			elif command_list[0] == "!unlearn" and self.settings.process_with == "scrib":
@@ -630,7 +641,7 @@ class scrib:
 						msg = "%sNo words censored." % self.settings.pubsym
 					else:
 						msg = "%sI will not use the word(s) %s" % (self.settings.pubsym, ", ".join(self.settings.censored))
-				# add every word listed to censored list
+				# add every word listd to censored list
 				else:
 					for x in xrange(1, len(command_list)):
 						if command_list[x] in self.settings.censored:
@@ -638,12 +649,12 @@ class scrib:
 						else:
 							self.settings.censored.append(command_list[x])
 							self.unlearn(command_list[x])
-							msg += "%s%s is now censored." % c(self.settings.pubsym, ommand_list[x])
+							msg += "%s%s is now censored." % (self.settings.pubsym, command_list[x])
 						msg += "\n"
 
 			# remove a word from the censored list
 			elif command_list[0] == "!uncensor" and self.settings.process_with == "scrib":
-				# Remove everyone listed from the ignore list
+				# Remove everyone listd from the ignore list
 				# eg !unignore tom dick harry
 				for x in xrange(1, len(command_list)):
 					try:
@@ -660,7 +671,7 @@ class scrib:
 					else:
 						msg = "%sI will alias the word(s) %s." \
 						% (self.settings.pubsym, ", ".join(self.settings.aliases.keys()))
-				# add every word listed to alias list
+				# add every word listd to alias list
 				elif len(command_list) == 2:
 					if command_list[1][0] != '~': command_list[1] = '~' + command_list[1]
 					if command_list[1] in self.settings.aliases.keys():
@@ -685,14 +696,10 @@ class scrib:
 
 			# Fortune command
 			elif command_list[0] == "!fortune":
-				msg = "%s".join([i for i in os.popen('fortune').readlines()]).replace('\n\n', '\n').replace('\n', ' ') % self.settings.pubsym
-			
-			# Tweeter command
-			elif command_list[0] == "!tweet":
-				msg = '%stest :3' % self.settings.pubsym
+				msg = self.settings.pubsym+"".join([i for i in os.popen('fortune').readlines()]).replace('\n\n', '\n').replace('\n', ' ')
 			# Date command
 			elif command_list[0] == "!date":
-				msg = "%sIt is ".join(i for i in os.popen('date').readlines()) % self.settings.pubsym
+				msg = self.settings.pubsym+"It is ".join(i for i in os.popen('date').readlines())
 			# Quit
 			elif command_list[0] == "!quit":
 				# Close the brain
@@ -829,7 +836,7 @@ class scrib:
 		while done == 0:
 			#create a brain which will contain all the words we can find before the "chosen" word
 			pre_words = {"" : 0}
-			#this is to prevent a case where we have an ignore_listed word
+			#this is to prevent a case where we have an ignore_listd word
 			word = str(sentence[0].split(" ")[0])
 			for x in xrange(0, len(self.words[word]) -1 ):
 				l, w = struct.unpack("iH", self.words[word][x])
@@ -861,26 +868,26 @@ class scrib:
 					pre_words[""] += num_context
 
 			#Sort the words
-			liste = pre_words.items()
-			liste.sort(lambda x,y: cmp(y[1],x[1]))
+			list = pre_words.items()
+			list.sort(lambda x,y: cmp(y[1],x[1]))
 			
-			numbers = [liste[0][1]]
-			for x in xrange(1, len(liste) ):
-				numbers.append(liste[x][1] + numbers[x-1])
+			numbers = [list[0][1]]
+			for x in xrange(1, len(list) ):
+				numbers.append(list[x][1] + numbers[x-1])
 
 			#take one of them from the list (randomly)
 			mot = randint(0, numbers[len(numbers) -1])
 			for x in xrange(0, len(numbers)):
 				if mot <= numbers[x]:
-					mot = liste[x][0]
+					mot = list[x][0]
 					break
 
 			#if the word is already choosen, pick the next one
 			while mot in sentence:
 				x += 1
-				if x >= len(liste) -1:
+				if x >= len(list) -1:
 					mot = ''
-				mot = liste[x][0]
+				mot = list[x][0]
 
 			mot = mot.split(" ")
 			mot.reverse()
@@ -930,27 +937,27 @@ class scrib:
 				else:
 					post_words[""] += num_context
 			#Sort the words
-			liste = post_words.items()
-			liste.sort(lambda x,y: cmp(y[1],x[1]))
-			numbers = [liste[0][1]]
-			
-			for x in xrange(1, len(liste) ):
-				numbers.append(liste[x][1] + numbers[x-1])
+			list = post_words.items()
+			list.sort(lambda x,y: cmp(y[1],x[1]))
+			numbers = [list[0][1]]
+		
+			for x in xrange(1, len(list) ):
+				numbers.append(list[x][1] + numbers[x-1])
 
 			#take one of them from the list (randomly)
 			mot = randint(0, numbers[len(numbers) -1])
 			for x in xrange(0, len(numbers)):
 				if mot <= numbers[x]:
-					mot = liste[x][0]
+					mot = list[x][0]
 					break
 
 			x = -1
 			while mot in sentence:
 				x += 1
-				if x >= len(liste) -1:
+				if x >= len(list) -1:
 					mot = ''
 					break
-				mot = liste[x][0]
+				mot = list[x][0]
 
 
 			mot = mot.split(" ")

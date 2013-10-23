@@ -577,17 +577,17 @@ class scrib:
 				x = 0
 				while x < 5:
 					if x < len(c):
-						io_module.output("%s"+c[x], args) % self.settings.pubsym
+						io_module.output(self.settings.pubsym+c[x], args)
 					x += 1
 				if len(c) == 5:
 					return
 				if len(c) > 10:
-					io_module.output("%s...("+`len(c)-10`+" skipped)...", args) % self.settings.pubsym
+					io_module.output(self.settings.pubsym+"...("+`len(c)-10`+" skipped)...", args)
 				x = len(c) - 5
 				if x < 5:
 					x = 5
 				while x < len(c):
-					io_module.output("%s"+c[x], args) % self.settings.pubsym
+					io_module.output(self.settings.pubsym+c[x], args)
 					x += 1
 
 			# Remove a word from the vocabulary [use with care]

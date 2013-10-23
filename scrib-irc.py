@@ -236,7 +236,7 @@ class ModIRC(SingleServerIRCBot):
 		if e.eventtype() == "pubmsg":
 			for x in self.channels[target].users():
 				body = body.replace(x, "#nick")
-		print "[%s][%s] %s" % (get_time(), x, body)
+		print "[%s][~] %s" % (get_time(), body)
 
 		# Ignore selected nicks
 		if self.settings.ignorelist.count(source) > 0 \
@@ -521,7 +521,7 @@ if __name__ == "__main__":
 		pass
 	except:
 		traceback.print_exc()
-		c = raw_input("[%s][!] Oh no, I've crashed! Would you like to save my brain? (y/n)") % get_time()
+		c = raw_input("["+get_time()+"][!] Oh no, I've crashed! Would you like to save my brain? (y/n)")
 		if c[:1] == 'n':
 			sys.exit(0)
 	bot.disconnect(bot.settings.quitmsg)

@@ -437,7 +437,7 @@ class ModIRC(SingleServerIRCBot):
 						phrase = phrase + str(command_list[x]) + " "
 					self.output(phrase, ("", command_list[1], "", c, e))
 			# Make the commands dynamic
-			elif command_list[0] == "! %s" % self.commanddict[command_list[0]]:
+			elif command_list[0] == "!%s" % self.commandlist.index(command_list[0]])
 				msg = PluginManager.ScribPlugin.action(command_list)
 
 			self.scrib.settings.save()

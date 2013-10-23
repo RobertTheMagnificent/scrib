@@ -452,8 +452,8 @@ class scrib:
 								self.barf(self.ACT, "Line '%s' word %d is not '%s' as expected." % \
 									(self.lines[line_idx][0],
 									word_num, w)
-								num_bad = num_bad + 1
-								del wlist[i])
+								num_bad = num_bad + 1)
+								del wlist[i]
 					if len(wlist) == 0:
 						del self.words[w]
 						self.settings.num_words = self.settings.num_words - 1

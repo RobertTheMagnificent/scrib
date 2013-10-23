@@ -57,9 +57,9 @@ class scrib:
 	import cfgfile
 
 	# Message Codes
-	ACT = '\033[92m [~] '
+	ACT = '\033[93m [~] '
 	MSG = '\033[94m [-] '
-	SAV = '\033[93m [#] '
+	SAV = '\033[92m [#] '
 	ERR = '\033[91m [!] '
 
 	def disable(self):
@@ -618,7 +618,7 @@ class scrib:
 				
 				if context == "":
 					return
-				print get_time() + self.MSG + "Looking for: %s" %context
+				print get_time() + self.ACT + "Looking for: %s" %context
 				# Unlearn contexts containing 'context'
 				t = time.time()
 				self.unlearn(context)
@@ -797,7 +797,7 @@ class scrib:
 			if len(words[x]) == 0:
 				del words[x]
 				self.settings.num_words = self.settings.num_words - 1
-				print get_time() + self.ACT + "\"%s\" vaped totally" %x
+				print get_time() + self.ACT + "\"%s\" vaporized from brain." %x
 
 	def reply(self, body):
 		"""

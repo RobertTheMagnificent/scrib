@@ -623,11 +623,11 @@ class scrib:
 				else:
 					for x in xrange(1, len(command_list)):
 						if command_list[x] in self.settings.censored:
-							msg += "%s is already censored" % command_list[x]
+							msg += "%s is already censored." % command_list[x]
 						else:
 							self.settings.censored.append(command_list[x])
 							self.unlearn(command_list[x])
-							msg += "done"
+							msg += "%s is now censored." % command_list[x]
 						msg += "\n"
 
 			# remove a word from the censored list
@@ -637,7 +637,7 @@ class scrib:
 				for x in xrange(1, len(command_list)):
 					try:
 						self.settings.censored.remove(command_list[x])
-						msg = "done"
+						msg = "%s is uncensored." % command_list[x]
 					except ValueError, e:
 						pass
 

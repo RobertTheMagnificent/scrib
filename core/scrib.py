@@ -49,16 +49,18 @@ def get_time():
 	"""
 	Make time sexy
 	"""
-	return time.strftime("\033[0m[%H:%M:%S] ", time.localtime(time.time()))
+	return time.strftime("\033[0m[%H:%M:%S]", time.localtime(time.time()))
 
 def barf(msg_code, message):
 		print get_time() + msg_code + message
 
 # Message Codes
-ACT = '\033[93m [~]'
-MSG = '\033[94m [-]'
-SAV = '\033[92m [#]'
-ERR = '\033[91m [!]'
+ACT = '\033[93m [~] '
+MSG = '\033[94m [-] '
+SAV = '\033[92m [#] '
+ERR = '\033[7;31m [!] '
+PLG = '\033[35m [*] '
+DBG = '\033[1;91m [$] '
 
 def disable(self):
 	ACT = ''
@@ -555,7 +557,7 @@ class scrib:
 
 				context = " ".join(command_list[1:])
 				barf(ACT, "========================")
-				barf(ACT, "Printing contexts containing '%s'" % context)
+				barf(ACT, "Printing contexts containing \033[1m'%s'" % context)
 				barf(ACT, "========================")
 
 				# Build context list

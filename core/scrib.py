@@ -455,7 +455,7 @@ class scrib:
 					if len(wlist) == 0:
 						del self.words[w]
 						self.settings.num_words = self.settings.num_words - 1
-						barf(ACT, "\"%s\" vaporized from brain. %w)
+						barf(ACT, "\"%s\" vaporized from brain." %w)
 
 				msg = "%sChecked my brain in %0.2fs. Fixed links: %d broken, %d bad." % \
 					(self.settings.pubsym, 

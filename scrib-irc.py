@@ -210,7 +210,7 @@ class ModIRC(SingleServerIRCBot):
 		if e.eventtype() == "pubmsg":
 			for x in self.channels[target].users():
 				body = body.replace(x, "#nick")
-		scrib.barf(scrib.MSG, "%s <%s> %s" % (target, source, body))
+				scrib.barf(scrib.MSG, "%s <%s> %s" % (target, source, body))
 
 		# Ignore selected nicks
 		if self.settings.ignorelist.count(source) > 0 \

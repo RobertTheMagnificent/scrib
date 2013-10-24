@@ -250,7 +250,7 @@ class ModIRC(SingleServerIRCBot):
 
 		# Pass message onto scrib
 		if source in self.owners and e.source() in self.owner_mask:
-			if highlighted = 1:
+			if highlighted == 1:
 				reply = nickreplyrate
 			else:
 				reply = replyrate

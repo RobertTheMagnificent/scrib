@@ -63,6 +63,7 @@ class ModIRC(SingleServerIRCBot):
 			  "reply_chance": ("Chance of reply (%) per message", 33),
 			  "nick_reply_chance": ("Chance of reply (%) per message when mentioned", 100),
 			  "quitmsg": ("IRC quit message", "Bye :-("),
+			  "debug":	("Toggle debug messages.", 0),
 			  "password": ("password for control the bot (Edit manually !)", "")
 			} )
 
@@ -207,8 +208,7 @@ class ModIRC(SingleServerIRCBot):
 		if source == self.settings.myname: return
 
 		# Ignore selected nicks
-		if self.settings.ignorelist.count(source) > 0 \
-			and self.settings.replyIgnored == 1:
+		if self.settings.ignorelist.count(source) > 0 and self.settings.replyIgnored == 1:
 			scrib.barf(scrib.ACT, "Not learning from %s" % source)
 			learn = 0
 		elif self.settings.ignorelist.count(source) > 0:
@@ -226,7 +226,8 @@ class ModIRC(SingleServerIRCBot):
 
 		# Ignore quoted messages
 		if body[0] == "<" or body[0:1] == "\"" or body[0:1] == " <" or body[0] == "[":
-			scrib.barf(scrib.ACT, "Ignoring quoted text.")
+			if self.settings.debug == 1:
+				scrib.barf(scrib.DBG, "Ignoring quoted text.")
 			return
 
 		# We want replies reply_chance%, if speaking is on
@@ -235,8 +236,8 @@ class ModIRC(SingleServerIRCBot):
 
 		if self.nick_check(body) == 1:
 			replyrate = nickreplyrate
-		
-			scrib.barf(scrib.ACT, "Responding to Highlight "+str(replyrate))
+			if self.settings.debug == 1:
+				scrib.barf(scrib.DBG, "Responding to Highlight")
 
 		# Always reply to private messages
 		if e.eventtype() == "privmsg":

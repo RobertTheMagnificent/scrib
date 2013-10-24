@@ -225,7 +225,7 @@ class ModIRC(SingleServerIRCBot):
 			return
 
 		# Ignore quoted messages
-		if body[0] == "<" or body[0:1] == "\"" or body[0:1] == " <":
+		if body[0] == "<" or body[0:1] == "\"" or body[0:1] == " <" or body[0] == "[":
 			scrib.barf(scrib.ACT, "Ignoring quoted text.")
 			return
 

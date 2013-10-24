@@ -58,9 +58,8 @@ def barf(msg_code, message):
 ACT = '\033[93m [~] '
 MSG = '\033[94m [-] '
 SAV = '\033[92m [#] '
-ERR = '\033[7;31m [!] '
 PLG = '\033[35m [*] '
-DBG = '\033[1;91m [$] '
+ERR = '\033[91m [!] '
 
 def disable(self):
 	ACT = ''
@@ -700,7 +699,7 @@ class scrib:
 			# Quit
 			elif command_list[0] == "!quit":
 				# Close the brain
-				save_all()
+				self.save_all()
 				barf(SAV, "Saved my brain. Goodbye!")
 				sys.exit()
 				

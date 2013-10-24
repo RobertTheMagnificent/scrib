@@ -204,13 +204,7 @@ class ModIRC(SingleServerIRCBot):
 			scrib.barf(scrib.MSG, "%s <%s> \033[0m%s" % (target, source, body))
 
 		# Ignore self.
-		#if source == self.settings.myname: return
-
-		#replace nicknames by "#nick"
-		if e.eventtype() == "pubmsg":
-			for x in self.channels[target].users():
-				body = body.replace(x, "#nick")
-			scrib.barf(scrib.MSG, "%s <%s> \033[0m%s" % (target, source, body))
+		if source == self.settings.myname: return
 
 		# Ignore selected nicks
 		if self.settings.ignorelist.count(source) > 0 \
@@ -239,6 +233,13 @@ class ModIRC(SingleServerIRCBot):
 		replyrate = self.settings.speaking * self.settings.reply_chance
 		nickreplyrate = self.settings.speaking * self.settings.nick_reply_chance
 
+		scrib.barf(scrib.ERR, "Replyrate is "+str(replyrate))
+		scrib.barf(scrib.ERR, str(self.nick_check(body)))
+		if self.nick_check(body) == 1:
+			replyrate = nickreplyrate
+		
+			scrib.barf(scrib.ERR, "Replyrate set to "+str(replyrate))
+
 		# Always reply to private messages
 		if e.eventtype() == "privmsg":
 			replyrate = 100
@@ -248,14 +249,15 @@ class ModIRC(SingleServerIRCBot):
 				if self.irc_commands(body, source, target, c, e) == 1:return
 				return
 
+		#replace nicknames by "#nick"
+		if e.eventtype() == "pubmsg":
+			scrib.barf(scrib.MSG, "%s <%s> \033[0m%s" % (target, source, body))
+			for x in self.channels[target].users():
+				body = body.replace(x, "#nick")
+
 		# Pass message onto scrib
 		if source in self.owners and e.source() in self.owner_mask:
-			reply = replyrate
-
-			if highlighted == 1:
-				reply = nickreplyrate
-			
-			self.scrib.process_msg(self, body, reply, learn, (body, source, target, c, e), owner=1)
+			self.scrib.process_msg(self, body, replyrate, learn, (body, source, target, c, e), owner=1)
 		else:
 			#start a new thread
 			thread.start_new_thread(self.scrib.process_msg, (self, body, replyrate, learn, (body, source, target, c, e)))
@@ -289,7 +291,14 @@ class ModIRC(SingleServerIRCBot):
 		else:
 			self.output(msg, ("<none>", source, target, c, e))
 			return 1
-			
+
+	def nick_check(self, message):
+		# Check to see if I'm highlighted
+		highlighted = 0
+		if message.find(self.settings.myname) != -1:
+			highlighted = 1
+		return highlighted
+
 	def output(self, message, args):
 		"""
 		Output a line of text. args = (body, source, target, c, e)
@@ -301,13 +310,6 @@ class ModIRC(SingleServerIRCBot):
 		# Unwrap arguments
 		body, source, target, c, e = args
 		
-		# replace by the good nickname
-		# but first see if we're mentioned
-		highlighted = 0
-		if message.find(self.settings.myname):
-			highlighted = 1
-		message = message.replace("#nick", source)
-
 		# Decide. should we do a ctcp action?
 		if message.find(self.settings.myname+" ") == 0:
 			action = 1
@@ -315,6 +317,9 @@ class ModIRC(SingleServerIRCBot):
 		else:
 			action = 0
 
+		# Replace nicks with #nick variable
+		message = message.replace("#nick", source)
+			
 		# Joins replies and public messages
 		if e.eventtype() == "join" or e.eventtype() == "quit" or e.eventtype() == "part" or e.eventtype() == "pubmsg":
 			if action == 0:

@@ -238,8 +238,10 @@ class ModIRC(SingleServerIRCBot):
 		# We want replies reply_chance%, if speaking is on
 		replyrate = self.settings.speaking * self.settings.reply_chance
 		nickreplyrate = self.settings.speaking * self.settings.nick_reply_chance
+		scrib.barf(scrib.ERR, "Replyrate is %s") % replyrate
 		if self.nick_check(body) == 1:
 			replyrate = nickreplyrate
+			scrib.barf(scrib.ERR, "Replyrate set to %s") % replyrate
 
 		# Always reply to private messages
 		if e.eventtype() == "privmsg":
@@ -290,7 +292,7 @@ class ModIRC(SingleServerIRCBot):
 	def nick_check(self, message):
 		# Check to see if I'm highlighted
 		highlighted = 0
-		if message.find(self.settings.myname) == 1:
+		if message.find(self.settings.myname) != -1:
 			highlighted = 1
 		return highlighted
 

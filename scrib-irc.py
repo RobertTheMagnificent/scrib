@@ -251,9 +251,9 @@ class ModIRC(SingleServerIRCBot):
 
 		#replace nicknames by "#nick"
 		if e.eventtype() == "pubmsg":
+			scrib.barf(scrib.MSG, "%s <%s> \033[0m%s" % (target, source, body))
 			for x in self.channels[target].users():
 				body = body.replace(x, "#nick")
-			scrib.barf(scrib.MSG, "%s <%s> \033[0m%s" % (target, source, body))
 
 		# Pass message onto scrib
 		if source in self.owners and e.source() in self.owner_mask:
@@ -295,7 +295,6 @@ class ModIRC(SingleServerIRCBot):
 	def nick_check(self, message):
 		# Check to see if I'm highlighted
 		highlighted = 0
-		print message.find(self.settings.myname)
 		if message.find(self.settings.myname) != -1:
 			highlighted = 1
 		return highlighted

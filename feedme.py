@@ -23,7 +23,7 @@ class ModFileIn:
 		buffer = f.read()
 		f.close()
 
-		print "I knew "+`Borg.settings.num_words`+" words ("+`len(Borg.lines)`+" lines) before reading "+sys.argv[1]
+		before = "I knew "+`Borg.settings.num_words`+" words ("+`len(Borg.lines)`+" lines) before reading "+sys.argv[1]
 		buffer = scrib.filter_message(buffer, Borg)
 		# Learn from input
 		try:
@@ -31,9 +31,12 @@ class ModFileIn:
 			Borg.learn(buffer)
 		except KeyboardInterrupt, e:
 			# Close database cleanly
-			print "Premature termination :-("
-		print "I know "+`Borg.settings.num_words`+" words ("+`len(Borg.lines)`+" lines) now."
+			print "Premature termination :("
+		after = "I know "+`Borg.settings.num_words`+" words ("+`len(Borg.lines)`+" lines) now."
 		del Borg
+		
+		print before
+		print after
 
 	def shutdown(self):
 		pass
@@ -46,7 +49,7 @@ class ModFileIn:
 
 if __name__ == "__main__":
 	if len(sys.argv) < 2:
-		print "Specify a filename."
+		print "Please specify a filename."
 		sys.exit()
 	# start the scrib
 	my_scrib = scrib.scrib()

@@ -63,6 +63,7 @@ class ModIRC(SingleServerIRCBot):
 			  "reply_chance": ("Chance of reply (%) per message", 33),
 			  "nick_reply_chance": ("Chance of reply (%) per message when mentioned", 100),
 			  "quitmsg": ("IRC quit message", "Bye :-("),
+			  "debug":	("Toggle debug messages.", 0),
 			  "password": ("password for control the bot (Edit manually !)", "")
 			} )
 
@@ -120,7 +121,7 @@ class ModIRC(SingleServerIRCBot):
 	def get_version(self):
 		if self.settings.private:
 			# private mode. we shall be a windows luser today
-			return "Omnominator"
+			return "Omnomnomicon"
 		else:
 			return self.scrib.ver_string
 
@@ -207,8 +208,7 @@ class ModIRC(SingleServerIRCBot):
 		if source == self.settings.myname: return
 
 		# Ignore selected nicks
-		if self.settings.ignorelist.count(source) > 0 \
-			and self.settings.replyIgnored == 1:
+		if self.settings.ignorelist.count(source) > 0 and self.settings.replyIgnored == 1:
 			scrib.barf(scrib.ACT, "Not learning from %s" % source)
 			learn = 0
 		elif self.settings.ignorelist.count(source) > 0:
@@ -225,20 +225,19 @@ class ModIRC(SingleServerIRCBot):
 			return
 
 		# Ignore quoted messages
-		if body[0] == "<" or body[0:1] == "\"" or body[0:1] == " <":
-			scrib.barf(scrib.ACT, "Ignoring quoted text.")
+		if body[0] == "<" or body[0:1] == "\"" or body[0:1] == " <" or body[0] == "[":
+			if self.settings.debug == 1:
+				scrib.barf(scrib.DBG, "Ignoring quoted text.")
 			return
 
 		# We want replies reply_chance%, if speaking is on
 		replyrate = self.settings.speaking * self.settings.reply_chance
 		nickreplyrate = self.settings.speaking * self.settings.nick_reply_chance
 
-		scrib.barf(scrib.ERR, "Replyrate is "+str(replyrate))
-		scrib.barf(scrib.ERR, str(self.nick_check(body)))
 		if self.nick_check(body) == 1:
 			replyrate = nickreplyrate
-		
-			scrib.barf(scrib.ERR, "Replyrate set to "+str(replyrate))
+			if self.settings.debug == 1:
+				scrib.barf(scrib.DBG, "Responding to Highlight")
 
 		# Always reply to private messages
 		if e.eventtype() == "privmsg":
@@ -264,20 +263,17 @@ class ModIRC(SingleServerIRCBot):
 
 	def irc_commands(self, body, source, target, c, e):
 		"""
-		All IRC commands have been turned into plugins. :D
+		Route IRC Commands to the PluginManager.
 		"""
 		
 		msg = ""
-
 		command_list = body.split()
 		command_list[0] = command_list[0]
 
 		### Owner commands (Which is all of them for now)
 		if source in self.owners and e.source() in self.owner_mask:
-			# Make the commands dynamic
-			# self.commanddict should eventually check self.commandlist
-			# so we can stop doing [1:]
-			if command_list[0][1:] in self.commanddict:
+			# Only accept commands that are in the Command List
+			if command_list[0] in self.commandlist:
 				msg = PluginManager.sendMessage(command_list[0][1:], command_list, self)
 
 			if command_list[0] == "!reload" and len(command_list) == 1:

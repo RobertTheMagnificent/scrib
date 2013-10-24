@@ -206,12 +206,6 @@ class ModIRC(SingleServerIRCBot):
 		# Ignore self.
 		if source == self.settings.myname: return
 
-		#replace nicknames by "#nick"
-		if e.eventtype() == "pubmsg":
-			for x in self.channels[target].users():
-				body = body.replace(x, "#nick")
-			scrib.barf(scrib.MSG, "%s <%s> \033[0m%s" % (target, source, body))
-
 		# Ignore selected nicks
 		if self.settings.ignorelist.count(source) > 0 \
 			and self.settings.replyIgnored == 1:
@@ -221,6 +215,12 @@ class ModIRC(SingleServerIRCBot):
 			scrib.barf(scrib.ACT, "Ignoring %s" % source)
 			return
 
+		#replace nicknames by "#nick"
+		if e.eventtype() == "pubmsg":
+			for x in self.channels[target].users():
+				body = body.replace(x, "#nick")
+			scrib.barf(scrib.MSG, "%s <%s> \033[0m%s" % (target, source, body))
+			
 		# private mode. disable commands for non owners
 		if (not source in self.owners) and self.settings.private:
 			while body[:1] == "!":
@@ -238,9 +238,12 @@ class ModIRC(SingleServerIRCBot):
 		# We want replies reply_chance%, if speaking is on
 		replyrate = self.settings.speaking * self.settings.reply_chance
 		nickreplyrate = self.settings.speaking * self.settings.nick_reply_chance
+
 		scrib.barf(scrib.ERR, "Replyrate is "+str(replyrate))
+		scrib.barf(scrib.ERR, str(self.nick_check(body)))
 		if self.nick_check(body) == 1:
 			replyrate = nickreplyrate
+		
 			scrib.barf(scrib.ERR, "Replyrate set to "+str(replyrate))
 
 		# Always reply to private messages
@@ -292,6 +295,7 @@ class ModIRC(SingleServerIRCBot):
 	def nick_check(self, message):
 		# Check to see if I'm highlighted
 		highlighted = 0
+		print message.find(self.settings.myname)
 		if message.find(self.settings.myname) != -1:
 			highlighted = 1
 		return highlighted

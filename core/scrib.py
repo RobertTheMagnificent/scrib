@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+h#!/usr/bin/env python
 # -*- coding: utf-8 -*-
   
 from random import *
@@ -117,7 +117,7 @@ class scrib:
 			} )
 
 		self.answers = self.cfgfile.cfgset()
-		self.answers.load("data/answers.txt",
+		self.answers.load("brain/answers.txt",
 			{ "sentences":	("A list of prepared answers", {})
 			} )
 		self.unfilterd = {}
@@ -131,7 +131,7 @@ class scrib:
 		# Read the brain
 		barf(SAV, "Reading my brain...")
 		try:
-			zfile = zipfile.ZipFile('data/archive.zip','r')
+			zfile = zipfile.ZipFile('brain/archive.zip','r')
 			for filename in zfile.namelist():
 				data = zfile.read(filename)
 				file = open(filename, 'w+b')
@@ -141,19 +141,19 @@ class scrib:
 			barf(ERR, "No zip found")
 		try:
 
-			f = open("data/version", "rb")
+			f = open("brain/version", "rb")
 			s = f.read()
 			f.close()
 			if s != self.version.brain:
 				barf(ERR, "Error loading the brain.\n[!]--> Please convert it before launching scrib.")
 				sys.exit(1)
 
-			f = open("data/words.dat", "rb")
+			f = open("brain/words.dat", "rb")
 			s = f.read()
 			f.close()
 			self.words = marshal.loads(s)
 			del s
-			f = open("data/lines.dat", "rb")
+			f = open("brain/lines.dat", "rb")
 			s = f.read()
 			f.close()
 			self.lines = marshal.loads(s)
@@ -204,7 +204,7 @@ class scrib:
 
 		#unlearn words in the unlearn.txt file.
 		try:
-			f = open("data/unlearn.txt", "r")
+			f = open("brain/unlearn.txt", "r")
 			while 1:
 				word = f.readline().strip('\n')
 				if word == "":
@@ -225,7 +225,7 @@ class scrib:
 			barf(SAV, "Writing to my brain...\033[0m")
 
 			try:
-				zfile = zipfile.ZipFile('data/archive.zip','r')
+				zfile = zipfile.ZipFile('brain/archive.zip','r')
 				for filename in zfile.namelist():
 					data = zfile.read(filename)
 					file = open(filename, 'w+b')
@@ -234,36 +234,36 @@ class scrib:
 			except (OSError, IOError), e:
 				barf(ERR, "No brain zip found. Is this the first time scrib has been launched?")
 
-			f = open("data/words.dat", "wb")
+			f = open("brain/words.dat", "wb")
 			s = marshal.dumps(self.words)
 			f.write(s)
 			f.close()
-			f = open("data/lines.dat", "wb")
+			f = open("brain/lines.dat", "wb")
 			s = marshal.dumps(self.lines)
 			f.write(s)
 			f.close()
 
 			#save the version
-			f = open("data/version", "w")
+			f = open("brain/version", "w")
 			f.write(self.version.brain)
 			f.close()
 
 
 			#zip the files
-			f = zipfile.ZipFile('data/archive.zip','w',zipfile.ZIP_DEFLATED)
-			f.write('data/words.dat')
-			f.write('data/lines.dat')
-			f.write('data/version')
+			f = zipfile.ZipFile('brain/archive.zip','w',zipfile.ZIP_DEFLATED)
+			f.write('brain/words.dat')
+			f.write('brain/lines.dat')
+			f.write('brain/version')
 			f.close()
 
 			try:
-				os.remove('data/words.dat')
-				os.remove('data/lines.dat')
-				os.remove('data/version')
+				os.remove('brain/words.dat')
+				os.remove('brain/lines.dat')
+				os.remove('brain/version')
 			except (OSError, IOError), e:
 				barf(ERR, "Could not remove the files.")
 
-			f = open("data/words.txt", "w")
+			f = open("brain/words.txt", "w")
 			# write each words known
 			wordlist = []
 			#Sort the list befor to export
@@ -273,7 +273,7 @@ class scrib:
 			map( (lambda x: f.write(str(x[0])+"\n\r") ), wordlist)
 			f.close()
 
-			f = open("data/sentences.txt", "w")
+			f = open("brain/sentences.txt", "w")
 			# write each words known
 			wordlist = []
 			#Sort the list befor to export

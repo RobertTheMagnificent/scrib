@@ -104,9 +104,7 @@ class scrib:
 		# Attempt to load settings
 		self.settings = self.cfgfile.cfgset()
 		self.settings.load("conf/scrib.cfg",
-			{ "num_contexts": ("Total word contexts", 0),
-			  "num_words":	("Total unique words known", 0),
-			  "max_words":	("max limits in the number of words known", 6000),
+			{ "max_words":	("max limits in the number of words known", 6000),
 			  "learning":	("Allow the bot to learn", 1),
 			  "ignore_list":("Words that can be ignored for the answer", ['!.', '?.', "'", ',', ';']),
 			  "censored":	("Don't learn the sentence if one of those words is found", []),
@@ -114,6 +112,13 @@ class scrib:
 			  "aliases":	("A list of similars words", {}),
 			  "pubsym": ("Symbol to append to cmd msgs in public", "!"),
 			  "no_save"	:("If True, Scrib doesn't save his brain and configuration to disk", "False")
+			} )
+
+		# Brain stats
+		self.brainstats = self.cfgfile.cfgset()
+		self.brainstats.load("brain/stats",
+			{ "num_contexts": ("Total word contexts", 0),
+			  "num_words":	("Total unique words known", 0)
 			} )
 
 		self.answers = self.cfgfile.cfgset()
@@ -165,16 +170,16 @@ class scrib:
 			barf(ERR, "Error reading saves. New database created.")
 
 		# Is a resizing required?
-		if len(self.words) != self.settings.num_words:
+		if len(self.words) != self.brainstats.num_words:
 			barf(ACT, "Updating my brain's information...")
-			self.settings.num_words = len(self.words)
+			self.brainstats.num_words = len(self.words)
 			num_contexts = 0
 			# Get number of contexts
 			for x in self.lines.keys():
 				num_contexts += len(self.lines[x][0].split())
-			self.settings.num_contexts = num_contexts
+			self.brainstats.num_contexts = num_contexts
 			# Save new values
-			self.settings.save()
+			self.brainstats.save()
 			
 		# Is an aliases update required ?
 		count = 0

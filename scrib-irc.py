@@ -236,7 +236,7 @@ class ModIRC(SingleServerIRCBot):
 		if self.nick_check(body) == 1:
 			replyrate = nickreplyrate
 		
-			scrib.barf(scrib.ERR, "Replyrate set to "+str(replyrate))
+			scrib.barf(scrib.ACT, "Responding to Highlight "+str(replyrate))
 
 		# Always reply to private messages
 		if e.eventtype() == "privmsg":

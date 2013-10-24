@@ -100,13 +100,13 @@ class ModIRC(SingleServerIRCBot):
 					pass
 
 	def our_start(self):
-		scrib.barf(scrib.ACT, "Connecting to %s" % self.settings.servers)
+		scrib.barf(scrib.ACT, "Connecting to \033[0m%s" % self.settings.servers)
 		SingleServerIRCBot.__init__(self, self.settings.servers, self.settings.myname, self.settings.realname, 2)
 
 		self.start()
 
 	def on_welcome(self, c, e):
-		scrib.barf(scrib.ACT, "%s" %self.chans)
+		scrib.barf(scrib.ACT, "Joining \033[0m%s" %self.chans)
 		for i in self.chans:
 			c.join(i)
 
@@ -172,7 +172,7 @@ class ModIRC(SingleServerIRCBot):
 		# First message from owner 'locks' the owner host mask
 		if not e.source() in self.owner_mask and source in self.owners:
 			self.owner_mask.append(e.source())
-			scrib.barf(scrib.ACT, "My owner is %s" %e.source())
+			scrib.barf(scrib.ACT, "My owner is \033[0m%s" %e.source())
 
 		# Message text
 		if len(e.arguments()) == 1:
@@ -201,7 +201,7 @@ class ModIRC(SingleServerIRCBot):
 
 		# WHOOHOOO!!
 		if target == self.settings.myname or source == self.settings.myname:
-			scrib.barf(scrib.MSG, "%s <%s> %s" % (target, source, body))
+			scrib.barf(scrib.MSG, "%s <%s> \033[0m%s" % (target, source, body))
 
 		# Ignore self.
 		#if source == self.settings.myname: return
@@ -210,7 +210,7 @@ class ModIRC(SingleServerIRCBot):
 		if e.eventtype() == "pubmsg":
 			for x in self.channels[target].users():
 				body = body.replace(x, "#nick")
-			scrib.barf(scrib.MSG, "%s <%s> %s" % (target, source, body))
+			scrib.barf(scrib.MSG, "%s <%s> \033[0m%s" % (target, source, body))
 
 		# Ignore selected nicks
 		if self.settings.ignorelist.count(source) > 0 \
@@ -313,16 +313,16 @@ class ModIRC(SingleServerIRCBot):
 		# Joins replies and public messages
 		if e.eventtype() == "join" or e.eventtype() == "quit" or e.eventtype() == "part" or e.eventtype() == "pubmsg":
 			if action == 0:
-				scrib.barf(scrib.MSG, "%s <%s> %s" % ( target, self.settings.myname, message))
+				scrib.barf(scrib.MSG, "%s <%s> \033[0m%s" % ( target, self.settings.myname, message))
 				c.privmsg(target, message)
 			else:
-				scrib.barf(scrib.MSG, "%s <%s> /me %s" % ( target, self.settings.myname, message))
+				scrib.barf(scrib.MSG, "%s <%s> /me \033[0m%s" % ( target, self.settings.myname, message))
 				c.action(target, message)
 		# Private messages
 		elif e.eventtype() == "privmsg":
 			# normal private msg
 			if action == 0:
-				scrib.barf(scrib.MSG, "%s <%s> %s" % ( source, self.settings.myname, message))
+				scrib.barf(scrib.MSG, "%s <%s> \033[0m%s" % ( source, self.settings.myname, message))
 				c.privmsg(source, message)
 				# send copy to owner
 				if not source in self.owners:
@@ -330,7 +330,7 @@ class ModIRC(SingleServerIRCBot):
 					c.privmsg(','.join(self.owners), "(To   "+source+") "+message)
 			# ctcp action priv msg
 			else:
-				scrib.barf(scrib.MSG, "%s <%s> /me %s" % ( target, self.settings.myname, message))
+				scrib.barf(scrib.MSG, "%s <%s> /me \033[0m%s" % ( target, self.settings.myname, message))
 				c.action(source, message)
 				# send copy to owner
 				if not source in self.owners:

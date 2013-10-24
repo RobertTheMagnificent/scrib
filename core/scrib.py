@@ -387,6 +387,7 @@ class scrib:
 					file = open(filename, 'w+b')
 					file.write(data)
 					file.close()
+					barf(SAV, "Brain saved.")
 			except:
 				barf(ERR, "No brain found, or it's broken. Attempting to restore...")
 				try:
@@ -443,7 +444,7 @@ class scrib:
 			map( (lambda x: f.write(str(x[0])+"\n") ), wordlist)
 			f.close()
 
-			if restart_timer is 1:
+			if restart_timer == 1:
 				self.autosave = threading.Timer(to_sec("125m"), self.save_all)
 				self.autosave.start()
 

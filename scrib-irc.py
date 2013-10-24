@@ -120,7 +120,7 @@ class ModIRC(SingleServerIRCBot):
 	def get_version(self):
 		if self.settings.private:
 			# private mode. we shall be a windows luser today
-			return "Omnominator"
+			return "Omnomnomicon"
 		else:
 			return self.scrib.ver_string
 

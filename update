@@ -5,10 +5,11 @@
 VER=0.7.0
 DATE=$(date +"%x %r %Z")
 BOLD="\e[1m"
+CLEAR="\e[0m"
 
 function push
 {
-	echo "We'll now setup your commit!"
+	echo -e $BOLD"We'll now setup your commit!"$CLEAR
 	sleep 1
 	while true; do
 		read -p "Update version? [y/N]" yn
@@ -27,14 +28,14 @@ function gitstatus
 	git status
 	echo ""
 
-	echo "Please enter the files you'd like to add to this commit."
+	echo -e $BOLD"Please enter the files you'd like to add to this commit."$CLEAR
 	sleep 1
 	read -p "# " LIST
 	echo ""
 	git add $LIST
 	sleep 1
 
-	echo "Enter the message you'd like to include with this commit."
+	echo -e $BOLD"Enter the message you'd like to include with this commit."$CLEAR
 	read -p "# " MESSAGE
 	git commit -m "$MESSAGE"
 	echo ""
@@ -46,12 +47,12 @@ function gitstatus
 	git push origin master
 
 	echo ""
-	echo "And we're done.  Have a good day, human."
+	echo -e $BOLD"And we're done.  Have a good day, human."$CLEAR
 }
 
 function version
 {
-	echo "Enter the core version number for this Scrib."
+	echo -e $BOLD"Enter the core version number for this Scrib."$CLEAR
 	read -e -p "# " CORE
 
 	echo "Creating new VERSION file.."
@@ -70,7 +71,7 @@ function version
 }
 
 # Really push to Github?
-echo -e $BOLD"You're about to push the current Scrib code to Github.\e[0m"
+echo -e $BOLD"You're about to push the current Scrib code to Github."$CLEAR
 sleep 1
 
 	while true; do

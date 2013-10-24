@@ -250,10 +250,10 @@ class ModIRC(SingleServerIRCBot):
 
 		# Pass message onto scrib
 		if source in self.owners and e.source() in self.owner_mask:
+			reply = replyrate
+
 			if highlighted == 1:
 				reply = nickreplyrate
-			else:
-				reply = replyrate
 			
 			self.scrib.process_msg(self, body, reply, learn, (body, source, target, c, e), owner=1)
 		else:
@@ -303,7 +303,10 @@ class ModIRC(SingleServerIRCBot):
 		
 		# replace by the good nickname
 		# but first see if we're mentioned
-		highlight = 
+		highlighted = 0
+		if message.find(body.find(self.settings.myname))
+			highlighted = 1
+
 		message = message.replace("#nick", source)
 
 		# Decide. should we do a ctcp action?

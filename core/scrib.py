@@ -391,7 +391,7 @@ class scrib:
 		if owner == 1:
 			# Save the brain
 			if command_list[0] == "!save":
-				save_all()
+				self.save_all()
 				msg = "%sBrain has been saved!" % self.settings.pubsym
 
 			# Command list

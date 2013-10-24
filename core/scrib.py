@@ -109,7 +109,6 @@ class scrib:
 			  "censored":	("Don't learn the sentence if one of those words is found", []),
 			  "num_aliases":("Total of aliases known", 0),
 			  "aliases":	("A list of similars words", {}),
-			  "process_with":("No longer used."),
 			  "pubsym": ("Symbol to append to cmd msgs in public", "!"),
 			  "no_save"	:("If True, Scrib doesn't save his brain and configuration to disk", "False")
 			} )
@@ -231,7 +230,6 @@ class scrib:
 					file.close()
 			except (OSError, IOError), e:
 				barf(ERR, "No brain zip found. Is this the first time scrib has been launched?")
-
 
 			f = open("data/words.dat", "wb")
 			s = marshal.dumps(self.words)

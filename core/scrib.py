@@ -19,9 +19,7 @@ def filter_message(message, bot):
 	message = message.replace("\"", "")
 	message = message.replace("\n", " ")
 	message = message.replace("\r", " ")
-	message = message.replace("'", "")
-	message = message.replace('"', '')
-
+	
 	# remove matching brackets
 	index = 0
 	try:

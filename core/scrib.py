@@ -55,9 +55,12 @@ def barf(msg_code, message):
 		print get_time() + msg_code + message
 
 # Message Codes
+# Message Codes
 ACT = '\033[93m [~] '
 MSG = '\033[94m [-] '
 SAV = '\033[92m [#] '
+PLG = '\033[35m [*] '
+DBG = '\033[1;91m [$] '
 ERR = '\033[91m [!] '
 
 def disable(self):
@@ -555,7 +558,7 @@ class scrib:
 
 				context = " ".join(command_list[1:])
 				barf(ACT, "========================")
-				barf(ACT, "Printing contexts containing '%s'" % context)
+				barf(ACT, "Printing contexts containing \033[1m'%s'" % context)
 				barf(ACT, "========================")
 
 				# Build context list

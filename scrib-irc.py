@@ -215,12 +215,6 @@ class ModIRC(SingleServerIRCBot):
 			scrib.barf(scrib.ACT, "Ignoring %s" % source)
 			return
 
-		#replace nicknames by "#nick"
-		if e.eventtype() == "pubmsg":
-			for x in self.channels[target].users():
-				body = body.replace(x, "#nick")
-			scrib.barf(scrib.MSG, "%s <%s> \033[0m%s" % (target, source, body))
-			
 		# private mode. disable commands for non owners
 		if (not source in self.owners) and self.settings.private:
 			while body[:1] == "!":
@@ -254,6 +248,12 @@ class ModIRC(SingleServerIRCBot):
 			if body[0:1] == "!":
 				if self.irc_commands(body, source, target, c, e) == 1:return
 				return
+
+		#replace nicknames by "#nick"
+		if e.eventtype() == "pubmsg":
+			for x in self.channels[target].users():
+				body = body.replace(x, "#nick")
+			scrib.barf(scrib.MSG, "%s <%s> \033[0m%s" % (target, source, body))
 
 		# Pass message onto scrib
 		if source in self.owners and e.source() in self.owner_mask:

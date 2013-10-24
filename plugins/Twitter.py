@@ -9,7 +9,7 @@ command = { "tweet": "Owner Command. Usage: !tweet\nTweet the most recently said
 # Plugin Action
 class TwitterPlugin(ScribPlugin.ScribPlugin):
 	def action(self, command_list, scrib):
-		if command_list[0] == alias and scrib.settings.twitter = 1:
+		if command_list[0] == alias and scrib.settings.twitter == 1:
 			self.settings = cfgfile.cfgset()
 			self.settings.load("conf/twitter.cfg",
 			{ "con_key = ": ("Consumer Key", ""),

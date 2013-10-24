@@ -1,0 +1,84 @@
+#!/bin/bash    
+# Scrib upload script ver. 0.1
+# by KittyTristy "Tristy Hopkins"
+
+VER=0.7.0
+DATE=$(date +"%x %r %Z")
+
+function push
+{
+	echo "We'll now setup your commit!"
+	sleep 2
+	while true; do
+		read -p "Update version? [y/N]" yn
+		case $yn in
+		[Yy]* ) (version); (gitstatus); exit ;;
+		[Nn]* ) (gitstatus); exit ;;
+		* ) echo "Please enter yes or no.";;
+		esac
+	done
+}
+
+function gitstatus
+{
+
+	echo ""
+	git status
+	echo ""
+
+	echo "Please enter the files you'd like to add to this commit."
+	sleep 1
+	read -p "# " LIST
+	echo ""
+	git add $LIST
+	sleep 1
+
+	echo ""
+	echo "Enter the message you'd like to include with this commit."
+	read -p "# " MESSAGE
+	git commit -m "$MESSAGE"
+	echo ""
+
+	echo "Okay, looks like we're ready to push to Github."
+	sleep 1
+	echo "Commencing push.."
+	sleep 1
+	git push origin master
+
+	echo ""
+	echo "And we're done.  Have a good day, human."
+}
+
+function version
+{
+	echo "Enter the core version number for this Scrib."
+	read -e -p "# " CORE
+
+	echo "Creating new VERSION file.."
+
+	# Building the new VERSION file!
+	rm -rf VERSION
+	cat >> VERSION <<- _EOF_
+	# Core version of Scrib #
+	core= '$CORE'
+	# Brain version of Scrib #
+	brain= '0.0.1'
+	# Date of last update #
+	date= '$DATE'
+	_EOF_
+
+}
+
+# Really push to Github?
+echo "You're about to push the current Scrib code to Github."
+sleep 1
+
+	while true; do
+		read -p "Continue? [y/N]" yn
+		case $yn in
+		[Yy]* ) (push); exit;;
+		[Nn]* ) exit ;;
+		* ) echo "Please enter yes or no.";;
+		esac
+	done
+

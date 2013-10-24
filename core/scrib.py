@@ -55,7 +55,6 @@ def barf(msg_code, message):
 		print get_time() + msg_code + message
 
 # Message Codes
-# Message Codes
 ACT = '\033[93m [~] '
 MSG = '\033[94m [-] '
 SAV = '\033[92m [#] '
@@ -126,7 +125,11 @@ class scrib:
 		self.version.load("VERSION",
 			{ "core": ("Core version of Scrib", 0),
 			  "brain": ("Brain version of Scrib", 0),
+			  "date": ("Date of last update", 0),
 			} )
+		
+		core = self.version.core
+		date = self.version.date
 
 		# Read the brain
 		barf(SAV, "Reading my brain...")
@@ -163,6 +166,9 @@ class scrib:
 			self.words = {}
 			self.lines = {}
 			barf(ERR, "Error reading saves. New database created.")
+
+		# Tell us what version of Scrib we're running and the last time it was updated!
+		barf(MSG, "Greetings human! I am Scrib version %s.\n               I was last updated on %s." % (core,date))
 
 		# Is a resizing required?
 		if len(self.words) != self.settings.num_words:

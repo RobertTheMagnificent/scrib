@@ -55,10 +55,10 @@ def barf(msg_code, message):
 		print get_time() + msg_code + message
 
 # Message Codes
-ACT = '\033[93m [~] '
-MSG = '\033[94m [-] '
-SAV = '\033[92m [#] '
-ERR = '\033[91m [!] '
+ACT = '\033[93m [~]'
+MSG = '\033[94m [-]'
+SAV = '\033[92m [#]'
+ERR = '\033[91m [!]'
 
 def disable(self):
 	ACT = ''

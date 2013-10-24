@@ -13,8 +13,9 @@ def barf(msg_code, message):
 ACT = '\033[93m [~] '
 MSG = '\033[94m [-] '
 SAV = '\033[92m [#] '
-ERR = '\033[91m [!] '
+ERR = '\033[7;31m [!] '
 PLG = '\033[35m [*] '
+DBG = '\033[1;91m [$] '
 
 def addPlugin( command, alias, action ):
 	global plugin_commands, plugin_aliases

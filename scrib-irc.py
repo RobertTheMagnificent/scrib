@@ -100,13 +100,13 @@ class ModIRC(SingleServerIRCBot):
 					pass
 
 	def our_start(self):
-		scrib.barf(scrib.ACT, "Connecting to \033[0m%s" % self.settings.servers)
+		scrib.barf(scrib.ACT, "Connecting to \033[1m%s" % self.settings.servers)
 		SingleServerIRCBot.__init__(self, self.settings.servers, self.settings.myname, self.settings.realname, 2)
 
 		self.start()
 
 	def on_welcome(self, c, e):
-		scrib.barf(scrib.ACT, "Joining \033[0m%s" %self.chans)
+		scrib.barf(scrib.ACT, "Joining \033[1m%s" %self.chans)
 		for i in self.chans:
 			c.join(i)
 

@@ -363,8 +363,8 @@ class scrib:
 
 		# How many words do we know?
 		elif command_list[0] == "!words":
-			num_w = self.settings.num_words
-			num_c = self.settings.num_contexts
+			num_w = self.brainstats.num_words
+			num_c = self.brainstats.num_contexts
 			num_l = len(self.lines)
 			if num_w != 0:
 				num_cpw = num_c/float(num_w) # contexts per word
@@ -460,7 +460,7 @@ class scrib:
 								del wlist[i]
 					if len(wlist) == 0:
 						del self.words[w]
-						self.settings.num_words = self.settings.num_words - 1
+						self.brainstats.num_words = self.brainstats.num_words - 1
 						barf(ACT, "\"%s\" vaporized from brain." %w)
 
 				msg = "%sChecked my brain in %0.2fs. Fixed links: %d broken, %d bad." % \
@@ -476,13 +476,13 @@ class scrib:
 					t = time.time()
 
 					old_lines = self.lines
-					old_num_words = self.settings.num_words
-					old_num_contexts = self.settings.num_contexts
+					old_num_words = self.brainstats.num_words
+					old_num_contexts = self.brainstats.num_contexts
 
 					self.words = {}
 					self.lines = {}
-					self.settings.num_words = 0
-					self.settings.num_contexts = 0
+					self.brainstats.num_words = 0
+					self.brainstats.num_contexts = 0
 
 					for k in old_lines.keys():
 						self.learn(old_lines[k][0], old_lines[k][1])
@@ -491,9 +491,9 @@ class scrib:
 							(self.settings.pubsym, 
 							time.time()-t,
 							old_num_words,
-							self.settings.num_words - old_num_words,
+							self.brainstats.num_words - old_num_words,
 							old_num_contexts,
-							self.settings.num_contexts - old_num_contexts)
+							self.brainstats.num_contexts - old_num_contexts)
 
 			# Remove rare words
 			elif command_list[0] == "!purge":
@@ -743,7 +743,7 @@ class scrib:
 				changed += 1
 
 		if self.words.has_key(new):
-			self.settings.num_words -= 1
+			self.brainstats.num_words -= 1
 			self.words[new].extend(self.words[old])
 		else:
 			self.words[new] = self.words[old]
@@ -786,10 +786,10 @@ class scrib:
 				# Check for any of the deleted contexts
 				if unpack("iH", word_contexts[y])[0] in dellist:
 					del word_contexts[y]
-					self.settings.num_contexts = self.settings.num_contexts - 1
+					self.brainstats.num_contexts = self.brainstats.num_contexts - 1
 			if len(words[x]) == 0:
 				del words[x]
-				self.settings.num_words = self.settings.num_words - 1
+				self.brainstats.num_words = self.brainstats.num_words - 1
 				barf(ACT, "\"%s\" vaporized from brain." % x)
 
 	def reply(self, body):
@@ -1040,9 +1040,9 @@ class scrib:
 					words[x]="#nick"
 
 
-			num_w = self.settings.num_words
+			num_w = self.brainstats.num_words
 			if num_w != 0:
-				num_cpw = self.settings.num_contexts/float(num_w) # contexts per word
+				num_cpw = self.brainstats.num_contexts/float(num_w) # contexts per word
 			else:
 				num_cpw = 0
 
@@ -1063,13 +1063,13 @@ class scrib:
 							self.words[words[x]].append(struct.pack("iH", hashval, x))
 						else:
 							self.words[words[x]] = [ struct.pack("iH", hashval, x) ]
-							self.settings.num_words += 1
-						self.settings.num_contexts += 1
+							self.brainstats.num_words += 1
+						self.brainstats.num_contexts += 1
 			else :
 				self.lines[hashval][1] += num_context
 
 			#is max_words reached, don't learn more
-			if self.settings.num_words >= self.settings.max_words: self.settings.learning = 0
+			if self.brainstats.num_words >= self.settings.max_words: self.settings.learning = 0
 
 		# Split body text into sentences and parse them
 		# one by one.

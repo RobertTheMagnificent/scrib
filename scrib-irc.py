@@ -240,7 +240,7 @@ class ModIRC(SingleServerIRCBot):
 		nickreplyrate = self.settings.speaking * self.settings.nick_reply_chance
 
 		# double reply chance if the text contains our nickname :-)
-		if body.lower().find(self.settings.myname.lower() ) != -1:
+		if body.find(self.settings.myname) != -1:
 			nickreplyrate = 100
 
 		# Always reply to private messages

@@ -71,12 +71,12 @@ class scrib:
 	import cfgfile
 
 	# Main command list
-	commandlist = "Owner commands:\n!alias, !censor, !check, !contexts, !learning, !limit, !purge, !rebuild, !replace, !save, !uncensor, !unlearn\nPublic commands:\n!date, !fortune, !help, !known, !owner, !tweet, !version, !words"
+	commandlist = "Owner commands:\n!alias, !censor, !check, !context, !learning, !limit, !purge, !rebuild, !replace, !save, !uncensor, !unlearn\nPublic commands:\n!date, !fortune, !help, !known, !owner, !tweet, !version, !words"
 	commanddict = {
 		"alias": "Usage: !alias : Show the differents aliases\n!alias <alias> : show the words attached to this alias\n!alias <alias> <word> : link the word to the alias.",
 		"censor": "Usage: !censor [word1 [...]]\nPrevent the bot using one or more words. Without arguments lists the currently censored words.",
 		"check": "Usage: !check\nChecks the brain for broken links. Shouldn't happen, but worth trying if you get KeyError crashes.",
-		"contexts": "Usage: !contexts <phrase>\nPrint contexts containing <phrase>.",
+		"context": "Usage: !context <phrase>\nPrint contexts containing <phrase>.",
 		"learning": "Usage: !learning [on|off]\nToggle bot learning. Without arguments shows the current setting.",
 		"limit": "Usage: !limit [number]\nSet the number of words that pyBorg can learn.",
 		"purge": "Usage: !purge [number]\nRemove all occurances of the words that appears in less than <number> contexts.",
@@ -136,7 +136,7 @@ class scrib:
 				file.write(data)
 				file.close()
 		except (EOFError, IOError), e:
-			barf(ERR + "No zip found")
+			barf(ERR, "No zip found")
 		try:
 
 			f = open("data/version", "rb")
@@ -220,7 +220,7 @@ class scrib:
 
 	def save_all(self):
 		if self.settings.no_save != "True":
-			barf(SAV + "Writing to my brain...\033[0m")
+			barf(SAV, "Writing to my brain...\033[0m")
 
 			try:
 				zfile = zipfile.ZipFile('data/archive.zip','r')
@@ -260,7 +260,7 @@ class scrib:
 				os.remove('data/lines.dat')
 				os.remove('data/version')
 			except (OSError, IOError), e:
-				barf(ERR + "Could not remove the files.")
+				barf(ERR, "Could not remove the files.")
 
 			f = open("data/words.txt", "w")
 			# write each words known
@@ -393,7 +393,7 @@ class scrib:
 		if owner == 1:
 			# Save the brain
 			if command_list[0] == "!save":
-				SAVe_all()
+				save_all()
 				msg = "%sBrain has been saved!" % self.settings.pubsym
 
 			# Command list
@@ -455,7 +455,7 @@ class scrib:
 					if len(wlist) == 0:
 						del self.words[w]
 						self.settings.num_words = self.settings.num_words - 1
-						barf(ACT, "\"%s\" vaped totally" %w)
+						barf(ACT, "\"%s\" vaporized from brain. %w)
 
 				msg = "%sChecked my brain in %0.2fs. Fixed links: %d broken, %d bad." % \
 					(self.settings.pubsym, 
@@ -545,7 +545,7 @@ class scrib:
 				msg = self.replace(old, new)
 
 			# Print contexts [flooding...:-]
-			elif command_list[0] == "!contexts":
+			elif command_list[0] == "!context":
 
 				# This is a large lump of data and should
 				# probably be printed, not module.output XXX
@@ -700,7 +700,7 @@ class scrib:
 			# Quit
 			elif command_list[0] == "!quit":
 				# Close the brain
-				SAVe_all()
+				save_all()
 				barf(SAV, "Saved my brain. Goodbye!")
 				sys.exit()
 				
@@ -1002,7 +1002,7 @@ class scrib:
 
 			# Ignore if the sentence starts with an exclamation
 			if body[0:1] == "!":
-				barf(ERR + "Not learning: %s" % words)
+				barf(ERR, "Not learning: %s" % words)
 				return
 			
 			vowels = "aÃ Ã¢eÃ©Ã¨ÃªiÃ®Ã¯oÃ¶Ã´uÃ¼Ã»y"

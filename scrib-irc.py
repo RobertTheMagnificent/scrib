@@ -304,9 +304,8 @@ class ModIRC(SingleServerIRCBot):
 		# replace by the good nickname
 		# but first see if we're mentioned
 		highlighted = 0
-		if message.find(body.find(self.settings.myname)):
+		if message.find(self.settings.myname):
 			highlighted = 1
-
 		message = message.replace("#nick", source)
 
 		# Decide. should we do a ctcp action?

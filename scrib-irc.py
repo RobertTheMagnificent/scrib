@@ -239,10 +239,6 @@ class ModIRC(SingleServerIRCBot):
 		replyrate = self.settings.speaking * self.settings.reply_chance
 		nickreplyrate = self.settings.speaking * self.settings.nick_reply_chance
 
-		# double reply chance if the text contains our nickname :-)
-		if body.find(self.settings.myname) == 1:
-			nickreplyrate = 100
-
 		# Always reply to private messages
 		if e.eventtype() == "privmsg":
 			replyrate = 100
@@ -254,7 +250,12 @@ class ModIRC(SingleServerIRCBot):
 
 		# Pass message onto scrib
 		if source in self.owners and e.source() in self.owner_mask:
-			self.scrib.process_msg(self, body, replyrate, learn, (body, source, target, c, e), owner=1)
+			if highlighted = 1:
+				reply = nickreplyrate
+			else:
+				reply = replyrate
+			
+			self.scrib.process_msg(self, body, reply, learn, (body, source, target, c, e), owner=1)
 		else:
 			#start a new thread
 			thread.start_new_thread(self.scrib.process_msg, (self, body, replyrate, learn, (body, source, target, c, e)))
@@ -301,6 +302,8 @@ class ModIRC(SingleServerIRCBot):
 		body, source, target, c, e = args
 		
 		# replace by the good nickname
+		# but first see if we're mentioned
+		highlight = 
 		message = message.replace("#nick", source)
 
 		# Decide. should we do a ctcp action?

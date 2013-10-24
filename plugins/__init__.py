@@ -13,7 +13,7 @@ for module in os.listdir(os.path.dirname(plugin_dir)):
 		if ext == '.py' and module_name != '__init__': # Important, ignore .pyc/other files.
 			try:
 				module = __import__(module_name)
-				ScribPlugin.barf(ScribPlugin.ACT, 'Imported plugin:                %s' % module_name)
+				ScribPlugin.barf(ScribPlugin.PLG, 'Imported plugin:                %s' % module_name)
 				library_list.append(module)
 			except ImportError as e:
 				ScribPlugin.barf(scribPlugin.ERR, "Failed to load plugin ( IE ):   %s" % module_name)

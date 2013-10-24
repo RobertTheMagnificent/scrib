@@ -166,7 +166,7 @@ class scrib:
 
 		# Is a resizing required?
 		if len(self.words) != self.settings.num_words:
-			barf(ACT + "Updating my brain's information...")
+			barf(ACT, "Updating my brain's information...")
 			self.settings.num_words = len(self.words)
 			num_contexts = 0
 			# Get number of contexts
@@ -181,7 +181,7 @@ class scrib:
 		for x in self.settings.aliases.keys():
 			count += len(self.settings.aliases[x])
 		if count != self.settings.num_aliases:
-			barf(ACT + "Check brain for new aliases.")
+			barf(ACT, "Check brain for new aliases.")
 			self.settings.num_aliases = count
 
 			for x in self.words.keys():
@@ -1024,7 +1024,7 @@ class scrib:
 				for censored in self.settings.censored:
 					pattern = "^%s$" % censored
 					if re.search(pattern, words[x]):
-						barf(ACT + "Censored word %s" %words[x])
+						barf(ACT, "Censored word %s" %words[x])
 						return
 
 				if len(words[x]) > 13 \

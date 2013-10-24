@@ -290,7 +290,7 @@ class ModIRC(SingleServerIRCBot):
 	def nick_check(self, message):
 		# Check to see if I'm highlighted
 		highlighted = 0
-		if message.find(self.settings.myname):
+		if message.find(self.settings.myname) == 1:
 			highlighted = 1
 		return highlighted
 

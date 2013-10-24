@@ -233,8 +233,6 @@ class ModIRC(SingleServerIRCBot):
 		replyrate = self.settings.speaking * self.settings.reply_chance
 		nickreplyrate = self.settings.speaking * self.settings.nick_reply_chance
 
-		scrib.barf(scrib.ERR, "Replyrate is "+str(replyrate))
-		scrib.barf(scrib.ERR, str(self.nick_check(body)))
 		if self.nick_check(body) == 1:
 			replyrate = nickreplyrate
 		
@@ -264,20 +262,17 @@ class ModIRC(SingleServerIRCBot):
 
 	def irc_commands(self, body, source, target, c, e):
 		"""
-		All IRC commands have been turned into plugins. :D
+		Route IRC Commands to the PluginManager.
 		"""
 		
 		msg = ""
-
 		command_list = body.split()
 		command_list[0] = command_list[0]
 
 		### Owner commands (Which is all of them for now)
 		if source in self.owners and e.source() in self.owner_mask:
-			# Make the commands dynamic
-			# self.commanddict should eventually check self.commandlist
-			# so we can stop doing [1:]
-			if command_list[0][1:] in self.commanddict:
+			# Only accept commands that are in the Command List
+			if command_list[0] in self.commandlist:
 				msg = PluginManager.sendMessage(command_list[0][1:], command_list, self)
 
 			if command_list[0] == "!reload" and len(command_list) == 1:

@@ -1,0 +1,4 @@
+# Number of unique words known #
+num_words = 0
+# Number of contexts #
+num_contexts = 0

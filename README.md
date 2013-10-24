@@ -2,8 +2,9 @@ Scrib, the IRC ChatBot
 ======================
 <pre>
 License:        GNU AGPLv3 or later
-Author:         Sina Mashek 
+Author:         Sina Mashek  & Tristy Hopkins
 Email:          mashek [ at ] thescoundrels [ dot ] net
+		kittytristy [ at ] gmail [ dot ] com
 </pre>
 
 What You'll Need

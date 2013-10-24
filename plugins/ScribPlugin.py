@@ -14,6 +14,7 @@ ACT = '\033[93m [~] '
 MSG = '\033[94m [-] '
 SAV = '\033[92m [#] '
 ERR = '\033[91m [!] '
+PLG = '\033[35m [*] '
 
 def addPlugin( command, alias, action ):
 	global plugin_commands, plugin_aliases

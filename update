@@ -4,11 +4,12 @@
 
 VER=0.7.0
 DATE=$(date +"%x %r %Z")
+BOLD="\e[1m"
 
 function push
 {
 	echo "We'll now setup your commit!"
-	sleep 2
+	sleep 1
 	while true; do
 		read -p "Update version? [y/N]" yn
 		case $yn in
@@ -33,7 +34,6 @@ function gitstatus
 	git add $LIST
 	sleep 1
 
-	echo ""
 	echo "Enter the message you'd like to include with this commit."
 	read -p "# " MESSAGE
 	git commit -m "$MESSAGE"
@@ -70,7 +70,7 @@ function version
 }
 
 # Really push to Github?
-echo "You're about to push the current Scrib code to Github."
+echo -e $BOLD"You're about to push the current Scrib code to Github.\e[0m"
 sleep 1
 
 	while true; do
@@ -82,3 +82,10 @@ sleep 1
 		esac
 	done
 
+
+trap reset SIGHUP SIGINT SIGTERM
+
+function reset
+{
+	echo -e "\e[0m"
+}

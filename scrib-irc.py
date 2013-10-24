@@ -238,7 +238,7 @@ class ModIRC(SingleServerIRCBot):
 		# We want replies reply_chance%, if speaking is on
 		replyrate = self.settings.speaking * self.settings.reply_chance
 		nickreplyrate = self.settings.speaking * self.settings.nick_reply_chance
-		if self.nick_check(self, body) == 1:
+		if self.nick_check(body) == 1:
 			replyrate = nickreplyrate
 
 		# Always reply to private messages

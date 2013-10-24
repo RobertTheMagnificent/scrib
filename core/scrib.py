@@ -138,7 +138,7 @@ class scrib:
 				file.write(data)
 				file.close()
 		except (EOFError, IOError), e:
-			barf(ERR + "No zip found")
+			barf(ERR, "No zip found")
 		try:
 
 			f = open("data/version", "rb")
@@ -222,7 +222,7 @@ class scrib:
 
 	def save_all(self):
 		if self.settings.no_save != "True":
-			barf(SAV + "Writing to my brain...\033[0m")
+			barf(SAV, "Writing to my brain...\033[0m")
 
 			try:
 				zfile = zipfile.ZipFile('data/archive.zip','r')
@@ -262,7 +262,7 @@ class scrib:
 				os.remove('data/lines.dat')
 				os.remove('data/version')
 			except (OSError, IOError), e:
-				barf(ERR + "Could not remove the files.")
+				barf(ERR, "Could not remove the files.")
 
 			f = open("data/words.txt", "w")
 			# write each words known
@@ -339,6 +339,7 @@ class scrib:
 			# else output
 			if owner==0: time.sleep(.2*len(message))
 			io_module.output(message, args)
+			message = "%s%s" % (message[:1].upper(), message[1:])
 	
 	def do_commands(self, io_module, body, args, owner):
 		"""
@@ -395,7 +396,7 @@ class scrib:
 		if owner == 1:
 			# Save the brain
 			if command_list[0] == "!save":
-				SAVe_all()
+				save_all()
 				msg = "%sBrain has been saved!" % self.settings.pubsym
 
 			# Command list
@@ -702,7 +703,7 @@ class scrib:
 			# Quit
 			elif command_list[0] == "!quit":
 				# Close the brain
-				SAVe_all()
+				save_all()
 				barf(SAV, "Saved my brain. Goodbye!")
 				sys.exit()
 				
@@ -1004,7 +1005,7 @@ class scrib:
 
 			# Ignore if the sentence starts with an exclamation
 			if body[0:1] == "!":
-				barf(ERR + "Not learning: %s" % words)
+				barf(ERR, "Not learning: %s" % words)
 				return
 			
 			vowels = "aÃ Ã¢eÃ©Ã¨ÃªiÃ®Ã¯oÃ¶Ã´uÃ¼Ã»y"

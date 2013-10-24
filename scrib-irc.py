@@ -61,6 +61,7 @@ class ModIRC(SingleServerIRCBot):
 			  "ignorelist": ("Ignore these nicknames:", []),
 			  "replyIgnored": ("Reply but don't learn from ignored people", 0),
 			  "reply_chance": ("Chance of reply (%) per message", 33),
+			  "nick_reply_chance": ("Chance of reply (%) per message when mentioned", 100),
 			  "quitmsg": ("IRC quit message", "Bye :-("),
 			  "password": ("password for control the bot (Edit manually !)", "")
 			} )
@@ -205,7 +206,6 @@ class ModIRC(SingleServerIRCBot):
 		# Ignore self.
 		#if source == self.settings.myname: return
 
-
 		#replace nicknames by "#nick"
 		if e.eventtype() == "pubmsg":
 			for x in self.channels[target].users():
@@ -237,10 +237,11 @@ class ModIRC(SingleServerIRCBot):
 
 		# We want replies reply_chance%, if speaking is on
 		replyrate = self.settings.speaking * self.settings.reply_chance
+		nickreplyrate = self.settings.speaking * self.settings.nick_reply_chance
 
 		# double reply chance if the text contains our nickname :-)
-		if body.find(self.settings.myname ) != -1:
-			replyrate = replyrate * 2
+		if body.lower().find(self.settings.myname.lower() ) != -1:
+			nickreplyrate = 100
 
 		# Always reply to private messages
 		if e.eventtype() == "privmsg":

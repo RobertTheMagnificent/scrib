@@ -38,8 +38,6 @@ class ModIRC(SingleServerIRCBot):
 
 	# We are going to store the owner's host mask :3
 	owner_mask = []
-
-	commandlist = PluginManager.ScribPlugin.plugin_aliases
 	commanddict = PluginManager.ScribPlugin.plugin_commands
 	
 	def __init__(self, my_scrib, args):
@@ -269,15 +267,16 @@ class ModIRC(SingleServerIRCBot):
 		"""
 		
 		msg = ""
-		command_list = body.split()
-		command_list[0] = command_list[0]
+		command_list = body#.split()
+		#command_list[0] = command_list[0]
 
 		### Owner commands (Which is all of them for now)
 		if source in self.owners and e.source() in self.owner_mask:
 			# Only accept commands that are in the Command List
-			if command_list[0] in self.commandlist:
-				msg = PluginManager.sendMessage(command_list[0], command_list, self)
-
+			print self.commanddict
+			print command_list
+			if command_list[1:] in self.commanddict:
+				msg = PluginManager.sendMessage(command_list[1:], source, self)
 			if command_list[0] == "!reload" and len(command_list) == 1:
 				msg = PluginManager.reloadPlugin(command_list[1])
 			

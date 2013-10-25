@@ -21,7 +21,7 @@ def addPlugin( command, alias, action ):
 	global plugin_commands, plugin_aliases
 	process_table[alias[1:]] = action
 	plugin_commands = dict( plugin_commands.items() + command.items() )
-	plugin_aliases.extend(alias)
+	plugin_aliases.append(alias)
 
 class ScribPlugin:
 	def action(self, stuff, scrib):

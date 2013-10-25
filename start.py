@@ -12,7 +12,6 @@ import cfgfile
 import PluginManager
 import random
 import traceback
-import thread
 
 from scribirc import ModIRC
 from chat import ModLineIn
@@ -64,7 +63,7 @@ if __name__ == "__main__":
 		c = raw_input("\033[94m"+scrib.get_time()+" \033[91m[!] Oh no, I've crashed! Would you like to save my brain? (yes/no)\033[0m")
 		if c[:1] == 'n':
 			sys.exit(0)
-	#bot.disconnect(bot.settings.quitmsg)
+	bot.disconnect(bot.settings.quitmsg)
 	my_scrib.save_all()
 	del my_scrib
 

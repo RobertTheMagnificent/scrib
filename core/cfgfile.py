@@ -2,12 +2,13 @@
 #
 # scrib config file
 
+from barf import *
 import string
 import time
 
 def _load_config(filename):
 	"""
-  Load a configuration that returns variables.
+	Load a config file returning dictionary of variables.
 	"""
 	try:
 		f = open(filename, "r")
@@ -25,14 +26,16 @@ def _load_config(filename):
 		if s[0]=="#":
 			continue
 			
+		#read if the string is above multiple lines
 		while s.find("#") == -1:
 			lecture = f.readline()
 			if lecture == "":
 				break
-    
+
+			#Convert old configuration system ( with \ at the end of line )
 			if s[-2] == '\\':
 				s = s[:-2]
-    
+
 			s = s[:s.rfind("\n")] + lecture
 			line = line + 1
 
@@ -40,45 +43,48 @@ def _load_config(filename):
 		try:
 			stuff[string.strip(s[0])] = eval(string.strip(string.join(s[1:], "=")))
 		except:
-			print "[%s][!] Malformed line in %s line %d" % (get_time(), filename, line)
-			print "[%s][!] \t%s" % (get_time(), s)
+			barf(ERR, "Malformed line in %s line %d" % (filename, line))
+			barf(ERR, "\t%s" %s)
 			continue
 	return stuff
 		
 def _save_config(filename, fields):
 	"""
-  Should be a dictionary;
-  Keys as names of variables containing tuple.
+	fields should be a dictionary. Keys as names of
+	variables containing tuple (string comment, value).
 	"""
 	f = open(filename, "w")
 
+	# write the values with comments. this is a silly comment
 	for key in fields.keys():
 		f.write("# "+fields[key][0]+" #\n")
 		s = repr(fields[key][1])
 		f.write(key+"\t= ")
 
-		#Create newline after each entry
+		#Create a new line after each dic entry
 		if s.find("],") != -1:
 			cut_string = ""
 			while s.find("],") != -1:
 				position = s.find("],")+3
+				#cut_string = cut_string + s[:position] + "\\\n\t"
 				cut_string = cut_string + s[:position] + "\n\t"
 				s = s[position:]
 			s = cut_string + s
 			f.write(s+"\n")
 			continue
 
-		#cut at 80 col
+		#If the line exceed a normal display ( 80 col ) cut it
 		if len(s) > 80:
 			cut_string = ""
 			while len(s) > 80:
 				position = s.rfind(",",0,80)+1
+				#cut_string = cut_string + s[:position] + "\\\n\t\t"
 				cut_string = cut_string + s[:position] + "\n\t\t"
 				s = s[position:]
 			s = cut_string + s
 		f.write(s+"\n")
 
-	f.write("# End of configuration #")
+	#f.write("# End of configuration #")
 	f.close()
 
 
@@ -105,7 +111,7 @@ class cfgset:
 
 	def save(self):
 		"""
-		Save borg settings
+		Save scrib settings
 		"""
 		keys = {}
 		for i in self.__dict__.keys():
@@ -119,4 +125,3 @@ class cfgset:
 			keys[i] = (comment, self.__dict__[i])
 		# save to config file
 		_save_config(self._filename, keys)
-

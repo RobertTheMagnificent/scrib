@@ -1,6 +1,7 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 import sys
+import re
 
 # See scrib.py
 sys.path.append('core/')
@@ -231,9 +232,10 @@ class ModIRC(SingleServerIRCBot):
 			return
 
 		# We want replies reply_chance%, if speaking is on
-		replyrate = self.settings.speaking * self.settings.reply_chance
-		nickreplyrate = self.settings.speaking * self.settings.nick_reply_chance
-
+		not_quiet = self.settings.speaking
+		replyrate = not_quiet * self.settings.reply_chance
+		nickreplyrate = not_quiet * self.settings.nick_reply_chance
+		
 		if self.nick_check(body) == 1:
 			replyrate = nickreplyrate
 			if self.settings.debug == 1:
@@ -256,10 +258,10 @@ class ModIRC(SingleServerIRCBot):
 
 		# Pass message onto scrib
 		if source in self.owners and e.source() in self.owner_mask:
-			self.scrib.process_msg(self, body, replyrate, learn, (body, source, target, c, e), owner=1)
+			self.scrib.process_msg(self, body, replyrate, learn, (body, source, target, c, e), 1, not_quiet )
 		else:
 			#start a new thread
-			thread.start_new_thread(self.scrib.process_msg, (self, body, replyrate, learn, (body, source, target, c, e)))
+			thread.start_new_thread(self.scrib.process_msg, (self, body, replyrate, learn, (body, source, target, c, e), 0, not_quiet))
 
 	def irc_commands(self, body, source, target, c, e):
 		"""
@@ -370,5 +372,5 @@ if __name__ == "__main__":
 		if c[:1] == 'n':
 			sys.exit(0)
 	bot.disconnect(bot.settings.quitmsg)
-	my_scrib.save_all()
+	my_scrib.save_all(False)
 	del my_scrib

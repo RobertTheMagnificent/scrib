@@ -88,7 +88,7 @@ def unfilter_reply(message):
 	message = message.replace(" ; ", ";")
 	# Fixes I and I contractions
 	message = message.replace(" i ", " I ")
-	message = message.replace("i'", "I'")
+	message = message.replace(" i'", " I'")
 	# Fixes the common issues with the teach system
 	message = message.replace("$C4", "||")
 	message = message.replace("$b7", "|-:")
@@ -630,15 +630,15 @@ class scrib:
 			if os.path.isfile("brain/prepared.dat"):
 				try:
 					key = ' '.join(command_list[1:]).strip()
-					for line in fileinput.input("qdb.dat" ,inplace =1):
+					for line in fileinput.input("brain/prepared.dat" ,inplace =1):
 						data = line.split(":=:")[0]
 						dlen = r'\b.{2,}\b'
 						if re.search(dlen, key, re.IGNORECASE):			
 							if key.lower() in data.lower() or data.lower() in key.lower():
 								pass
 						else: print line.strip()
-						msg = "%s I've discarded %s from me brain." % (self.settings.pubsym, key)
-				except: msg = "%s Sorry, I couldn't forget that!"
+						msg = "%s I've discarded '%s' from my brain." % (self.settings.pubsym, key)
+				except: msg = "%s Sorry, I couldn't forget that!"  % (self.settings.pubsym)
 			else: msg = "You have to teach me before you can make me forget it!"
 
 		# Find response command
@@ -1396,3 +1396,4 @@ class scrib:
 		# one by one.
 		body += " "
 		map ( (lambda x : learn_line(self, x, num_context)), body.split(". "))
+

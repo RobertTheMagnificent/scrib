@@ -1,28 +1,78 @@
 #!/bin/bash    
-# Scrib upload script ver. 0.1
+# Scrib update script ver. 0.2
 # by KittyTristy "Tristy Hopkins"
 
+## Our Variables! ##
 CORE=0.7.2
 BRAIN=0.1.0
 DATE=$(date +"%x %r %Z")
 BOLD="\e[1m"
 CLEAR="\e[0m"
 
-function push
+## Our functions! ##
+function update
+{
+	echo -e $BOLD"You're about to push the current Scrib code to Github."$CLEAR
+	sleep 1
+
+		while true; do
+			read -p "Continue? [Yes/No]" yn
+			case $yn in
+			[Yy]* ) (upver); exit;;
+			[Nn]* ) exit ;;
+			* ) echo "Please enter yes or no.";;
+			esac
+		done
+}
+
+## Push or pull to Github? (in progress)
+#function pushorpull
+#{
+#	echo -e $BOLD"Would you like to push or pull?"$CLEAR
+#	sleep 1
+#
+#		while true; do
+#			read -p "> "
+#			case 
+
+function upver
 {
 	echo -e $BOLD"We'll now setup your commit!"$CLEAR
 	sleep 1
 	while true; do
-		read -p "Update version? [y/N]" yn
+		read -p "Update version? [Yes/No]" yn
 		case $yn in
-		[Yy]* ) (version); (gitstatus); exit ;;
-		[Nn]* ) (gitstatus); exit ;;
-		* ) echo "Please enter yes or no.";;
+		[Yy]* ) (version); (push); exit ;;
+		[Nn]* ) (push); exit ;;
+		* ) echo "Please enter Yes or No.";;
 		esac
 	done
 }
 
-function gitstatus
+function version
+{
+	echo -e $BOLD"Enter the core version number for this Scrib."$CLEAR
+	read -e -p "# " CORE
+
+	echo -e $BOLD"Okay, now enter the brain version."$CLEAR
+	read -e -p "# " BRAIN
+
+	echo "Creating new VERSION file.."
+
+	# Building the new VERSION file!
+	rm -rf VERSION
+	cat >> VERSION <<- _EOF_
+	# Core version of Scrib #
+	core= '$CORE'
+	# Brain version of Scrib #
+	brain= '$BRAIN'
+	# Date of last update #
+	date= '$DATE'
+	_EOF_
+
+}
+
+function push
 {
 
 	echo ""
@@ -41,7 +91,7 @@ function gitstatus
 	git commit -m "$MESSAGE"
 	echo ""
 
-	echo "Okay, looks like we're ready to push to Github."
+	echo -e $BOLD"Okay, looks like we're ready to push to Github."$CLEAR
 	sleep 1
 	echo "Commencing push.."
 	sleep 1
@@ -51,43 +101,14 @@ function gitstatus
 	echo -e $BOLD"And we're done.  Have a good day, human."$CLEAR
 }
 
-function version
-{
-	echo -e $BOLD"Enter the core version number for this Scrib."$CLEAR
-	read -e -p "# " CORE
-
-	echo "Creating new VERSION file.."
-
-	# Building the new VERSION file!
-	rm -rf VERSION
-	cat >> VERSION <<- _EOF_
-	# Core version of Scrib #
-	core= '$CORE'
-	# Brain version of Scrib #
-	brain= '$BRAIN'
-	# Date of last update #
-	date= '$DATE'
-	_EOF_
-
-}
-
-# Really push to Github?
-echo -e $BOLD"You're about to push the current Scrib code to Github."$CLEAR
-sleep 1
-
-	while true; do
-		read -p "Continue? [y/N]" yn
-		case $yn in
-		[Yy]* ) (push); exit;;
-		[Nn]* ) exit ;;
-		* ) echo "Please enter yes or no.";;
-		esac
-	done
-
-
-trap reset SIGHUP SIGINT SIGTERM
-
 function reset
 {
 	echo -e "\e[0m"
 }
+
+## The bit that starts everything! ##
+update
+
+## Let's not leave behind any stray color codes when terminated! ##
+trap reset SIGHUP SIGINT SIGTERM
+

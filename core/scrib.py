@@ -29,7 +29,7 @@ def dbread(key):
 			data = line.split(":=:")[0]
 			dlen = r'\b.{2,}\b'
 			if re.search(dlen, key, re.IGNORECASE):			
-				if key.lower() in data.lower() or data.lower() in key.lower():
+				if key in data or data in key:
 					if reps > 1:
 						repnum = randint(1, int(reps))
 						value = line.split(":=:")[repnum].strip()
@@ -41,6 +41,7 @@ def dbread(key):
 				
 		file.close()
 	return value
+
 def dbwrite(key, value):
 	if dbread(key) is None:
 		file = open("brain/prepared.dat", "a")
@@ -197,6 +198,8 @@ def disable(self):
 	ACT = ''
 	MSG = ''
 	SAV = ''
+	PLG = ''
+	DBG = ''
 	ERR = ''
 
 class scrib:
@@ -568,6 +571,8 @@ class scrib:
 				time.sleep(5)
 			else:
 				time.sleep(.2*len(message))
+			if self.settings.debug == 1:
+				barf(DBG, "Output: %s") % message
 			io_module.output(message, args)
 	
 	def do_commands(self, io_module, body, args, owner):

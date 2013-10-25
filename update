@@ -2,7 +2,8 @@
 # Scrib upload script ver. 0.1
 # by KittyTristy "Tristy Hopkins"
 
-VER=0.7.0
+CORE=0.7.2
+BRAIN=0.1.0
 DATE=$(date +"%x %r %Z")
 BOLD="\e[1m"
 CLEAR="\e[0m"
@@ -63,7 +64,7 @@ function version
 	# Core version of Scrib #
 	core= '$CORE'
 	# Brain version of Scrib #
-	brain= '0.0.1'
+	brain= '$BRAIN'
 	# Date of last update #
 	date= '$DATE'
 	_EOF_

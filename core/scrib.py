@@ -76,7 +76,9 @@ def unfilter_reply(message):
 	This undoes the phrase mangling the central code does
 	so the bot sounds more human :P
 	"""
-
+	if self.settings.debug == 1:
+		barf(DBG, "Sent to unfilter_reply...")
+	
 	# Had to write my own initial capitalizing code *sigh*
 	message = "%s%s" % (message[:1].upper(), message[1:])
 	# Fixes punctuation
@@ -108,12 +110,17 @@ def unfilter_reply(message):
 		message = message.replace(" xp", " XP")
 		message = message.replace("XX", "xx")
 
+	if self.settings.debug == 1:
+		barf(DBG, "Unfiltered message: %s") % message
 	return message
 
 def filter_message(message, bot):
 	"""
 	Make easier to learn and reply to.
 	"""
+
+	if self.settings.debug == 1:
+		barf(DBG, "Sent to filter_message...")
 
 	# remove garbage
 	message = message.replace("\"", "")
@@ -175,10 +182,15 @@ def filter_message(message, bot):
 					words[x] = z
 
 	message = " ".join(words)
+	if self.settings.debug == 1:
+		barf(DBG, "Filtered message: %s") % message
 	return message
 
 class scrib:
 	import cfgfile
+
+	if self.settings.debug == 1:
+		barf(DBG, "Class scrib initialized.")
 
 	# Main command list
 	commandlist = "Owner commands:\n!alias, !censor, !check, !context, !learning, !limit, !prune, !rebuild, !replace, !save, !uncensor, !unlearn\nPublic commands:\n!date, !fortune, !help, !known, !owner, !tweet, !version, !words"
@@ -507,6 +519,8 @@ class scrib:
 	
 		# Learn from input
 		if learn == 1:
+			if self.settings.debug == 1:
+				barf(DBG, "Learning: %s") % body
 			self.learn(body)
 
 		# Make a reply if desired
@@ -530,6 +544,8 @@ class scrib:
 							self.unfilterd[body] = 0
 
 				if message == "":
+					if self.settings.debug == 1:
+						barf(DBG, "No prepared answer.
 					message = self.reply(body)
 					message = unfilter_reply(body)
 			else: return
@@ -1163,7 +1179,7 @@ class scrib:
 						mot = list[x][0]
 						break
 
-				#if the word is already choosen, pick the next one
+				#if the word is already chosen, pick the next one
 				while mot in sentence:
 					x += 1
 					if x >= len(list) -1:
@@ -1200,7 +1216,7 @@ class scrib:
 					context = self.lines[l][0]
 					num_context = self.lines[l][1]
 					cwords = context.split()
-					#look if we can find a pair with the choosen word, and the next one
+					#look if we can find a pair with the chosen word, and the next one
 					if len(sentence) > 1:
 						if sentence[len(sentence)-2] != cwords[w-1]:
 							continue

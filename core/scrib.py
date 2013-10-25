@@ -387,7 +387,6 @@ class scrib:
 					file = open(filename, 'w+b')
 					file.write(data)
 					file.close()
-					barf(SAV, "Brain saved.")
 			except:
 				barf(ERR, "No brain found, or it's broken. Attempting to restore...")
 				try:
@@ -424,7 +423,7 @@ class scrib:
 			f = open("brain/words.txt", "w")
 			# write each words known
 			wordlist = []
-			#Sort the list befor to export
+			#Sort the list before to export
 			for key in self.words.keys():
 				try:
 					wordlist.append([key, len(self.words[key])])
@@ -437,7 +436,7 @@ class scrib:
 			f = open("brain/sentences.txt", "w")
 			# write each words known
 			wordlist = []
-			#Sort the list befor to export
+			#Sort the list before to export
 			for key in self.unfilterd.keys():
 				wordlist.append([key, self.unfilterd[key]])
 			wordlist.sort(lambda x,y: cmp(y[1],x[1]))
@@ -450,6 +449,7 @@ class scrib:
 
 			# Save settings
 			self.settings.save()
+			barf(SAV, "Brain saved.")
 
 			# Cleaning up the shit
 			try:

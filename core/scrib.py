@@ -76,8 +76,6 @@ def unfilter_reply(message):
 	This undoes the phrase mangling the central code does
 	so the bot sounds more human :P
 	"""
-	if self.settings.debug == 1:
-		barf(DBG, "Sent to unfilter_reply...")
 	
 	# Had to write my own initial capitalizing code *sigh*
 	message = "%s%s" % (message[:1].upper(), message[1:])
@@ -110,17 +108,12 @@ def unfilter_reply(message):
 		message = message.replace(" xp", " XP")
 		message = message.replace("XX", "xx")
 
-	if self.settings.debug == 1:
-		barf(DBG, "Unfiltered message: %s") % message
 	return message
 
 def filter_message(message, bot):
 	"""
 	Make easier to learn and reply to.
 	"""
-
-	if self.settings.debug == 1:
-		barf(DBG, "Sent to filter_message...")
 
 	# remove garbage
 	message = message.replace("\"", "")
@@ -182,8 +175,7 @@ def filter_message(message, bot):
 					words[x] = z
 
 	message = " ".join(words)
-	if self.settings.debug == 1:
-		barf(DBG, "Filtered message: %s") % message
+
 	return message
 
 class scrib:
@@ -518,7 +510,11 @@ class scrib:
 			return
 
 		# Filter out garbage and do some formatting
+		if self.settings.debug == 1:
+			barf(DBG, "Sent to filter_message...")
 		body = filter_message(body, self)
+		if self.settings.debug == 1:
+			barf(DBG, "Filtered message: %s") % body
 	
 		# Learn from input
 		if learn == 1:
@@ -537,6 +533,8 @@ class scrib:
 				if self.settings.debug == 1:
 					barf(DBG, "Using prepared answer.")
 				message = unfilter_reply(dbread(body))
+				if self.settings.debug == 1:
+					barf(DBG, "Unfiltered message: %s") % message
 			elif not_quiet == 1:
 				for sentence in self.answers.sentences.keys():
 					pattern = "^%s$" % sentence

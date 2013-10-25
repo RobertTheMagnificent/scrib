@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
   
 from random import *
+from barf import *
 import ctypes
 import sys
 import os
@@ -175,15 +176,6 @@ def filter_message(message, bot):
 
 	message = " ".join(words)
 	return message
-
-def get_time():
-	"""
-	Make time sexy
-	"""
-	return time.strftime("\033[0m[%H:%M:%S]", time.localtime(time.time()))
-
-def barf(msg_code, message):
-		print get_time() + msg_code + message
 
 # Message Codes
 # Message Codes

@@ -203,7 +203,7 @@ class scrib:
 	import cfgfile
 
 	# Main command list
-	commandlist = "Owner commands:\n!alias, !censor, !check, !context, !learning, !limit, !purge, !rebuild, !replace, !save, !uncensor, !unlearn\nPublic commands:\n!date, !fortune, !help, !known, !owner, !tweet, !version, !words"
+	commandlist = "Owner commands:\n!alias, !censor, !check, !context, !learning, !limit, !prune, !rebuild, !replace, !save, !uncensor, !unlearn\nPublic commands:\n!date, !fortune, !help, !known, !owner, !tweet, !version, !words"
 	commanddict = {
 		"alias": "Usage: !alias : Show the difference aliases\n!alias <alias> : show the words attached to this alias\n!alias <alias> <word> : link the word to the alias.",
 		"censor": "Usage: !censor [word1 [...]]\nPrevent the bot using one or more words. Without arguments lists the currently censored words.",
@@ -216,7 +216,7 @@ class scrib:
 		"find": "Owner command. Usage: !find trigger\nFinds all matches to the trigger word or phrase and displays the amount of matches",
 		"responses": "Owner command. Usage: !responses\nDisplays the total number of trigger/response pairs the bot has learned",
 		"limit": "Usage: !limit [number]\nSet the number of words that Scrib can learn.",
-		"purge": "Usage: !purge [number]\nRemove all occurrences of the words that appears in less than <number> contexts.",
+		"prune": "Usage: !prune [number]\nRemove all occurrences of the words that appears in less than <number> contexts.",
 		"rebuild": "Usage: !rebuild\nRebuilds brain links from the lines of known text. Takes a while. You probably don't need to do it unless the brain is very screwed.",
 		"replace": "Usage: !replace <old> <new>\nReplace all occurrences of word <old> in the brain with <new>.",
         "save": "Usage: !save\nSave Scrib's brain.",
@@ -383,6 +383,8 @@ class scrib:
 			try:
 				zfile = zipfile.ZipFile('brain/cortex.zip','r')
 				for filename in zfile.namelist():
+					if self.settings.debug == 1:
+						barf(DBG, "Cortex saved.")
 					data = zfile.read(filename)
 					file = open(filename, 'w+b')
 					file.write(data)
@@ -398,26 +400,40 @@ class scrib:
 			s = marshal.dumps(self.words)
 			f.write(s)
 			f.close()
+			if self.settings.debug == 1:
+				barf(DBG, "Words saved.")
 			f = open("brain/lines.dat", "wb")
 			s = marshal.dumps(self.lines)
 			f.write(s)
 			f.close()
+			if self.settings.debug == 1:
+				barf(DBG, "Lines saved.")
 			
 			#save the version
 			f = open("brain/version", "w")
 			f.write(self.version.brain)
 			f.close()
+			if self.settings.debug == 1:
+				barf(DBG, "Version saved.")
 
 			#zip the files
 			f = zipfile.ZipFile('brain/cortex.zip','w',zipfile.ZIP_DEFLATED)
 			f.write('brain/words.dat')
+			if self.settings.debug == 1:
+				barf(DBG, "Words zipped")
 			f.write('brain/lines.dat')
+			if self.settings.debug == 1:
+				barf(DBG, "Lines zipped")
 			try:
 				f.write('brain/version')
+				if self.settings.debug == 1:
+					barf(DBG, "Version zipped")
 			except:
 				f2 = open("brain/version", "w")
-				f2 = write("0.1.0")
+				f2 = write(self.version.brain)
 				f.write('version')
+				if self.settings.debug == 1:
+					barf(DBG, "Version written.")
 			f.close()
 
 			f = open("brain/words.dat", "w")
@@ -432,7 +448,9 @@ class scrib:
 			wordlist.sort(lambda x,y: cmp(x[1],y[1]))
 			map( (lambda x: f.write(str(x[0])+"\n\r") ), wordlist)
 			f.close()
-
+			if self.settings.debug == 1:
+				barf(DBG, "Words written.")
+			
 			f = open("brain/sentences.dat", "w")
 			# write each words known
 			wordlist = []
@@ -442,10 +460,14 @@ class scrib:
 			wordlist.sort(lambda x,y: cmp(y[1],x[1]))
 			map( (lambda x: f.write(str(x[0])+"\n") ), wordlist)
 			f.close()
+			if self.settings.debug == 1:
+				barf(DBG, "Sentences written.")
 
 			if restart_timer is True:
 				self.autosave = threading.Timer(to_sec("125m"), self.save_all)
 				self.autosave.start()
+				if self.settings.debug == 1:
+					barf(DBG, "Restart timer started.")
 
 			# Save settings
 			self.settings.save()
@@ -676,7 +698,7 @@ class scrib:
 		if owner == 1:
 			# Save the brain
 			if command_list[0] == "!save":
-				self.save_all(0)
+				self.save_all(False)
 				msg = "%s Brain has been saved!" % self.settings.pubsym
 
 			# Command list
@@ -807,7 +829,7 @@ class scrib:
 							break
 
 				if c_max < 1:
-					io_module.output("%s %s words to remove" % self.settings.pubsym, count, args)
+					io_module.output("%s %s words to remove" % (self.settings.pubsym, count, args))
 					return
 
 				# Remove the words

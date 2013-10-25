@@ -506,6 +506,9 @@ class scrib:
 		If not_quiet==0 only respond with taught responses.
 		"""
 
+		if self.settings.debug == 1:
+			barf(DBG, "Sent to process_msg...")
+		
 		# add trailing space so sentences are broken up correctly
 		body = body + " "
 
@@ -525,16 +528,21 @@ class scrib:
 
 		# Make a reply if desired
 		if randint(0, 99) < replyrate:
-
+			if self.settings.debug == 1:
+				barf(DBG, "Deciding to reply")
 			message  = ""
 
 			#Look if we can find a prepared answer
 			if dbread(body):
+				if self.settings.debug == 1:
+					barf(DBG, "Using prepared answer.")
 				message = unfilter_reply(dbread(body))
 			elif not_quiet == 1:
 				for sentence in self.answers.sentences.keys():
 					pattern = "^%s$" % sentence
 					if re.search(pattern, body):
+						if self.settings.debug == 1:
+							barf(DBG, "Searching for reply...")
 						message = self.answers.sentences[sentence][randint(0, len(self.answers.sentences[sentence])-1)]
 						break
 					else:
@@ -545,7 +553,7 @@ class scrib:
 
 				if message == "":
 					if self.settings.debug == 1:
-						barf(DBG, "No prepared answer.
+						barf(DBG, "No prepared answer.")
 					message = self.reply(body)
 					message = unfilter_reply(body)
 			else: return
@@ -562,7 +570,9 @@ class scrib:
 				time.sleep(5)
 			else:
 				time.sleep(.2*len(message))
-			io_module.output(message, args)
+				if self.settings.debug == 1:
+					barf(DBG, "Sending to output: "+message)
+				io_module.output(message, args)
 	
 	def do_commands(self, io_module, body, args, owner):
 		"""

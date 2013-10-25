@@ -8,6 +8,7 @@ import sys
 sys.path.append('core/')
 sys.path.append('plugins/')
 
+from barf import *
 import scrib
 import PluginManager
 
@@ -25,9 +26,9 @@ class ModLineIn:
                 self.start()
 
         def start(self):
-                scrib.barf(scrib.ACT, "Scrib offline chat!")
-                scrib.barf(scrib.ACT, "Type !quit to leave")
-                scrib.barf(scrib.ACT, "Enter your name?\033[0m")
+                barf(ACT, "Scrib offline chat!")
+                barf(ACT, "Type !quit to leave")
+                barf(ACT, "Enter your name?\033[0m")
                 name = raw_input("> ")
                 while 1:
                         try:
@@ -55,7 +56,7 @@ class ModLineIn:
                 Output a line of text.
                 """
                 message = message.replace("#nick", args)
-                scrib.barf(scrib.MSG, message + "\033[0m")
+                barf(MSG, message + "\033[0m")
 
 if __name__ == "__main__":
         # start the pyborg
@@ -64,7 +65,7 @@ if __name__ == "__main__":
                 ModLineIn(my_scrib)
         except SystemExit:
                 pass
-        my_scrib.save_all()
+        my_scrib.save_all(False)
         del my_scrib
 
 

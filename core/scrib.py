@@ -375,7 +375,7 @@ class scrib:
 
 		self.settings.save()
 
-	def save_all(self, restart_timer = 1):
+	def save_all(self, restart_timer = True):
 		if self.settings.no_save != "True":
 			nozip = "no"
 			barf(SAV, "Writing to my brain...\033[0m")
@@ -443,7 +443,7 @@ class scrib:
 			map( (lambda x: f.write(str(x[0])+"\n") ), wordlist)
 			f.close()
 
-			if restart_timer == 1:
+			if restart_timer is True:
 				self.autosave = threading.Timer(to_sec("125m"), self.save_all)
 				self.autosave.start()
 
@@ -452,12 +452,12 @@ class scrib:
 			barf(SAV, "Brain saved.")
 
 			# Cleaning up the shit
-			try:
-				os.remove('brain/words.dat')
-				os.remove('brain/lines.dat')
-				os.remove('brain/version')
-			except (OSError, IOError), e:
-				barf(ERR, "Could not remove the files.")
+			#try:
+			#	os.remove('brain/words.dat')
+			#	os.remove('brain/lines.dat')
+			#	os.remove('brain/version')
+			#except (OSError, IOError), e:
+			#	barf(ERR, "Could not remove the files.")
 
 	def auto_rebuild(self):
 		if self.settings.learning == 1:
@@ -982,7 +982,7 @@ class scrib:
 			elif command_list[0] == "!quit":
 				# Close the brain
 				barf(SAV, "Saved my brain. Goodbye!")
-				sys.exit()
+				sys.exit(0)
 				
 			# Save changes
 			self.settings.save()

@@ -371,5 +371,5 @@ if __name__ == "__main__":
 		if c[:1] == 'n':
 			sys.exit(0)
 	bot.disconnect(bot.settings.quitmsg)
-	my_scrib.save_all()
+	my_scrib.save_all(0)
 	del my_scrib

@@ -67,7 +67,7 @@ class ModIRC(SingleServerIRCBot):
 			  "debug":	("Toggle debug messages.", 0),
 			  "password": ("password for control the bot (Edit manually !)", "")
 			} )
-		
+
 		self.owners = self.settings.owners[:]
 		self.chans = self.settings.chans[:]
 
@@ -258,8 +258,6 @@ class ModIRC(SingleServerIRCBot):
 
 		# Pass message onto scrib
 		if source in self.owners and e.source() in self.owner_mask:
-			if scrib.settings.debug == 1:
-				scrib.barf(scrib.DBG, "Passing message to scrib")
 			self.scrib.process_msg(self, body, replyrate, learn, (body, source, target, c, e), 1, not_quiet )
 		else:
 			#start a new thread
@@ -277,18 +275,9 @@ class ModIRC(SingleServerIRCBot):
 		### Owner commands (Which is all of them for now)
 		if source in self.owners and e.source() in self.owner_mask:
 			# Only accept commands that are in the Command List
-			if self.settings.debug == 1:
-				barf(DBG, "Is %s in Command List?" % command_list[0])
 			if command_list[0] in self.commandlist:
-				if self.settings.debug == 1:
-					barf(DBG, "Yes, it is!")
 				msg = PluginManager.sendMessage(command_list[0][1:], command_list, self)
-				if self.settings.debug == 1:
-					barf(DBG, "Plugin msg: %s" % s)
-			else:
-				if self.settings.debug == 1:
-					barf(DBG, "No such command.")
-					
+
 			if command_list[0] == "!reload" and len(command_list) == 1:
 				msg = PluginManager.reloadPlugin(command_list[1])
 			
@@ -305,8 +294,6 @@ class ModIRC(SingleServerIRCBot):
 		# Check to see if I'm highlighted
 		highlighted = 0
 		if message.find(self.settings.myname) != -1:
-			if scrib.settings.debug == 1:
-				scrib.barf(scrib.DBG, "Oh, I was mentioned!")
 			highlighted = 1
 		return highlighted
 

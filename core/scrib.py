@@ -562,22 +562,25 @@ class scrib:
 					
 			# single word reply: always output
 			if len(message.split()) == 1:
+				if self.settings.debug == 1:
+					barf(DBG, "Replying!")
 				io_module.output(message, args)
 				return
 			# empty. do not output
 			if message == "":
+				if self.settings.debug == 1:
+					barf(DBG, "Not replying.")
 				return
+			replying = "Not replying."
 			# else output
 			if len(message) >= 25:
 				time.sleep(3)
 			else:
 				time.sleep(.1*len(message))
-				if self.settings.debug == 1:
-					barf(DBG, "Replying!")
+				replying = "Replying!"
 				io_module.output(message, args)
-		if self.settings.debug == 1:
-			barf(DBG, "Not replying.")
-
+			if self.settings.debug == 1:
+				barf(DBG, replying)
 
 	def do_commands(self, io_module, body, args, owner):
 		"""

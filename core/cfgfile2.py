@@ -1,9 +1,25 @@
 # -*- coding: utf-8 -*-
 #
-# scrib config file
-
+# PyBorg: The python AI bot.
+#
+# Copyright (c) 2000, 2006 Tom Morton, Sebastien Dailly
+#
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#        
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+#
 import string
-import time
 
 def _load_config(filename):
 	"""
@@ -110,7 +126,7 @@ class cfgset:
 
 	def save(self):
 		"""
-		Save scrib settings
+		Save borg settings
 		"""
 		keys = {}
 		for i in self.__dict__.keys():
@@ -124,3 +140,4 @@ class cfgset:
 			keys[i] = (comment, self.__dict__[i])
 		# save to config file
 		_save_config(self._filename, keys)
+

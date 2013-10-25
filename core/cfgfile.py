@@ -2,6 +2,7 @@
 #
 # scrib config file
 
+from barf import *
 import string
 import time
 
@@ -42,8 +43,8 @@ def _load_config(filename):
 		try:
 			stuff[string.strip(s[0])] = eval(string.strip(string.join(s[1:], "=")))
 		except:
-			print "Malformed line in %s line %d" % (filename, line)
-			print "\t%s" %s
+			barf(ERR, "Malformed line in %s line %d" % (filename, line))
+			barf(ERR, "\t%s" %s)
 			continue
 	return stuff
 		

@@ -471,6 +471,9 @@ class scrib:
 
 			# Save settings
 			self.settings.save()
+			self.brainstats.save()
+			self.version.save()
+			
 			barf(SAV, "Brain saved.")
 
 			# Cleaning up the shit

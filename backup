@@ -1,0 +1,48 @@
+#!/bin/bash    
+# Scrib brain backup script ver. 0.1
+# by KittyTristy "Tristy Hopkins"
+
+BRAIN=
+FORMAT="--%F-%H-%M-%S"
+DATE=$(date +"$FORMAT")
+BOLD="\e[1m"
+CLEAR="\e[0m"
+
+function start
+{
+	echo -e $BOLD"Would you like to backup your Scrib's brain?"$CLEAR
+	sleep 1
+
+		while true; do
+			read -p "[Yes/No]" yn
+			case $yn in
+			[Yy]* ) (brainbak); exit ;;
+			[Nn]* ) exit ;;
+			* ) echo "Please enter yes or no.";;
+			esac
+		done	
+}
+
+function brainbak
+{
+	echo ""
+	echo -e $BOLD"Whose brain are you backing up?"$CLEAR
+	read -p "# " BRAIN
+	echo ""
+	echo -e $BOLD"Okay, starting backup. Standby."$CLEAR
+	echo ""
+	tar -zcvf $BRAIN-brain$DATE.tar.gz brain/
+	echo ""
+	echo -e $BOLD"We're done!"$CLEAR
+
+}
+
+function reset
+{
+	echo -e "\e[0m"
+}
+
+start
+
+trap reset SIGHUP SIGINT SIGTERM
+

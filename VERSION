@@ -1,6 +1,6 @@
-# Core version of Scrib #
-core= '0.7.3'
+#  #
+date	= '10/24/2013 08:28:31 PM PDT'
 # Brain version of Scrib #
-brain= '0.1.0'
-# Date of last update #
-date= '10/24/2013 08:28:31 PM PDT'
+brain	= '0.1.0'
+# Core version of Scrib #
+core	= '0.7.3'

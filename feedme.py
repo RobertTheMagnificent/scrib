@@ -6,6 +6,7 @@ import string
 import sys
 
 sys.path.append('core')
+from barf import *
 import scrib
 
 class ModFileIn:
@@ -17,26 +18,28 @@ class ModFileIn:
 	commandlist = "FileIn Module Commands:\nNone"
 	commanddict = {}
 	
-	def __init__(self, Borg, args):
+	def __init__(self, Scrib, args):
 
 		f = open(args[1], "r")
 		buffer = f.read()
 		f.close()
 
-		before = "I knew "+`Borg.settings.num_words`+" words ("+`len(Borg.lines)`+" lines) before reading "+sys.argv[1]
-		buffer = scrib.filter_message(buffer, Borg)
+		if Scrib.settings.debug == 1:
+			barf(DBG, "Scrib: %s" % Scrib.settings)
+		before = "I knew "+`Scrib.brainstats.num_words`+" words ("+`len(Scrib.lines)`+" lines) before reading "+sys.argv[1]
+		buffer = scrib.filter_message(buffer, Scrib)
 		# Learn from input
 		try:
-			print buffer
-			Borg.learn(buffer)
+			barf(MSG, buffer)
+			Scrib.learn(buffer)
 		except KeyboardInterrupt, e:
 			# Close database cleanly
-			print "Premature termination :("
-		after = "I know "+`Borg.settings.num_words`+" words ("+`len(Borg.lines)`+" lines) now."
-		del Borg
+			barf(ERR, "Early termination.")
+		after = "I know "+`Scrib.brainstats.num_words`+" words ("+`len(Scrib.lines)`+" lines) now."
+		del Scrib
 		
-		print before
-		print after
+		barf(ACT, before)
+		barf(ACT, after)
 
 	def shutdown(self):
 		pass
@@ -49,11 +52,11 @@ class ModFileIn:
 
 if __name__ == "__main__":
 	if len(sys.argv) < 2:
-		print "Please specify a filename."
+		barf(scrib.ERR, "Please specify a filename.")
 		sys.exit()
 	# start the scrib
 	my_scrib = scrib.scrib()
 	ModFileIn(my_scrib, sys.argv)
-	my_scrib.save_all()
+	my_scrib.save_all(False)
 	del my_scrib
 

@@ -232,9 +232,10 @@ class ModIRC(SingleServerIRCBot):
 			return
 
 		# We want replies reply_chance%, if speaking is on
-		replyrate = self.settings.speaking * self.settings.reply_chance
-		nickreplyrate = self.settings.speaking * self.settings.nick_reply_chance
-
+		not_quiet = self.settings.speaking
+		replyrate = not_quiet * self.settings.reply_chance
+		nickreplyrate = not_quiet * self.settings.nick_reply_chance
+		
 		if self.nick_check(body) == 1:
 			replyrate = nickreplyrate
 			if self.settings.debug == 1:

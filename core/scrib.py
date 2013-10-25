@@ -256,7 +256,7 @@ class scrib:
 			} )
 
 		self.answers = self.cfgfile.cfgset()
-		self.answers.load("brain/answers.txt",
+		self.answers.load("brain/answers.dat",
 			{ "sentences":	("A list of prepared answers", {})
 			} )
 		self.unfilterd = {}
@@ -420,7 +420,7 @@ class scrib:
 				f.write('version')
 			f.close()
 
-			f = open("brain/words.txt", "w")
+			f = open("brain/words.dat", "w")
 			# write each words known
 			wordlist = []
 			#Sort the list before to export
@@ -433,7 +433,7 @@ class scrib:
 			map( (lambda x: f.write(str(x[0])+"\n\r") ), wordlist)
 			f.close()
 
-			f = open("brain/sentences.txt", "w")
+			f = open("brain/sentences.dat", "w")
 			# write each words known
 			wordlist = []
 			#Sort the list before to export

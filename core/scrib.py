@@ -386,12 +386,12 @@ class scrib:
 			try:
 				zfile = zipfile.ZipFile('brain/cortex.zip','r')
 				for filename in zfile.namelist():
-					if self.settings.debug == 1:
-						barf(DBG, "Cortex saved.")
 					data = zfile.read(filename)
 					file = open(filename, 'w+b')
 					file.write(data)
 					file.close()
+				if self.settings.debug == 1:
+					barf(DBG, "Cortex saved.")
 			except:
 				barf(ERR, "No brain found, or it's broken. Attempting to restore...")
 				try:
@@ -571,8 +571,6 @@ class scrib:
 				time.sleep(5)
 			else:
 				time.sleep(.2*len(message))
-			if self.settings.debug == 1:
-				barf(DBG, "Output: %s") % str(message)
 			io_module.output(message, args)
 	
 	def do_commands(self, io_module, body, args, owner):

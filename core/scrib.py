@@ -594,7 +594,7 @@ class scrib:
 		if command_list[0] == "!version":
 			brain = self.version.brain
 			core = self.version.core
-			msg = "%s I am a version %s scrib. My braintechnology is at %s." % (self.settings.pubsym, core, brain)
+			msg = "%s I am a scrib version %s. My brain version is %s." % (self.settings.pubsym, core, brain)
 
 
 		# Learn/Teach commands

@@ -565,9 +565,9 @@ class scrib:
 				return
 			# else output
 			if len(message) >= 25:
-				time.sleep(5)
+				time.sleep(3)
 			else:
-				time.sleep(.2*len(message))
+				time.sleep(.1*len(message))
 				if self.settings.debug == 1:
 					barf(DBG, "Sending to output: "+message)
 				io_module.output(message, args)

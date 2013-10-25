@@ -535,7 +535,7 @@ class scrib:
 				message = unfilter_reply(dbread(body))
 				if self.settings.debug == 1:
 					barf(DBG, "Unfiltered message: " + message)
-			elif not_quiet == 1:
+			if not_quiet == 1:
 				for sentence in self.answers.sentences.keys():
 					pattern = "^%s$" % sentence
 					if re.search(pattern, body):
@@ -553,7 +553,7 @@ class scrib:
 					if self.settings.debug == 1:
 						barf(DBG, "No prepared answer.")
 					message = self.reply(body)
-					message = unfilter_reply(body)
+					message = unfilter_reply(message)
 			else: return
 					
 			# single word reply: always output

@@ -499,7 +499,7 @@ class scrib:
 		"""
 
 		if self.settings.debug == 1:
-			barf(DBG, "Sent to process_msg...")
+			barf(DBG, "Processing message...")
 		
 		# add trailing space so sentences are broken up correctly
 		body = body + " "
@@ -511,7 +511,7 @@ class scrib:
 
 		# Filter out garbage and do some formatting
 		if self.settings.debug == 1:
-			barf(DBG, "Sent to filter_message...")
+			barf(DBG, "Filtering message...")
 		body = filter_message(body, self)
 		if self.settings.debug == 1:
 			barf(DBG, "Filtered message: " + body)
@@ -525,7 +525,7 @@ class scrib:
 		# Make a reply if desired
 		if randint(0, 99) < replyrate:
 			if self.settings.debug == 1:
-				barf(DBG, "Deciding to reply")
+				barf(DBG, "Decided to reply...")
 			message  = ""
 
 			#Look if we can find a prepared answer
@@ -551,8 +551,10 @@ class scrib:
 
 				if message == "":
 					if self.settings.debug == 1:
-						barf(DBG, "No prepared answer.")
+						barf(DBG, "No prepared answer; thinking...")
 					message = self.reply(body)
+					if self.settings.debug == 1:
+						barf(DBG, "Reply formed; unfiltering...")
 					message = unfilter_reply(message)
 			else: return
 					
@@ -569,7 +571,7 @@ class scrib:
 			else:
 				time.sleep(.1*len(message))
 				if self.settings.debug == 1:
-					barf(DBG, "Sending to output: "+message)
+					barf(DBG, "Replying!")
 				io_module.output(message, args)
 	
 	def do_commands(self, io_module, body, args, owner):
@@ -1098,6 +1100,9 @@ class scrib:
 			"""
 			Reply to a line of text.
 			"""
+			if self.settings.debug == 1:
+				barf(DBG, "Forming a reply...")
+				
 			# split sentences into list of words
 			_words = body.split(" ")
 			words = []

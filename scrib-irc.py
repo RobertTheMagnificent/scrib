@@ -50,6 +50,9 @@ class ModIRC(SingleServerIRCBot):
 		self.scrib = my_scrib
 		# load settings
 		
+		if scrib.settings.debug == 1:
+			scrib.barf(DBG, "Class ModIRC initialized.")
+		
 		self.settings = cfgfile.cfgset()
 		self.settings.load("conf/scrib-irc.cfg",
 			{ "myname": ("The bot's nickname", "Scribbington"),
@@ -258,6 +261,8 @@ class ModIRC(SingleServerIRCBot):
 
 		# Pass message onto scrib
 		if source in self.owners and e.source() in self.owner_mask:
+			if scrib.settings.debug == 1:
+				scrib.barf(scrib.DBG, "Passing message to scrib")
 			self.scrib.process_msg(self, body, replyrate, learn, (body, source, target, c, e), 1, not_quiet )
 		else:
 			#start a new thread
@@ -303,6 +308,8 @@ class ModIRC(SingleServerIRCBot):
 		# Check to see if I'm highlighted
 		highlighted = 0
 		if message.find(self.settings.myname) != -1:
+			if scrib.settings.debug == 1:
+				scrib.barf(scrib.DBG, "Oh, I was mentioned!")
 			highlighted = 1
 		return highlighted
 

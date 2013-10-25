@@ -7,6 +7,8 @@ command = { "replyrate": "Usage: !echo message\nMake the bot mimic your message.
 # Plugin Action
 class ReplyRatePlugin(ScribPlugin.ScribPlugin):
 	def action(self, command_list, scrib):
+		if scrib.settings.debug == 1:
+			scrib.barf(scrib.DBG, "ReplyRate Plugin activated.")
 		try:
 			scrib.settings.reply_chance = int(command_list[1])
 			msg = "Now replying to %d%% of messages." % int(command_list[1])

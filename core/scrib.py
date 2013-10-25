@@ -84,8 +84,8 @@ def unfilter_reply(message):
 	message = message.replace(" !", "!")
 	message = message.replace(" .", ".")
 	message = message.replace(" ,", ",")
-	message = message.replace(" : ", ": ")
-	message = message.replace(" ; ", "; ")
+	message = message.replace(" : ", ":")
+	message = message.replace(" ; ", ";")
 	# Fixes I and I contractions
 	message = message.replace(" i ", " I ")
 	message = message.replace("i'", "I'")
@@ -525,7 +525,7 @@ class scrib:
 		# Make a reply if desired
 		if randint(0, 99) < replyrate:
 			if self.settings.debug == 1:
-				barf(DBG, "Decided to reply...")
+				barf(DBG, "Decided to answer...")
 			message  = ""
 
 			#Look if we can find a prepared answer
@@ -556,6 +556,8 @@ class scrib:
 					if self.settings.debug == 1:
 						barf(DBG, "Reply formed; unfiltering...")
 					message = unfilter_reply(message)
+					if self.settings.debug == 1:
+						barf(DBG, "Unfiltered message: " + message)
 			else: return
 					
 			# single word reply: always output
@@ -573,7 +575,10 @@ class scrib:
 				if self.settings.debug == 1:
 					barf(DBG, "Replying!")
 				io_module.output(message, args)
-	
+		if self.settings.debug == 1:
+			barf(DBG, "Not replying.")
+
+
 	def do_commands(self, io_module, body, args, owner):
 		"""
 		Respond to user commands.

@@ -540,7 +540,7 @@ class scrib:
 				return
 			# else output
 			if len(message) >= 25:
-				time.seep(5)
+				time.sleep(5)
 			else:
 				time.sleep(.2*len(message))
 			io_module.output(message, args)

@@ -12,11 +12,12 @@ import cfgfile
 import PluginManager
 import random
 import traceback
+import time
 
-from scribirc import ModIRC
+from scrib_irc import ModIRC
 from chat import ModLineIn
 
-import threading
+import thread
 from threading import Thread
 
 class scribtalk:
@@ -54,9 +55,9 @@ if __name__ == "__main__":
 	try:
 		Thread(target = scribirc).start()
 		Thread(target = scribterm).start()
-	except KeyboardInterrupt, e:
-		pass
-	except SystemExit, e:
+  		while True: time.sleep(100)
+	except KeyboardInterrupt, SystemExit:
+		thread.exit()
 		pass
 	except:
 		traceback.print_exc()
@@ -64,6 +65,6 @@ if __name__ == "__main__":
 		if c[:1] == 'n':
 			sys.exit(0)
 	bot.disconnect(bot.settings.quitmsg)
-	my_scrib.save_all()
+	my_scrib.save_all(False)
 	del my_scrib
 

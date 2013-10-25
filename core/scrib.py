@@ -514,12 +514,12 @@ class scrib:
 			barf(DBG, "Sent to filter_message...")
 		body = filter_message(body, self)
 		if self.settings.debug == 1:
-			barf(DBG, "Filtered message: %s") % body
+			barf(DBG, "Filtered message: " + body)
 	
 		# Learn from input
 		if learn == 1:
 			if self.settings.debug == 1:
-				barf(DBG, "Learning: %s") % body
+				barf(DBG, "Learning: " + body)
 			self.learn(body)
 
 		# Make a reply if desired
@@ -534,7 +534,7 @@ class scrib:
 					barf(DBG, "Using prepared answer.")
 				message = unfilter_reply(dbread(body))
 				if self.settings.debug == 1:
-					barf(DBG, "Unfiltered message: %s") % message
+					barf(DBG, "Unfiltered message: " + message)
 			elif not_quiet == 1:
 				for sentence in self.answers.sentences.keys():
 					pattern = "^%s$" % sentence

@@ -981,7 +981,6 @@ class scrib:
 			# Quit
 			elif command_list[0] == "!quit":
 				# Close the brain
-				self.save_all()
 				barf(SAV, "Saved my brain. Goodbye!")
 				sys.exit()
 				

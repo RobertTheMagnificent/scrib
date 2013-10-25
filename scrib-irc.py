@@ -50,9 +50,6 @@ class ModIRC(SingleServerIRCBot):
 		self.scrib = my_scrib
 		# load settings
 		
-		if scrib.settings.debug == 1:
-			scrib.barf(DBG, "Class ModIRC initialized.")
-		
 		self.settings = cfgfile.cfgset()
 		self.settings.load("conf/scrib-irc.cfg",
 			{ "myname": ("The bot's nickname", "Scribbington"),
@@ -70,7 +67,7 @@ class ModIRC(SingleServerIRCBot):
 			  "debug":	("Toggle debug messages.", 0),
 			  "password": ("password for control the bot (Edit manually !)", "")
 			} )
-
+		
 		self.owners = self.settings.owners[:]
 		self.chans = self.settings.chans[:]
 

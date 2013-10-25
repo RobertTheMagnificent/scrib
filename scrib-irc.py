@@ -257,10 +257,10 @@ class ModIRC(SingleServerIRCBot):
 
 		# Pass message onto scrib
 		if source in self.owners and e.source() in self.owner_mask:
-			self.scrib.process_msg(self, body, replyrate, learn, (body, source, target, c, e), owner=1)
+			self.scrib.process_msg(self, body, replyrate, learn, (body, source, target, c, e), 1, not_quiet )
 		else:
 			#start a new thread
-			thread.start_new_thread(self.scrib.process_msg, (self, body, replyrate, learn, (body, source, target, c, e)))
+			thread.start_new_thread(self.scrib.process_msg, (self, body, replyrate, learn, (body, source, target, c, e), 0, not_quiet))
 
 	def irc_commands(self, body, source, target, c, e):
 		"""

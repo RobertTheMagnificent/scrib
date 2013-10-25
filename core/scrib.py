@@ -572,7 +572,7 @@ class scrib:
 			else:
 				time.sleep(.2*len(message))
 			if self.settings.debug == 1:
-				barf(DBG, "Output: %s") % message
+				barf(DBG, "Output: %s") % str(message)
 			io_module.output(message, args)
 	
 	def do_commands(self, io_module, body, args, owner):
@@ -1314,7 +1314,8 @@ class scrib:
 
 			# Ignore if the sentence starts with an exclamation
 			if body[0:1] == "!":
-				barf(ERR, "Not learning: %s" % words)
+				if self.settings.debug == 1:
+					barf(ERR, "Not learning: %s" % words)
 				return
 			
 			vowels = "aÃ Ã¢eÃ©Ã¨ÃªiÃ®Ã¯oÃ¶Ã´uÃ¼Ã»y"

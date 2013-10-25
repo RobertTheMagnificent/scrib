@@ -571,13 +571,15 @@ class scrib:
 				if self.settings.debug == 1:
 					barf(DBG, "Not replying.")
 				return
-			replying = "Not replying."
+			if self.settings.debug == 1:
+				replying = "Not replying."
 			# else output
 			if len(message) >= 25:
 				time.sleep(3)
 			else:
 				time.sleep(.1*len(message))
-				replying = "Replying!"
+				if self.settings.debug == 1:
+					replying = "Replying!"
 				io_module.output(message, args)
 			if self.settings.debug == 1:
 				barf(DBG, replying)
@@ -844,7 +846,7 @@ class scrib:
 							break
 
 				if c_max < 1:
-					io_module.output("%s %s words to remove" % (self.settings.pubsym, count, args))
+					io_module.output("%s %s words to remove" % (self.settings.pubsym, count))
 					return
 
 				# Remove the words

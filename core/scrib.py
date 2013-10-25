@@ -182,7 +182,7 @@ class scrib:
 	import cfgfile
 
 	# Main command list
-	commandlist = "Owner commands:\n!alias, !censor, !check, !context, !learning, !limit, !prune, !rebuild, !replace, !save, !uncensor, !unlearn\nPublic commands:\n!date, !fortune, !help, !known, !owner, !tweet, !version, !words"
+	commandlist = "Owner commands:\n!alias, !censor, !check, !context, !learning, !limit, !prune, !rebuild, !replace, !save, !uncensor, !unlearn\nPublic commands:\n!date, !fortune, !help, !known, !owner, !version, !words"
 	commanddict = {
 		"alias": "Usage: !alias : Show the difference aliases\n!alias <alias> : show the words attached to this alias\n!alias <alias> <word> : link the word to the alias.",
 		"censor": "Usage: !censor [word1 [...]]\nPrevent the bot using one or more words. Without arguments lists the currently censored words.",
@@ -846,7 +846,7 @@ class scrib:
 							break
 
 				if c_max < 1:
-					io_module.output("%s %s words to remove" % (self.settings.pubsym, count))
+					io_module.output("%s %s words to remove" % (self.settings.pubsym, count), args)
 					return
 
 				# Remove the words

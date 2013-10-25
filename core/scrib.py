@@ -189,9 +189,6 @@ def filter_message(message, bot):
 class scrib:
 	import cfgfile
 
-	if self.settings.debug == 1:
-		barf(DBG, "Class scrib initialized.")
-
 	# Main command list
 	commandlist = "Owner commands:\n!alias, !censor, !check, !context, !learning, !limit, !prune, !rebuild, !replace, !save, !uncensor, !unlearn\nPublic commands:\n!date, !fortune, !help, !known, !owner, !tweet, !version, !words"
 	commanddict = {
@@ -238,6 +235,9 @@ class scrib:
 			  "no_save"	:("If True, Scrib doesn't save his brain and configuration to disk", "False")
 			} )
 
+		if self.settings.debug == 1:
+			barf(DBG, "Class scrib initialized.")
+			
 		# Brain stats
 		self.brainstats = self.cfgfile.cfgset()
 		self.brainstats.load("brain/knowledge",

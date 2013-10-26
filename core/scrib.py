@@ -881,7 +881,7 @@ class scrib:
 				context = " ".join(command_list[1:])
 				num_contexts = len(context)
 				barf(ACT, "=========================================")
-				barf(ACT, "Printing % contexts containing \033[1m'%s'" (% num_contexts, context))
+				barf(ACT, "Printing %s contexts containing \033[1m'%s'" (% num_contexts, context))
 				barf(ACT, "=========================================")
 
 				# Build context list

@@ -84,11 +84,12 @@ def unfilter_reply(message):
 	message = message.replace(" !", "!")
 	message = message.replace(" .", ".")
 	message = message.replace(" ,", ",")
-	message = message.replace(" : ", ":")
-	message = message.replace(" ; ", ";")
+	message = message.replace(" : ", ": ")
+	message = message.replace(" ; ", "; ")
 	# Fixes I and I contractions
 	message = message.replace(" i ", " I ")
-	message = message.replace(" i'", " I'")
+	# This was causing issues with words ending with 'i'
+	#message = message.replace(" i'", " I'")
 	# Fixes the common issues with the teach system
 	message = message.replace("$C4", "||")
 	message = message.replace("$b7", "|-:")
@@ -99,6 +100,7 @@ def unfilter_reply(message):
 	message = message.replace("$b2", "=|")
 	message = message.replace("$b1", ":|")
 	# Fixes emoticons that don't work in lowercase
+	# Needs to add support for D: and DX
 	emoticon = re.search("(:|x|;|=|8){1}(-)*(p|x|d){1}", message, re.IGNORECASE)
 	if not emoticon == None: 
 		emoticon = "%s" % emoticon.group()
@@ -569,7 +571,7 @@ class scrib:
 			# empty. do not output
 			if message == "":
 				if self.settings.debug == 1:
-					barf(DBG, "Not replying.")
+					barf(DBG, "Not replying, message empty.")
 				return
 			if self.settings.debug == 1:
 				replying = "Not replying."

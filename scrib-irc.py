@@ -50,8 +50,9 @@ class ModIRC(SingleServerIRCBot):
 		
 		self.settings = cfgfile.cfgset()
 		self.settings.load("conf/scrib-irc.cfg",
-			{ "myname": ("The bot's nickname", "Scribbington"),
+			{ "myname": ("The bot's nickname", "Scrib"),
 			  "realname": ("Reported 'real name'", "Scrib"),
+			  "filter": ("Do we filter our replies or just blindly speak?", "1"),
 			  "owners": ("Owner(s) nickname", [ "OwnerNick" ]),
 			  "servers": ("IRC Server to connect to (server, port [,password])", [("irc.starchat.net", 6667)]),
 			  "chans": ("Channels to auto-join", ["#test"]),

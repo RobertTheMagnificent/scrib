@@ -879,8 +879,9 @@ class scrib:
 					return
 
 				context = " ".join(command_list[1:])
+				num_contexts = len(context)
 				barf(ACT, "=========================================")
-				barf(ACT, "Printing contexts containing \033[1m'%s'" % context)
+				barf(ACT, "Printing % contexts containing \033[1m'%s'" (% num_contexts, context))
 				barf(ACT, "=========================================")
 
 				# Build context list
@@ -908,10 +909,11 @@ class scrib:
 					x += 1
 				if len(c) == 5:
 					return
-				if len(c) > 10:
-					number = len(c)-10
-					barf(ACT, "...(%s lines skipped)..." % number)
-				x = len(c) - 5
+				# Disabling as it gets barfed into console.				
+				#if len(c) > 10:
+				#	number = len(c)-10
+				#	barf(ACT, "...(%s lines skipped)..." % number)
+				#x = len(c) - 5
 				if x < 5:
 					x = 5
 				while x < len(c):

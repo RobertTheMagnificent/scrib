@@ -270,17 +270,18 @@ class ModIRC(SingleServerIRCBot):
 		"""
 
         msg = ""
-        command_list = body#.split()
-        #command_list[0] = command_list[0]
+        command_list = body.split()
+        command_list[0] = command_list[0]
 
         ### Owner commands (Which is all of them for now)
         if source in self.owners and e.source() in self.owner_mask:
             # Only accept commands that are in the Command List
             if self.scrib.settings.debug == 1:
-                scrib.barf(scrib.DBG, "Command list: %s" % command_list)
+                scrib.barf(scrib.DBG, "Command: %s" % command_list[0])
+                scrib.barf(scrib.DBG, "Command list: %s" % str(command_list))
                 scrib.barf(scrib.DBG, "Command Dict: %s" % self.commanddict)
-            if command_list[1:] in self.commanddict:
-                msg = PluginManager.sendMessage(command_list[1:], source, self)
+            if command_list[0][1:] in self.commanddict:
+                msg = PluginManager.sendMessage(command_list[0][1:], command_list, self)
             # Doesn't work yet. :(
             if command_list[0] == "!reload" and len(command_list) == 1:
                 msg = PluginManager.reloadPlugin(command_list[1])

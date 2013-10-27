@@ -8,6 +8,7 @@ nick_command = { "nick": "Owner command. Usage: !nick nickname\nChange nickname.
 # Plugin Action
 class NickPlugin(ScribPlugin.ScribPlugin):
 	def action(self, command_list, scrib):
+		msg = ""
 		if command_list[0] == nick_alias and len(command_list) == 1:
 			try:
 				scrib.connection.nick(command_list[1])
@@ -23,6 +24,7 @@ join_command = { "join": "Owner command. Usage: !join #chan1 [#chan2 [...]]\nJoi
 
 class JoinPlugin(ScribPlugin.ScribPlugin):
 	def action(self, command_list, scrib):
+		msg = ""
 		if command_list[0] == join_alias:
 			for x in xrange(1, len(command_list)):
 				if not command_list[x] in scrib.chans:
@@ -36,6 +38,7 @@ part_command = { "part": "Owner command. Usage: !part #chan1 [#chan2 [...]]\nLea
 
 class PartPlugin(ScribPlugin.ScribPlugin):
 	def action(self, command_list, scrib):
+		msg = ""
 		if command_list[0] == part_alias:
 			for x in xrange(1, len(command_list)):
 				if command_list[x] in scrib.chans:
@@ -49,6 +52,7 @@ chans_command = { "chans": "Owner command. Usage: !chans\nList channels currentl
 
 class ChansPlugin(ScribPlugin.ScribPlugin):
 	def action(self, command_list, scrib):
+		msg = ""
 		if command_list[0] == chans_alias:
 			if len(scrib.channels.keys())==0:
 				msg = "I'm currently on no channels"
@@ -72,6 +76,7 @@ quitmsg_command = { "quitmsg": "Owner command. Usage: !quitmsg [message]\nSet th
 
 class QuitmsgPlugin(ScribPlugin.ScribPlugin):
 	def action(self, command_list, scrib):
+		msg = ""
 		if command_list[0] == quitmsg_alias:
 			if len(command_list) > 1:
 				scrib.settings.quitmsg = body.split(" ", 1)[1]
@@ -108,6 +113,7 @@ unignore_command = { "unignore": "Owner command. Usage: !unignore nick1 [nick2 [
 
 class UnIgnorePlugin(ScribPlugin.ScribPlugin):
 	def action(self, command_list, scrib):
+		msg = ""
 		if command_list[0] == unignore_alias:
 			# Remove everyone listed from the ignore list
 			# eg !unignore tom dick harry
@@ -124,6 +130,7 @@ replyignore_command = { "replyIgnored": "Owner command. Usage: !replyIgnored [on
 
 class ReplyIgnorePlugin(ScribPlugin.ScribPlugin):
 	def action(self, command_list, scrib):
+		msg = ""
 		if command_list[0] == replyignore_alias:
 			msg = "Replying to ignored users "
 			if len(command_list) == 1:

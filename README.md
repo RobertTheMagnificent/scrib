@@ -1,7 +1,7 @@
 Scrib, the IRC ChatBot
 ======================
 <pre>
-License:		GNU AGPLv3 or later
+License:		GNU GPLv2
 Authors:        See AUTHORS
 </pre>
 

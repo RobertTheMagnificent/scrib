@@ -2,7 +2,6 @@
 #
 # I eat ASCII
 
-import string
 import sys
 
 sys.path.append('core')
@@ -59,5 +58,3 @@ if __name__ == "__main__":
 	ModFileIn(my_scrib, sys.argv)
 	my_scrib.save_all(False)
 	del my_scrib
-
-

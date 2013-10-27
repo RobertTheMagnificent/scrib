@@ -141,7 +141,7 @@ def filter_message(message, bot):
 		pass
 
 	# Strips out urls not ignored before...
-	message = re.sub("([a-zA-Z0-9\-_]+?\.)*[a-zA-Z0-9\-_]+?\.[a-zA-Z]{2,4}(\/[a-zA-Z0-9]*)*", "", message)
+	message = re.sub("([a-zA-Z0-9\-_]+?\.)*[a-zA-Z0-9\-_]+?\.[a-zA-Z]{2,5}(\/[a-zA-Z0-9]*)*", "", message)
 
 	# Strips out mIRC Control codes
 	ccstrip = re.compile("\x1f|\x02|\x12|\x0f|\x16|\x03(?:\d{1,2}(?:,\d{1,2})?)?", re.UNICODE)
@@ -225,16 +225,18 @@ class scrib:
 		# Attempt to load settings
 		self.settings = self.cfgfile.cfgset()
 		self.settings.load("conf/scrib.cfg",
-						   {"max_words": ("max limits in the number of words known", 6000),
-							"learning": ("Allow the bot to learn", 1),
-							"ignore_list": ("Words that can be ignored for the answer", ['!.', '?.', "'", ',', ';']),
-							"censored": ("Don't learn the sentence if one of those words is found", []),
-							"num_aliases": ("Total of aliases known", 0),
-							"aliases": ("A list of similars words", {}),
-						    "length": ("Max length bot reply can be, otherwise filtered", 25),
-							"pubsym": ("Symbol to append to cmd msgs in public", "!"),
-							"no_save": ("If True, Scrib doesn't save his brain and configuration to disk", "False")
-						   })
+				   {"max_words": ("max limits in the number of words known", 6000),
+				"learning": ("Allow the bot to learn", 1),
+				"ignore_list": ("Words that can be ignored for the answer", ['!.', '?.', "'", ',', ';']),
+				"censored": ("Don't learn the sentence if one of those words is found", []),
+				"num_aliases": ("Total of aliases known", 0),
+				"debug": ("Debug mode adds verbose output to terminal", 0),
+				"aliases": ("A list of similar words", {}),
+				"aliases": ("A list of similars words", {}),
+ 				    "length": ("Max length bot reply can be, otherwise filtered", 25),
+				"pubsym": ("Symbol to append to cmd msgs in public", "!"),
+				"no_save": ("If True, Scrib doesn't save his brain and configuration to disk", "False")
+				   })
 
 		if self.settings.debug == 1:
 			barf(DBG, "Class scrib initialized.")

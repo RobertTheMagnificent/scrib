@@ -1247,7 +1247,7 @@ class scrib:
 
 						#if the word is in ignore_list, look to the previous word
 						look_for = cwords[w - 1]
-						if look_for in self.settings.ignore_list and w > 1:!
+						if look_for in self.settings.ignore_list and w > 1:
 							look_for = cwords[w - 2] + " " + look_for
 
 						#saves how many times we can find each word

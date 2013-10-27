@@ -292,9 +292,8 @@ class scrib:
             s = f.read()
             f.close()
             if s != self.version.brain:
-                barf(ERR, "Error loading the brain.\n[!]--> Please convert it before launching scrib.")
+                barf(ERR, "Brain is version %s and we use %s.\n               Please convert it before launching scrib." % self.version.brain, s )
                 sys.exit(1)
-
             f = open("brain/words.dat", "rb")
             s = f.read()
             f.close()

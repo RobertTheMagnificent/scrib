@@ -296,7 +296,6 @@ class ModIRC(SingleServerIRCBot):
 			if self.scrib.settings.debug == 1:
 				scrib.barf(scrib.DBG, "Command: %s" % command_list[0])
 				scrib.barf(scrib.DBG, "Command list: %s" % str(command_list))
-				scrib.barf(scrib.DBG, "Command Dict: %s" % self.commanddict)
 			if command_list[0][1:] in self.commanddict:
 				msg = PluginManager.sendMessage(command_list[0][1:], command_list, self, c)
 			# Doesn't work yet. :(

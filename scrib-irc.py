@@ -1,6 +1,7 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import sys
 # See scrib.py
 sys.path.append('core/')
 sys.path.append('plugins/')
@@ -26,6 +27,7 @@ import PluginManager
 import traceback
 import thread
 
+sys = scrib.sys
 
 class ModIRC(SingleServerIRCBot):
     """

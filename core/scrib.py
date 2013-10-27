@@ -938,8 +938,8 @@ class scrib:
 				# probably be printed, not module.output XXX
 
 				# build context we are looking for
-				num_contexts = len(context)
 				context = " ".join(command_list[1:])
+				num_contexts = len(context)
 				if context == "":
 					return
 

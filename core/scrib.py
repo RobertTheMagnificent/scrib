@@ -222,6 +222,15 @@ class scrib:
 		"""
 		Open the brain. Resize as required.
 		"""
+
+		#if os.path.exists("conf/scrib.cfg") = :
+		#	try:
+		#
+		#	except:
+		#		barf(ERR, "No scrib.cfg file found. Creating a new one.")
+		#		open("conf/scrib.cfg", "w")
+
+
 		# Attempt to load settings
 		self.settings = self.cfgfile.cfgset()
 		self.settings.load("conf/scrib.cfg",
@@ -937,15 +946,12 @@ class scrib:
 
 				# build context we are looking for
 				context = " ".join(command_list[1:])
-				num_contexts = len(context)
 				if context == "":
 					return
 
-				context = " ".join(command_list[1:])
+				find_context = " ".join(command_list[1:])
+				num_contexts = len(context)
 
-				barf(ACT, "=========================================")
-				barf(ACT, "Printing %s contexts containing \033[1m'%s'" % (num_contexts, context))
-				barf(ACT, "=========================================")
 
 				# Build context list
 				# Pad it
@@ -960,11 +966,18 @@ class scrib:
 					if ctxt.find(context) != -1:
 						# Avoid duplicates (2 of a word
 						# in a single context)
+						num_contexts = len(c) + 1
 						if len(c) == 0:
 							c.append(self.lines[x][0])
 						elif c[len(c) - 1] != self.lines[x][0]:
 							c.append(self.lines[x][0])
 				x = 0
+
+
+				barf(ACT, "=========================================")
+				barf(ACT, "Printing %s contexts containing \033[1m'%s'" % (num_contexts, find_context))
+				barf(ACT, "=========================================")
+
 				while x < 5:
 					if x < len(c):
 						lines = c

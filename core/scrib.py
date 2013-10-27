@@ -231,6 +231,7 @@ class scrib:
 							"censored": ("Don't learn the sentence if one of those words is found", []),
 							"num_aliases": ("Total of aliases known", 0),
 							"aliases": ("A list of similars words", {}),
+						    "length": ("Max length bot reply can be, otherwise filtered", 25),
 							"pubsym": ("Symbol to append to cmd msgs in public", "!"),
 							"no_save": ("If True, Scrib doesn't save his brain and configuration to disk", "False")
 						   })
@@ -602,6 +603,7 @@ class scrib:
 			else:
 				return
 
+
 			# single word reply: always output
 			if len(message.split()) == 1:
 				if self.settings.debug == 1:
@@ -615,18 +617,14 @@ class scrib:
 				return
 			if self.settings.debug == 1:
 				replying = "Not replying."
-			# else output
-			#if len(message) >= 25:
-			#	time.sleep(3)
-			#else:
-			#	time.sleep(.1 * len(message))
-			#	if self.settings.debug == 1:
-			#		replying = "Replying!"
-			#	io_module.output(message, args)
-			time.sleep(.1 * len(message))
-			if self.settings.debug == 1:
-				replying = "Replying!"
-			io_module.output(message, args)
+			#  else output
+			if len(message) >= self.settings.length:
+				time.sleep(3)
+			else:
+				time.sleep(.1 * len(message))
+				if self.settings.debug == 1:
+					replying = "Replying!"
+				io_module.output(message, args)
 			if self.settings.debug == 1:
 				barf(DBG, replying)
 

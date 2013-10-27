@@ -3,8 +3,8 @@
 # by KittyTristy "Tristy Hopkins"
 
 ## Our Variables! ##
-CORE=0.7.2
-BRAIN=0.1.0
+CORE=$(cat VERSION | grep "core")
+BRAIN=$(cat VERSION | grep "brain")
 DATE=$(date +"%x %r %Z")
 BOLD="\e[1m"
 CLEAR="\e[0m"
@@ -51,10 +51,10 @@ function upver
 
 function version
 {
-	echo -e $BOLD"Enter the core version number for this Scrib."$CLEAR
+	echo -e $BOLD"Enter new core version (current $CORE):"$CLEAR
 	read -e -p "# " CORE
 
-	echo -e $BOLD"Okay, now enter the brain version."$CLEAR
+	echo -e $BOLD"Okay, now enter new brain version (current $BRAIN)."$CLEAR
 	read -e -p "# " BRAIN
 
 	echo "Creating new VERSION file.."

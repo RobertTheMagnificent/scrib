@@ -9,7 +9,7 @@ Scrib is an IRC learning chat bot that self-optimizes. It can also be taught thr
 
 Scrib's origins lie within the sources of Pyborg, which was written by Tom Morton and Sébastian Dailly. It was a simple Markov chain-driven bot, similar to MegaHAL, but with the unique ability to learn patterns of speech by figuring out what words go together well. This gives the bot the ability to come up with its own replies, as well as repeating previously learned phrases. There have been pieces absorbed from the Alia fork of Pyborg, as well.
 
-Though Scrib is based on Pyborg, very little of the bot is compatible with any other Pyborg (including the original)! The intention is to morph this bot into something more robust, while maintaining speed and reliability and extendability.
+Though Scrib is based on Pyborg, very little of the bot is compatible with any other Pyborg (including the original)! The intention is to morph this bot into something more robust, while maintaining speed, reliability and providing extendability though use of the PluginManager.
 
 
 What You'll Need
@@ -26,11 +26,37 @@ Here's an outline of configuration file options.
 
 scrib.cfg
 ---------
-_(Internal options)_
+_(General Scrib options)_
+
+* pubsym	= '!' - This is the "public symbol" that the bot will prepend to any command reply.
+* num_aliases	= 0 - This is the number of total aliases known. *Needs to be moved to brain/knowledge*
+* no_save	= 'False' - Setting this to true will disable brain saving.
+* ignore_list	= ['!.', '?.', "'", ',', ';'] - This is a list of items to ignore and not reply *Doesn't seem to work*
+* length	= 25 - This is the length of formed reply. If it goes over this number of characters, the bot won't reply.
+* max_words	= 106000 - This is the maximum number of words allowed in the bot's brain.
+* learning	= 1 - This toggles whether the bot is in learning mode.
+* debug	= 0 - This toggles whether or not the bot is in debug mode. Debug mode makes more verbose terminal messages.
+* censored	= [''] - If a statement contains any words in this list, that message is ignored.
+* aliases	= {} - These are a list of similar words.
+
 
 scrib-irc.cfg
 -------------
 _(IRC-specific options)_
+
+* owners = [''] - This lets you set a list of people that can use all bot commands.
+* reply_chance = 50 - This is the percent(%) chance that the bot will reply.
+* nick_reply_chance = 100 - This is the percent(%) chance that the bot will reply when highlighted.
+* realname = 'Scribbington S. Dreud' - This is the 'real name' reported to the IRC server.
+* myname = 'Scribbington' - This is your bot's nickname.
+* replyIgnored = 0 - Setting this to 1 will allow your bot to reply to people that are on the ignore list, but not learn from them.
+* servers = [('irc.freenode.net', 6667)] - This is a list of servers that your bot can connect to. For now, only one is supported.
+* ignorelist = [''] - This is the list of ignored nicks.
+* private = 1 - Setting this to 0 will allow others to use the public IRC commands.
+* chans = [''] - These are the channels the bot will join, across all servers.
+* password = 'yourpassword' - This is your admin password. Generally you won't want to give this out.
+* speaking = 1 - This toggles whether or not the bot talks.
+* quitmsg = 'Quitting.' - This is the message channels see when the bot quits IRC.
 
 Commands
 ========

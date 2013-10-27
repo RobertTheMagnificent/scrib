@@ -338,10 +338,10 @@ class scrib:
 			self.lines = pickle.loads(s)
 			del s
 		except (EOFError, IOError), e:
-			# Create new database
-			#self.words = {}
-			#self.lines = {}
-			barf(ERR, "Error reading brain. Exiting.")
+			# Create new brain
+			self.words = {}
+			self.lines = {}
+			barf(ERR, "New brain generated.")
 			sys.exit(1)
 
 		# Is a resizing required?

@@ -38,8 +38,8 @@ class scrib(self):
 			if s != self.version.brain:
 				barf(ERR, "Brain version incorrect.")
 				found_ver = "UNKOWN"
-				ancient = 0.0.1
-				old = 0.1.0
+				ancient = "0.0.1"
+				old = "0.1.0"
 
 				if s == ancient:
 					found_ver = ancient
@@ -174,4 +174,8 @@ class scrib(self):
 			self.version.save()
 
 			barf(SAV, "Brain saved.")
-			sys.exit(0)
+
+if __name__ == "main":
+	my_scrib = scrib.scrib()
+	my_scrib.save_all(False)
+	del my_scrib

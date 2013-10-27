@@ -616,7 +616,7 @@ class scrib:
         if command_list[0] == "!teach" or command_list[0] == "!learn":
             try:
                 key = ' '.join(command_list[1:]).split("|")[0].strip()
-                key = re.sub('[\.\,\?\*"\\', "", key)
+                key = re.sub("[\.\,\?\*\"\'!]", "", key)
                 rnum = int(len(' '.join(command_list[1:]).split("|")) - 1)
                 if "#nick" in key:
                     msg = "%s Stop trying to teach me something that will break me!" % self.settings.pubsym

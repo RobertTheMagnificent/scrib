@@ -292,6 +292,7 @@ class scrib:
 			s = f.read()
 			f.close()
 			if s != self.version.brain:
+                import marshal
 				barf(ERR, "Brain version incorrect. Attempting to convert.")
 				f = open("brain/words.dat", "rb")
 				s = f.read()

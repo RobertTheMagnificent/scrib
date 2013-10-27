@@ -6,7 +6,7 @@ command = { "control": "Usage: !control password\nAllow user to have access to b
 
 # Plugin Action
 class ControlPlugin(ScribPlugin.ScribPlugin):
-	def action(self, command_list, scrib):
+	def action(self, command_list, scrib, c):
 		if command_list[0] == alias and len(command_list) > 1 and scrib.source not in scrib.owners:
 			msg = ""
 			if command_list[1] == scrib.settings.password:

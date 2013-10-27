@@ -112,6 +112,8 @@ class ModIRC(SingleServerIRCBot):
         for i in self.chans:
             c.join(i)
 
+
+
     def shutdown(self):
         try:
             self.die() # disconnect from server
@@ -281,7 +283,7 @@ class ModIRC(SingleServerIRCBot):
                 scrib.barf(scrib.DBG, "Command list: %s" % str(command_list))
                 scrib.barf(scrib.DBG, "Command Dict: %s" % self.commanddict)
             if command_list[0][1:] in self.commanddict:
-                msg = PluginManager.sendMessage(command_list[0][1:], command_list, self)
+                msg = PluginManager.sendMessage(command_list[0][1:], command_list, self, c)
             # Doesn't work yet. :(
             if command_list[0] == "!reload" and len(command_list) == 1:
                 msg = PluginManager.reloadPlugin(command_list[1])

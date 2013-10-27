@@ -6,7 +6,7 @@ command = { "replyrate": "Usage: !replyrate <num>\n Set the bot's replyrate." }
 
 # Plugin Action
 class ReplyRatePlugin(ScribPlugin.ScribPlugin):
-	def action(self, command_list, scrib):
+	def action(self, command_list, scrib, c):
 		if scrib.scrib.settings.debug == 1:
 			ScribPlugin.barf(ScribPlugin.DBG, "ReplyRate Plugin activated")
 		if command_list[0] == alias and len(command_list) == 2:

@@ -230,8 +230,12 @@ class scrib:
 							"ignore_list": ("Words that can be ignored for the answer", ['!.', '?.', "'", ',', ';']),
 							"censored": ("Don't learn the sentence if one of those words is found", []),
 							"num_aliases": ("Total of aliases known", 0),
+<<<<<<< HEAD
 							"debug": ("Debug mode adds verbose output to terminal", 0),
 							"aliases": ("A list of similar words", {}),
+=======
+							"aliases": ("A list of similars words", {}),
+>>>>>>> parent of 61509d8... Messing with replies.
 							"pubsym": ("Symbol to append to cmd msgs in public", "!"),
 							"no_save": ("If True, Scrib doesn't save his brain and configuration to disk", "False")
 						   })

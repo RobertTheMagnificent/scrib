@@ -6,7 +6,7 @@ from scrib import *
 class scrib(self):
     def _init__(self):
         self.settings = self.cfgfile.cfgset()
-        self.settings.load("conf/scrib.cfg",
+        self.settings.load("../conf/scrib.cfg",
                            {"max_words": ("max limits in the number of words known", 6000),
                             "learning": ("Allow the bot to learn", 1),
                             "ignore_list": ("Words that can be ignored for the answer", ['!.', '?.', "'", ',', ';']),
@@ -23,7 +23,7 @@ class scrib(self):
     	# Read the brain
 		barf(SAV, "Reading my brain...")
 		try:
-			zfile = zipfile.ZipFile('brain/cortex.zip', 'r')
+			zfile = zipfile.ZipFile('../brain/cortex.zip', 'r')
 			for filename in zfile.namelist():
 				data = zfile.read(filename)
 				file = open(filename, 'w+b')
@@ -32,7 +32,7 @@ class scrib(self):
 		except (EOFError, IOError), e:
 			barf(ERR, "No brain found, or perhaps corrupt? Recreating.")
 		try:
-			f = open("brain/version", "rb")
+			f = open("../brain/version", "rb")
 			s = f.read()
 			f.close()
 			if s != self.version.brain:
@@ -48,17 +48,17 @@ class scrib(self):
 
                 if s == found_ver:
                     barf(ACT, "Brain version %s detected. Attempting update..." % found_ver)
-                    f = open("brain/words.dat", "rb")
+                    f = open("../brain/words.dat", "rb")
                     s = f.read()
                     f.close()
                     self.words = marshal.load(s)
 
-                    f = open("brain/lines.dat", "rb")
+                    f = open("../brain/lines.dat", "rb")
                     s = f.read()
                     f.close()
                     self.lines = marshal.load(s)
 
-                    f = open("brain/version" "w")
+                    f = open("../brain/version" "w")
                     f.write(self.version.brain)
                     f.close()
 
@@ -80,7 +80,7 @@ class scrib(self):
 			barf(SAV, "Writing to my brain...\033[0m")
 
 			try:
-				zfile = zipfile.ZipFile('brain/cortex.zip', 'r')
+				zfile = zipfile.ZipFile('../brain/cortex.zip', 'r')
 				for filename in zfile.namelist():
 					data = zfile.read(filename)
 					file = open(filename, 'w+b')
@@ -91,17 +91,17 @@ class scrib(self):
 			except:
 				barf(ERR, "No brain found, or it's broken. Attempting to restore...")
 				try:
-					os.remove('brain/cortex.zip')
+					os.remove('../brain/cortex.zip')
 				except:
 					pass
 
-			f = open("brain/words.dat", "wb")
+			f = open("../brain/words.dat", "wb")
 			s = pickle.dumps(self.words)
 			f.write(s)
 			f.close()
 			if self.settings.debug == 1:
 				barf(DBG, "Words saved.")
-			f = open("brain/lines.dat", "wb")
+			f = open("../brain/lines.dat", "wb")
 			s = pickle.dumps(self.lines)
 			f.write(s)
 			f.close()
@@ -109,33 +109,33 @@ class scrib(self):
 				barf(DBG, "Lines saved.")
 
 			#save the version
-			f = open("brain/version", "w")
+			f = open("../brain/version", "w")
 			f.write(self.version.brain)
 			f.close()
 			if self.settings.debug == 1:
 				barf(DBG, "Version saved.")
 
 			#zip the files
-			f = zipfile.ZipFile('brain/cortex.zip', 'w', zipfile.ZIP_DEFLATED)
-			f.write('brain/words.dat')
+			f = zipfile.ZipFile('../brain/cortex.zip', 'w', zipfile.ZIP_DEFLATED)
+			f.write('../brain/words.dat')
 			if self.settings.debug == 1:
 				barf(DBG, "Words zipped")
-			f.write('brain/lines.dat')
+			f.write('../brain/lines.dat')
 			if self.settings.debug == 1:
 				barf(DBG, "Lines zipped")
 			try:
-				f.write('brain/version')
+				f.write('../brain/version')
 				if self.settings.debug == 1:
 					barf(DBG, "Version zipped")
 			except:
-				f2 = open("brain/version", "w")
+				f2 = open("../brain/version", "w")
 				f2 = write(self.version.brain)
-				f.write('brain/version')
+				f.write('../brain/version')
 				if self.settings.debug == 1:
 					barf(DBG, "Version written.")
 			f.close()
 
-			f = open("brain/words.dat", "w")
+			f = open("../brain/words.dat", "w")
 			# write each words known
 			wordlist = []
 			#Sort the list before to export
@@ -150,7 +150,7 @@ class scrib(self):
 			if self.settings.debug == 1:
 				barf(DBG, "Words written.")
 
-			f = open("brain/sentences.dat", "w")
+			f = open("../brain/sentences.dat", "w")
 			# write each words known
 			wordlist = []
 			#Sort the list before to export

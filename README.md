@@ -5,6 +5,13 @@ License:		GNU GPLv2
 Authors:        See AUTHORS
 </pre>
 
+Scrib is an IRC learning chat bot that self-optimizes. It can also be taught through various commands.
+
+Scrib's origins lie within the sources of Pyborg, which was written by Tom Morton and Sébastian Dailly. It was a simple Markov chain-driven bot, similar to MegaHAL, but with the unique ability to learn patterns of speech by figuring out what words go together well. This gives the bot the ability to come up with its own replies, as well as repeating previously learned phrases. There have been pieces absorbed from the Alia fork of Pyborg, as well.
+
+Though Scrib is based on Pyborg, very little of the bot is compatible with any other Pyborg (including the original)! The intention is to morph this bot into something more robust, while maintaining speed and reliability and extendability.
+
+
 What You'll Need
 ----------------
 * [python-irclib](http://python-irclib.sourceforge.net) Most distros: install python-irclib

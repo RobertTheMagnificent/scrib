@@ -2,7 +2,7 @@ from plugins import ScribPlugin
 
 # User Alias and Command
 alias = "!replyrate"
-command = { "replyrate": "Usage: !echo message\nMake the bot mimic your message." }
+command = { "replyrate": "Usage: !replyrate <num>\n Set the bot's replyrate." }
 
 # Plugin Action
 class ReplyRatePlugin(ScribPlugin.ScribPlugin):

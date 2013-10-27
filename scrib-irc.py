@@ -1,7 +1,5 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
-import sys
-import re
 
 # See scrib.py
 sys.path.append('core/')
@@ -22,11 +20,9 @@ def my_remove_connection(self, connection):
 
 IRC._remove_connection = my_remove_connection
 
-import os
 import scrib
 import cfgfile
 import PluginManager
-import random
 import traceback
 import thread
 
@@ -278,8 +274,9 @@ class ModIRC(SingleServerIRCBot):
         ### Owner commands (Which is all of them for now)
         if source in self.owners and e.source() in self.owner_mask:
             # Only accept commands that are in the Command List
-            print self.commanddict
-            print command_list
+            if scrib.settings.debug == 1:
+                scrib.barf(DBG, "Command list: %s" % command_list)
+                scrib.barf(DBG, "Command Dict: %s" % self.commanddict)
             if command_list[1:] in self.commanddict:
                 msg = PluginManager.sendMessage(command_list[1:], source, self)
             if command_list[0] == "!reload" and len(command_list) == 1:

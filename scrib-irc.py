@@ -276,7 +276,7 @@ class ModIRC(SingleServerIRCBot):
         ### Owner commands (Which is all of them for now)
         if source in self.owners and e.source() in self.owner_mask:
             # Only accept commands that are in the Command List
-            if self.settings.debug == 1:
+            if self.scrib.settings.debug == 1:
                 scrib.barf(scrib.DBG, "Command list: %s" % command_list)
                 scrib.barf(scrib.DBG, "Command Dict: %s" % self.commanddict)
             if command_list[1:] in self.commanddict:

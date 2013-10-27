@@ -4,23 +4,23 @@
 from scrib import *
 
 class scrib(self):
-    def _init__(self):
-        self.settings = self.cfgfile.cfgset()
-        self.settings.load("../conf/scrib.cfg",
-                           {"max_words": ("max limits in the number of words known", 6000),
-                            "learning": ("Allow the bot to learn", 1),
-                            "ignore_list": ("Words that can be ignored for the answer", ['!.', '?.', "'", ',', ';']),
-                            "censored": ("Don't learn the sentence if one of those words is found", []),
-                            "num_aliases": ("Total of aliases known", 0),
-                            "aliases": ("A list of similars words", {}),
-                            "pubsym": ("Symbol to append to cmd msgs in public", "!"),
-                            "no_save": ("If True, Scrib doesn't save his brain and configuration to disk", "False")
-                           })
+	def _init__(self):
+		self.settings = self.cfgfile.cfgset()
+		self.settings.load("../conf/scrib.cfg",
+						   {"max_words": ("max limits in the number of words known", 6000),
+							"learning": ("Allow the bot to learn", 1),
+							"ignore_list": ("Words that can be ignored for the answer", ['!.', '?.', "'", ',', ';']),
+							"censored": ("Don't learn the sentence if one of those words is found", []),
+							"num_aliases": ("Total of aliases known", 0),
+							"aliases": ("A list of similars words", {}),
+							"pubsym": ("Symbol to append to cmd msgs in public", "!"),
+							"no_save": ("If True, Scrib doesn't save his brain and configuration to disk", "False")
+						   })
 
-        if self.settings.debug == 1:
-            barf(DBG, "Class scrib initialized.")
+		if self.settings.debug == 1:
+			barf(DBG, "Class scrib initialized.")
 
-    	# Read the brain
+		# Read the brain
 		barf(SAV, "Reading my brain...")
 		try:
 			zfile = zipfile.ZipFile('../brain/cortex.zip', 'r')
@@ -37,44 +37,44 @@ class scrib(self):
 			f.close()
 			if s != self.version.brain:
 				barf(ERR, "Brain version incorrect.")
-                found_ver = "UNKOWN"
-                ancient = 0.0.1
-                old = 0.1.0
+				found_ver = "UNKOWN"
+				ancient = 0.0.1
+				old = 0.1.0
 
-                if s == ancient:
-                    found_ver = ancient
-                if s == old:
-                    found_ver = old
+				if s == ancient:
+					found_ver = ancient
+				if s == old:
+					found_ver = old
 
-                if s == found_ver:
-                    barf(ACT, "Brain version %s detected. Attempting update..." % found_ver)
-                    f = open("../brain/words.dat", "rb")
-                    s = f.read()
-                    f.close()
-                    self.words = marshal.load(s)
+				if s == found_ver:
+					barf(ACT, "Brain version %s detected. Attempting update..." % found_ver)
+					f = open("../brain/words.dat", "rb")
+					s = f.read()
+					f.close()
+					self.words = marshal.load(s)
 
-                    f = open("../brain/lines.dat", "rb")
-                    s = f.read()
-                    f.close()
-                    self.lines = marshal.load(s)
+					f = open("../brain/lines.dat", "rb")
+					s = f.read()
+					f.close()
+					self.lines = marshal.load(s)
 
-                    f = open("../brain/version" "w")
-                    f.write(self.version.brain)
-                    f.close()
+					f = open("../brain/version" "w")
+					f.write(self.version.brain)
+					f.close()
 
-                    barf(ACT, "Brain update a success!")
-                else:
-                    barf(ERR, "Unable to update this brain.")
-                    sys.exit(1)
-            elif found_ver == "UNKNOWN":
-                barf(ERR, "Unknown brain version. Cannot proceed.")
-                sys.exit(1)
+					barf(ACT, "Brain update a success!")
+				else:
+					barf(ERR, "Unable to update this brain.")
+					sys.exit(1)
+			elif found_ver == "UNKNOWN":
+				barf(ERR, "Unknown brain version. Cannot proceed.")
+				sys.exit(1)
 		except (EOFError, IOError), e:
 			barf(ERR, "Could not update brain. :(")
-            sys.exit(1)
-        self.save_all(False)
+			sys.exit(1)
+		self.save_all(False)
 
-    def save_all(self, restart_timer=True):
+	def save_all(self, restart_timer=True):
 		if self.settings.no_save != "True":
 			nozip = "no"
 			barf(SAV, "Writing to my brain...\033[0m")
@@ -174,4 +174,4 @@ class scrib(self):
 			self.version.save()
 
 			barf(SAV, "Brain saved.")
-            sys.exit(0)
+			sys.exit(0)

@@ -1,8 +1,7 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
-import sys
-import re
 
+import sys
 # See scrib.py
 sys.path.append('core/')
 sys.path.append('plugins/')
@@ -22,14 +21,11 @@ def my_remove_connection(self, connection):
 
 IRC._remove_connection = my_remove_connection
 
-import os
 import scrib
 import cfgfile
 import PluginManager
-import random
 import traceback
 import thread
-
 
 class ModIRC(SingleServerIRCBot):
     """
@@ -113,6 +109,8 @@ class ModIRC(SingleServerIRCBot):
         scrib.barf(scrib.ACT, "Joining \033[1m%s" % self.chans)
         for i in self.chans:
             c.join(i)
+
+
 
     def shutdown(self):
         try:
@@ -272,16 +270,19 @@ class ModIRC(SingleServerIRCBot):
 		"""
 
         msg = ""
-        command_list = body#.split()
-        #command_list[0] = command_list[0]
+        command_list = body.split()
+        command_list[0] = command_list[0]
 
         ### Owner commands (Which is all of them for now)
         if source in self.owners and e.source() in self.owner_mask:
             # Only accept commands that are in the Command List
-            print self.commanddict
-            print command_list
-            if command_list[1:] in self.commanddict:
-                msg = PluginManager.sendMessage(command_list[1:], source, self)
+            if self.scrib.settings.debug == 1:
+                scrib.barf(scrib.DBG, "Command: %s" % command_list[0])
+                scrib.barf(scrib.DBG, "Command list: %s" % str(command_list))
+                scrib.barf(scrib.DBG, "Command Dict: %s" % self.commanddict)
+            if command_list[0][1:] in self.commanddict:
+                msg = PluginManager.sendMessage(command_list[0][1:], command_list, self, c)
+            # Doesn't work yet. :(
             if command_list[0] == "!reload" and len(command_list) == 1:
                 msg = PluginManager.reloadPlugin(command_list[1])
 

@@ -605,11 +605,11 @@ class scrib:
 
 
 			# single word reply: always output
-			if len(message.split()) == 1:
-				if self.settings.debug == 1:
-					barf(DBG, "Replying!")
-				io_module.output(message, args)
-				return
+			#if len(message.split()) == 1:
+			#	if self.settings.debug == 1:
+			#		barf(DBG, "Replying!")
+			#	io_module.output(message, args)
+			#	return
 			# empty. do not output
 			if message == "":
 				if self.settings.debug == 1:

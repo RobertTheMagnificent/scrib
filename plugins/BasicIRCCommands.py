@@ -7,8 +7,9 @@ nick_command = { "nick": "Owner command. Usage: !nick nickname\nChange nickname.
 
 # Plugin Action
 class NickPlugin(ScribPlugin.ScribPlugin):
-	def action(self, command_list, scrib):
-		if command_list[0] == nick_alias and len(command_list) == 1:
+	def action(self, command_list, scrib, c):
+		msg = ""
+		if command_list[0] == nick_alias and len(command_list) == 2:
 			try:
 				scrib.connection.nick(command_list[1])
 				scrib.settings.myname = command_list[1]
@@ -22,33 +23,36 @@ join_alias = "!join"
 join_command = { "join": "Owner command. Usage: !join #chan1 [#chan2 [...]]\nJoin one or more channels." }
 
 class JoinPlugin(ScribPlugin.ScribPlugin):
-	def action(self, command_list, scrib):
+	def action(self, command_list, scrib, c):
+		msg = ""
 		if command_list[0] == join_alias:
 			for x in xrange(1, len(command_list)):
 				if not command_list[x] in scrib.chans:
 					msg = "Attempting to join channel %s" % command_list[x]
 					scrib.chans.append(command_list[x])
-					scrib.c.join(command_list[x])
+					c.join(command_list[x])
 			return msg
 
 part_alias = "!part"
 part_command = { "part": "Owner command. Usage: !part #chan1 [#chan2 [...]]\nLeave one or more channels." }
 
 class PartPlugin(ScribPlugin.ScribPlugin):
-	def action(self, command_list, scrib):
+	def action(self, command_list, scrib, c):
+		msg = ""
 		if command_list[0] == part_alias:
 			for x in xrange(1, len(command_list)):
 				if command_list[x] in scrib.chans:
 					msg = "Leaving channel %s" % command_list[x]
 					scrib.chans.remove(command_list[x])
-					scrib.c.part(command_list[x])
+					c.part(command_list[x])
 			return msg
 
 chans_alias = "!chans"
 chans_command = { "chans": "Owner command. Usage: !chans\nList channels currently on." }
 
 class ChansPlugin(ScribPlugin.ScribPlugin):
-	def action(self, command_list, scrib):
+	def action(self, command_list, scrib, c):
+		msg = ""
 		if command_list[0] == chans_alias:
 			if len(scrib.channels.keys())==0:
 				msg = "I'm currently on no channels"
@@ -63,7 +67,7 @@ quit_alias = "!quit"
 quit_command = { "quit": "Owner command. Usage: !quit\nMake the bot quit IRC." }
 
 class QuitPlugin(ScribPlugin.ScribPlugin):
-	def action(self, command_list, scrib):
+	def action(self, command_list, scrib, c):
 		if command_list[0] == quit_alias:
 			sys.exit()
 
@@ -71,7 +75,8 @@ quitmsg_alias = "!quitmsg"
 quitmsg_command = { "quitmsg": "Owner command. Usage: !quitmsg [message]\nSet the quit message. Without arguments show the current quit message." }
 
 class QuitmsgPlugin(ScribPlugin.ScribPlugin):
-	def action(self, command_list, scrib):
+	def action(self, command_list, scrib, c):
+		msg = ""
 		if command_list[0] == quitmsg_alias:
 			if len(command_list) > 1:
 				scrib.settings.quitmsg = body.split(" ", 1)[1]
@@ -84,7 +89,7 @@ ignore_alias = "!ignore"
 ignore_command = { "ignore": "Owner command. Usage: !ignore [nick1 [nick2 [...]]]\nIgnore one or more nicknames. Without arguments it lists ignored nicknames." }
 
 class IgnorePlugin(ScribPlugin.ScribPlugin):
-	def action(self, command_list, scrib):
+	def action(self, command_list, scrib, c):
 		if command_list[0] == ignore_alias:
 			# if no arguments are given say who we are
 			# ignoring
@@ -107,7 +112,8 @@ unignore_alias = "!unignore"
 unignore_command = { "unignore": "Owner command. Usage: !unignore nick1 [nick2 [...]]\nUnignores one or more nicknames." }
 
 class UnIgnorePlugin(ScribPlugin.ScribPlugin):
-	def action(self, command_list, scrib):
+	def action(self, command_list, scrib, c):
+		msg = ""
 		if command_list[0] == unignore_alias:
 			# Remove everyone listed from the ignore list
 			# eg !unignore tom dick harry
@@ -123,7 +129,8 @@ replyignore_alias = "!replyignore"
 replyignore_command = { "replyIgnored": "Owner command. Usage: !replyIgnored [on|off]\nAllow/disallow replying to ignored users. Without arguments shows the current setting." }
 
 class ReplyIgnorePlugin(ScribPlugin.ScribPlugin):
-	def action(self, command_list, scrib):
+	def action(self, command_list, scrib, c):
+		msg = ""
 		if command_list[0] == replyignore_alias:
 			msg = "Replying to ignored users "
 			if len(command_list) == 1:

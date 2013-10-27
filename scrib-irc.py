@@ -7,16 +7,16 @@ sys.path.append('core/')
 sys.path.append('plugins/')
 
 try:
-    from ircbot import *
-    from irclib import *
+	from ircbot import *
+	from irclib import *
 except:
-    print "Dearest User,\nircbot.py and irclib.py are not found. Please install them forthwith from\nhttp://python-irclib.sourceforge.net\n\nThank you,\nscrib"
-    sys.exit(1)
+	print "Dearest User,\nircbot.py and irclib.py are not found. Please install them forthwith from\nhttp://python-irclib.sourceforge.net\n\nThank you,\nscrib"
+	sys.exit(1)
 
 # Let's override some irclib function
 def my_remove_connection(self, connection):
-    if self.fn_to_remove_socket:
-        self.fn_to_remove_socket(connection._get_socket())
+	if self.fn_to_remove_socket:
+		self.fn_to_remove_socket(connection._get_socket())
 
 
 IRC._remove_connection = my_remove_connection
@@ -28,18 +28,18 @@ import traceback
 import thread
 
 class ModIRC(SingleServerIRCBot):
-    """
+	"""
 	Interfacing some IRC I/O with scrib learn/reply modules!
 	"""
-    join_msg = "%s"# is here"
-    part_msg = "%s"# has left"
+	join_msg = "%s"# is here"
+	part_msg = "%s"# has left"
 
-    # We are going to store the owner's host mask :3
-    owner_mask = []
-    commanddict = PluginManager.ScribPlugin.plugin_commands
+	# We are going to store the owner's host mask :3
+	owner_mask = []
+	commanddict = PluginManager.ScribPlugin.plugin_commands
 
-    def __init__(self, my_scrib, args):
-        """
+	def __init__(self, my_scrib, args):
+		"""
 		Args will be sys.argv (command prompt arguments)
 		"""
 		# Scribbington
@@ -129,39 +129,39 @@ class ModIRC(SingleServerIRCBot):
 		"""
 		Process leaving
 		"""
-        # Parse Nickname!username@host.mask.net to Nickname
-        kicked = e.arguments()[0]
-        kicker = e.source().split("!")[0]
-        target = e.target() #channel
-        if len(e.arguments()) >= 2:
-            reason = e.arguments()[1]
-        else:
-            reason = ""
+		# Parse Nickname!username@host.mask.net to Nickname
+		kicked = e.arguments()[0]
+		kicker = e.source().split("!")[0]
+		target = e.target() #channel
+		if len(e.arguments()) >= 2:
+			reason = e.arguments()[1]
+		else:
+			reason = ""
 
-        if kicked == self.settings.myname:
-            scrib.barf(scrib.ACT, "%s was kicked off %s by %s (%s)" % (kicked, target, kicker, reason))
+		if kicked == self.settings.myname:
+			scrib.barf(scrib.ACT, "%s was kicked off %s by %s (%s)" % (kicked, target, kicker, reason))
 
-    def on_privmsg(self, c, e):
-        self.on_msg(c, e)
+	def on_privmsg(self, c, e):
+		self.on_msg(c, e)
 
-    def on_pubmsg(self, c, e):
-        self.on_msg(c, e)
+	def on_pubmsg(self, c, e):
+		self.on_msg(c, e)
 
-    def on_ctcp(self, c, e):
-        ctcptype = e.arguments()[0]
-        if ctcptype == "ACTION":
-            self.on_msg(c, e)
-        else:
-            SingleServerIRCBot.on_ctcp(self, c, e)
+	def on_ctcp(self, c, e):
+		ctcptype = e.arguments()[0]
+		if ctcptype == "ACTION":
+			self.on_msg(c, e)
+		else:
+			SingleServerIRCBot.on_ctcp(self, c, e)
 
-    def _on_disconnect(self, c, e):
-        # self.channels = IRCDict()
-        scrib.barf(scrib.ACT, "Disconnected..")
-        self.connection.execute_delayed(self.reconnection_interval, self._connected_checker)
+	def _on_disconnect(self, c, e):
+		# self.channels = IRCDict()
+		scrib.barf(scrib.ACT, "Disconnected..")
+		self.connection.execute_delayed(self.reconnection_interval, self._connected_checker)
 
 
-    def on_msg(self, c, e):
-        """
+	def on_msg(self, c, e):
+		"""
 		Process messages.
 		"""
 		# Parse Nickname!username@host.mask.net to Nickname
@@ -286,114 +286,114 @@ class ModIRC(SingleServerIRCBot):
 		Route IRC Commands to the PluginManager.
 		"""
 
-        msg = ""
-        command_list = body.split()
-        command_list[0] = command_list[0]
+		msg = ""
+		command_list = body.split()
+		command_list[0] = command_list[0]
 
-        ### Owner commands (Which is all of them for now)
-        if source in self.owners and e.source() in self.owner_mask:
-            # Only accept commands that are in the Command List
-            if self.scrib.settings.debug == 1:
-                scrib.barf(scrib.DBG, "Command: %s" % command_list[0])
-                scrib.barf(scrib.DBG, "Command list: %s" % str(command_list))
-                scrib.barf(scrib.DBG, "Command Dict: %s" % self.commanddict)
-            if command_list[0][1:] in self.commanddict:
-                msg = PluginManager.sendMessage(command_list[0][1:], command_list, self, c)
-            # Doesn't work yet. :(
-            if command_list[0] == "!reload" and len(command_list) == 1:
-                msg = PluginManager.reloadPlugin(command_list[1])
+		### Owner commands (Which is all of them for now)
+		if source in self.owners and e.source() in self.owner_mask:
+			# Only accept commands that are in the Command List
+			if self.scrib.settings.debug == 1:
+				scrib.barf(scrib.DBG, "Command: %s" % command_list[0])
+				scrib.barf(scrib.DBG, "Command list: %s" % str(command_list))
+				scrib.barf(scrib.DBG, "Command Dict: %s" % self.commanddict)
+			if command_list[0][1:] in self.commanddict:
+				msg = PluginManager.sendMessage(command_list[0][1:], command_list, self, c)
+			# Doesn't work yet. :(
+			if command_list[0] == "!reload" and len(command_list) == 1:
+				msg = PluginManager.reloadPlugin(command_list[1])
 
-            self.scrib.settings.save()
-            self.settings.save()
+			self.scrib.settings.save()
+			self.settings.save()
 
-        if msg == "":
-            return 0
-        else:
-            self.output(msg, ("<none>", source, target, c, e))
-            return 1
+		if msg == "":
+			return 0
+		else:
+			self.output(msg, ("<none>", source, target, c, e))
+			return 1
 
-    def nick_check(self, message):
-        # Check to see if I'm highlighted
-        highlighted = 0
-        if message.find(self.settings.myname) != -1:
-            highlighted = 1
-        return highlighted
+	def nick_check(self, message):
+		# Check to see if I'm highlighted
+		highlighted = 0
+		if message.find(self.settings.myname) != -1:
+			highlighted = 1
+		return highlighted
 
-    def output(self, message, args):
-        """
+	def output(self, message, args):
+		"""
 		Output a line of text. args = (body, source, target, c, e)
 		"""
-        if not self.connection.is_connected():
-            scrib.barf(scrib.ERR, "Can't send reply : not connected to server")
-            return
+		if not self.connection.is_connected():
+			scrib.barf(scrib.ERR, "Can't send reply : not connected to server")
+			return
 
-        # Unwrap arguments
-        body, source, target, c, e = args
+		# Unwrap arguments
+		body, source, target, c, e = args
 
-        # Decide. should we do a ctcp action?
-        if message.find(self.settings.myname + " ") == 0:
-            action = 1
-            message = message[len(self.settings.myname) + 1:]
-        else:
-            action = 0
+		# Decide. should we do a ctcp action?
+		if message.find(self.settings.myname + " ") == 0:
+			action = 1
+			message = message[len(self.settings.myname) + 1:]
+		else:
+			action = 0
 
-        # Replace nicks with #nick variable
-        message = message.replace("#nick", source)
+		# Replace nicks with #nick variable
+		message = message.replace("#nick", source)
 
-        # Joins replies and public messages
-        if e.eventtype() == "join" or e.eventtype() == "quit" or e.eventtype() == "part" or e.eventtype() == "pubmsg":
-            if action == 0:
-                scrib.barf(scrib.MSG, "%s <%s> \033[0m%s" % ( target, self.settings.myname, message))
-                c.privmsg(target, message)
-            else:
-                scrib.barf(scrib.MSG, "%s <%s> /me \033[0m%s" % ( target, self.settings.myname, message))
-                c.action(target, message)
-        # Private messages
-        elif e.eventtype() == "privmsg":
-            # normal private msg
-            if action == 0:
-                scrib.barf(scrib.MSG, "%s <%s> \033[0m%s" % ( source, self.settings.myname, message))
-                c.privmsg(source, message)
-                # send copy to owner
-                if not source in self.owners:
-                    c.privmsg(','.join(self.owners), "(From " + source + ") " + body)
-                    c.privmsg(','.join(self.owners), "(To   " + source + ") " + message)
-            # ctcp action priv msg
-            else:
-                scrib.barf(scrib.MSG, "%s <%s> /me \033[0m%s" % ( target, self.settings.myname, message))
-                c.action(source, message)
-                # send copy to owner
-                if not source in self.owners:
-                    map(( lambda x: c.action(x, "(From " + source + ") " + body) ), self.owners)
-                    map(( lambda x: c.action(x, "(To   " + source + ") " + message) ), self.owners)
+		# Joins replies and public messages
+		if e.eventtype() == "join" or e.eventtype() == "quit" or e.eventtype() == "part" or e.eventtype() == "pubmsg":
+			if action == 0:
+				scrib.barf(scrib.MSG, "%s <%s> \033[0m%s" % ( target, self.settings.myname, message))
+				c.privmsg(target, message)
+			else:
+				scrib.barf(scrib.MSG, "%s <%s> /me \033[0m%s" % ( target, self.settings.myname, message))
+				c.action(target, message)
+		# Private messages
+		elif e.eventtype() == "privmsg":
+			# normal private msg
+			if action == 0:
+				scrib.barf(scrib.MSG, "%s <%s> \033[0m%s" % ( source, self.settings.myname, message))
+				c.privmsg(source, message)
+				# send copy to owner
+				if not source in self.owners:
+					c.privmsg(','.join(self.owners), "(From " + source + ") " + body)
+					c.privmsg(','.join(self.owners), "(To   " + source + ") " + message)
+			# ctcp action priv msg
+			else:
+				scrib.barf(scrib.MSG, "%s <%s> /me \033[0m%s" % ( target, self.settings.myname, message))
+				c.action(source, message)
+				# send copy to owner
+				if not source in self.owners:
+					map(( lambda x: c.action(x, "(From " + source + ") " + body) ), self.owners)
+					map(( lambda x: c.action(x, "(To   " + source + ") " + message) ), self.owners)
 
 
 if __name__ == "__main__":
 
-    if "--help" in sys.argv:
-        print "Scrib irc bot. Usage:"
-        print " scrib-irc.py [options]"
-        print " -s   server:port"
-        print " -c   channel"
-        print " -n   nickname"
-        print "Defaults stored in scrib-irc.cfg"
-        print
-        sys.exit(0)
-    # start the scrib
-    my_scrib = scrib.scrib()
-    bot = ModIRC(my_scrib, sys.argv)
-    try:
-        bot.our_start()
-    except KeyboardInterrupt, e:
-        pass
-    except SystemExit, e:
-        pass
-    except:
-        traceback.print_exc()
-        c = raw_input(
-            "\033[94m" + scrib.get_time() + " \033[91m[!] Oh no, I've crashed! Would you like to save my brain? (yes/no)\033[0m")
-        if c[:1] == 'n':
-            sys.exit(0)
-    bot.disconnect(bot.settings.quitmsg)
-    my_scrib.save_all(False)
-    del my_scrib
+	if "--help" in sys.argv:
+		print "Scrib irc bot. Usage:"
+		print " scrib-irc.py [options]"
+		print " -s   server:port"
+		print " -c   channel"
+		print " -n   nickname"
+		print "Defaults stored in scrib-irc.cfg"
+		print
+		sys.exit(0)
+	# start the scrib
+	my_scrib = scrib.scrib()
+	bot = ModIRC(my_scrib, sys.argv)
+	try:
+		bot.our_start()
+	except KeyboardInterrupt, e:
+		pass
+	except SystemExit, e:
+		pass
+	except:
+		traceback.print_exc()
+		c = raw_input(
+			"\033[94m" + scrib.get_time() + " \033[91m[!] Oh no, I've crashed! Would you like to save my brain? (yes/no)\033[0m")
+		if c[:1] == 'n':
+			sys.exit(0)
+	bot.disconnect(bot.settings.quitmsg)
+	my_scrib.save_all(False)
+	del my_scrib

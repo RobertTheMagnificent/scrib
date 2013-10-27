@@ -3,4 +3,8 @@ core= '0.7.4'
 # Brain version of Scrib #
 brain= '0.1.2'
 # Date of last update #
+<<<<<<< HEAD
 date= '10/27/2013 05:48:51 AM PDT'
+=======
+date= '10/27/2013 06:29:11 AM PDT'
+>>>>>>> 61b887a91058a114e615f7c2302e530f8100e757

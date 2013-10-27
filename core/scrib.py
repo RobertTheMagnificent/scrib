@@ -286,7 +286,7 @@ class scrib:
 				file.write(data)
 				file.close()
 		except (EOFError, IOError), e:
-			barf(ERR, "No zip found, or perhaps corrupt? Recreating.")
+			barf(ERR, "No zip found, or perhaps corrupt? Attempting to recover.")
 		try:
 			f = open("brain/version", "rb")
 			s = f.read()
@@ -300,7 +300,7 @@ class scrib:
 				self.words = marshal.loads(s)
 				del s
 				f = open("brain/words.dat", "wb")
-				s = pickle.dumps(self.lines)
+				s = pickle.dumps(self.words)
 				f.write(s)
 				f.close()
 				del s
@@ -339,9 +339,10 @@ class scrib:
 			del s
 		except (EOFError, IOError), e:
 			# Create new database
-			self.words = {}
-			self.lines = {}
-			barf(ERR, "Error reading saves. New database created.")
+			#self.words = {}
+			#self.lines = {}
+			barf(ERR, "Error reading brain. Exiting.")
+			sys.exit(1)
 
 		# Is a resizing required?
 		if len(self.words) != self.brainstats.num_words:

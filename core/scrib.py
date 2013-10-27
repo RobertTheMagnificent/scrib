@@ -141,7 +141,7 @@ def filter_message(message, bot):
 		pass
 
 	# Strips out urls not ignored before...
-	message = re.sub("([a-zA-Z0-9\-_]+?\.)*[a-zA-Z0-9\-_]+?\.[a-zA-Z]{2,4}(\/[a-zA-Z0-9]*)*", "", message)
+	message = re.sub("([a-zA-Z0-9\-_]+?\.)*[a-zA-Z0-9\-_]+?\.[a-zA-Z]{2,5}(\/[a-zA-Z0-9]*)*", "", message)
 
 	# Strips out mIRC Control codes
 	ccstrip = re.compile("\x1f|\x02|\x12|\x0f|\x16|\x03(?:\d{1,2}(?:,\d{1,2})?)?", re.UNICODE)

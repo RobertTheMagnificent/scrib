@@ -303,7 +303,9 @@ class scrib:
 				f.write(s)
 				f.close()
 				del s
-                barf(ACT, "Words converted")
+				if self.settings.debug == 1:
+					barf(DBG, "Words converted.")
+
 				f = open("brain/lines.dat", "rb")
 				s = f.read()
 				f.close()
@@ -313,10 +315,16 @@ class scrib:
 				f.write(s)
 				f.close()
 				del s
-                f = open("brain/version", "wb")
-                f.write(self.version.brain)
-                f.close()
-                barf(ACT, "Brain converted successfully!")
+				if self.settings.debug == 1:
+					barf(DBG, "Lines converted.")
+
+				f = open("brain/version", "wb")
+				f.write(self.version.brain)
+				f.close()
+				if self.settings.debug == 1:
+					barf(DBG, "Version updated.")
+
+				barf(ACT, "Brain converted successfully! Continuing.")
 
 			f = open("brain/words.dat", "rb")
 			s = f.read()

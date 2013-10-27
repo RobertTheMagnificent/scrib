@@ -342,7 +342,6 @@ class scrib:
 			self.words = {}
 			self.lines = {}
 			barf(ERR, "New brain generated.")
-			sys.exit(1)
 
 		# Is a resizing required?
 		if len(self.words) != self.brainstats.num_words:

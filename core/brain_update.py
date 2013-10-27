@@ -3,7 +3,7 @@
 
 from scrib import *
 
-class scrib(self):
+class scrib:
 	def _init__(self):
 		self.settings = self.cfgfile.cfgset()
 		self.settings.load("../conf/scrib.cfg",
@@ -37,7 +37,7 @@ class scrib(self):
 			f.close()
 			if s != self.version.brain:
 				barf(ERR, "Brain version incorrect.")
-				found_ver = "UNKOWN"
+				found_ver = "UNKNOWN"
 				ancient = "0.0.1"
 				old = "0.1.0"
 

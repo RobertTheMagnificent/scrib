@@ -27,8 +27,6 @@ import PluginManager
 import traceback
 import thread
 
-sys = scrib.sys
-
 class ModIRC(SingleServerIRCBot):
     """
 	Interfacing some IRC I/O with scrib learn/reply modules!

@@ -301,13 +301,15 @@ class scrib:
 				self.words = marshal.loads(s)
 				del s
 				f = open("brain/words.dat", "wb")
+				if self.settings.debug == 1:
+					barf(DBG, "Applying filter to adjust to new brain system.               This may take several minutes...")
+				self.words = filter_message(body, self)
 				s = pickle.dumps(self.words)
 				f.write(s)
 				f.close()
 				del s
 				if self.settings.debug == 1:
 					barf(DBG, "Words converted.")
-
 				f = open("brain/lines.dat", "rb")
 				s = f.read()
 				f.close()

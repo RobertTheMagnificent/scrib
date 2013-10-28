@@ -295,7 +295,7 @@ class scrib:
 			if s != self.version.brain:
 				import marshal
 				barf(ERR, "Brain version incorrect.")
-				c = raw_input("\033[94m"+scrib.get_time()+" \033[91m[!] Would you like to update the brain? (yes/no)\033[0m")
+				c = raw_input("\033[94m"+self.get_time()+" \033[91m[!] Would you like to update the brain? (yes/no)\033[0m")
 				if c[:1] == 'y':
 					f = open("brain/words.dat", "rb")
 					s = f.read()

@@ -1041,17 +1041,19 @@ class scrib:
 
 			# remove a word from the censored list
 			elif command_list[0] == "!uncensor":
-				# Remove everyone listd from the ignore list
-				# eg !unignore tom dick harry
+                if self.settings.debug == 1:
+                    barf(DBG, "Uncensoring...")
+				# Remove words listed from the censor list
+				# eg !uncensor tom dick harry
 				for x in xrange(1, len(command_list)):
 					try:
 						self.settings.censored.remove(command_list[x])
-						msg = "%s%s is uncensored." % (self.settings.pubsym, command_list[x])
+						msg = "%s %s is uncensored." % (self.settings.pubsym, command_list[x])
 					except ValueError, e:
 						pass
 
 			elif command_list[0] == "!alias":
-				# no arguments. list aliases words
+				# List aliases words
 				if len(command_list) == 1:
 					if len(self.settings.aliases) == 0:
 						msg = "%s No aliases" % self.settings.pubsym

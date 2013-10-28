@@ -300,7 +300,7 @@ class scrib:
 					f = open("brain/words.dat", "rb")
 					s = f.read()
 					f.close()
-					if self.version.brain == "0.1.0" or self.version.brain == "0.1.1"
+					if self.version.brain == "0.1.0" or self.version.brain == "0.1.1":
 						self.words = marshal.loads(s)
 					else:
 						self.words = pickle.load(s)
@@ -326,7 +326,7 @@ class scrib:
 					del s
 					if self.settings.debug == 1:
 						barf(DBG, "Lines converted.")
-      
+
 					f = open("brain/version", "wb")
 					f.write(self.version.brain)
 					f.close()

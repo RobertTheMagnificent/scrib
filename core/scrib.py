@@ -294,12 +294,13 @@ class scrib:
 		try:
 			f = open("brain/version", "rb")
 			s = f.read()
+			barf(MSG, "Current brain version is %s " % s)
 			f.close()
 			if s != self.version.brain:
 				import marshal
 				barf(ERR, "Brain version incorrect.")
-				c = raw_input(raw_barf(ERR, "Would you like to update the brain? (yes/no) "))
-				if c[:1] == 'y':
+				c = raw_input(raw_barf(ERR, "Would you like to update the brain? (Y/n) "))
+				if c[:1].lower() != 'n':
 					timestamp = get_time_for_file()
 					shutil.copyfile("brain/cortex.zip", "brain/cortex-%s.zip" % timestamp)
 					barf(ACT, "Backup saved to brain/cortex-%s.zip" % timestamp)
@@ -344,7 +345,6 @@ class scrib:
 
 					if self.debug == 1:
 						barf(DBG, "Brain saved.")
-					self.save_all(False)
 					self.clean_up()
 
 			f = open("brain/words.dat", "rb")
@@ -519,7 +519,7 @@ class scrib:
 			self.clean_up()
 
 			barf(SAV, "Brain saved.")
-			sys.exit(0)
+			sys.exit(1)
 
 	def clean_up(self):
 		barf(DBG, "clean_up used but not implemented...")
@@ -548,8 +548,8 @@ class scrib:
 			self.brainstats.num_contexts = 0
 
 			for k in old_lines.keys():
-				k = filter_message(old_lines[k][1], self)
-				self.learn(old_lines[k][0], old_lines[k][1])
+				filtered_line = filter_message(old_lines[k][0], self)
+				self.learn(filtered_line, old_lines[k][1])
 
 			# Restarts the timer
 			self.autorebuild = threading.Timer(to_sec("71h"), self.auto_rebuild)

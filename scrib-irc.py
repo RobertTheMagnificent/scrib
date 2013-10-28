@@ -396,3 +396,4 @@ if __name__ == "__main__":
 	bot.disconnect(bot.settings.quitmsg)
 	my_scrib.save_all(False)
 	del my_scrib
+	sys.exit(0)

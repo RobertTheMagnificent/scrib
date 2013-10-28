@@ -298,7 +298,7 @@ class scrib:
 			if s != self.version.brain:
 				import marshal
 				barf(ERR, "Brain version incorrect.")
-				c = raw_input(raw_barf(ERR, "Would you like to update the brain? (yes/no)\033[0m"))
+				c = raw_input(raw_barf(ERR, "Would you like to update the brain? (yes/no) "))
 				if c[:1] == 'y':
 					timestamp = get_time_for_file()
 					shutil.copyfile("brain/cortex.zip", "brain/cortex-%s.zip" % timestamp)
@@ -344,7 +344,7 @@ class scrib:
 
 					if self.debug == 1:
 						barf(DBG, "Brain saved.")
-					self.save_all()
+					self.save_all(False)
 					self.clean_up()
 
 			f = open("brain/words.dat", "rb")
@@ -522,16 +522,17 @@ class scrib:
 			sys.exit(0)
 
 	def clean_up(self):
-		if self.debug == 1:
-			barf(DBG,"Cleaning up brain.")
-		try:
-			os.remove('brain/words.dat')
-			os.remove('brain/lines.dat')
-			os.remove('brain/version')
-			if self.debug == 1:
-				barf(DBG, "Cleaned up brain mess.")
-		except (OSError, IOError), e:
-			barf(ERR, "Could not remove the files.")
+		barf(DBG, "clean_up used but not implemented...")
+		#if self.debug == 1:
+		#	barf(DBG,"Cleaning up brain.")
+		#try:
+			#os.remove('brain/words.dat')
+			#os.remove('brain/lines.dat')
+			#os.remove('brain/version')
+			#if self.debug == 1:
+			#	barf(DBG, "Cleaned up brain mess.")
+		#except (OSError, IOError), e:
+		#	barf(ERR, "Could not remove the files.")
 
 	def auto_rebuild(self):
 		if self.settings.learning == 1:
@@ -547,6 +548,7 @@ class scrib:
 			self.brainstats.num_contexts = 0
 
 			for k in old_lines.keys():
+                k = filter_message(k)
 				self.learn(old_lines[k][0], old_lines[k][1])
 
 			# Restarts the timer

@@ -548,7 +548,7 @@ class scrib:
 			self.brainstats.num_contexts = 0
 
 			for k in old_lines.keys():
-				k = filter_message(k, self)
+				k = filter_message(old_lines[k][1], self)
 				self.learn(old_lines[k][0], old_lines[k][1])
 
 			# Restarts the timer

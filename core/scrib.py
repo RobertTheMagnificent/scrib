@@ -298,8 +298,7 @@ class scrib:
 			if s != self.version.brain:
 				import marshal
 				barf(ERR, "Brain version incorrect.")
-				raw_msg = barf(ERR, "Would you like to update the brain? (yes/no)\033[0m")
-				c = raw_input(raw_msg)
+				c = raw_input(raw_barf(ERR, "Would you like to update the brain? (yes/no)\033[0m"))
 				if c[:1] == 'y':
 					timestamp = get_time_for_file()
 					shutil.copyfile("brain/cortex.zip", "brain/cortex-%s.zip" % timestamp)
@@ -342,6 +341,11 @@ class scrib:
 					if self.debug == 1:
 						barf(DBG, "Version updated.")
 					barf(ACT, "Brain converted successfully! Continuing.")
+
+					if self.debug == 1:
+						barf(DBG, "Brain saved.")
+					self.save_all()
+					self.clean_up()
 
 			f = open("brain/words.dat", "rb")
 			s = f.read()
@@ -455,13 +459,6 @@ class scrib:
 			if self.debug == 1:
 				barf(DBG, "Lines saved.")
 
-			#save the version
-			#f = open("brain/version", "w")
-			#f.write(self.version.brain)
-			#f.close()
-			#if self.debug == 1:
-			#	barf(DBG, "Version saved.")
-
 			#zip the files
 			f = zipfile.ZipFile('brain/cortex.zip', 'w', zipfile.ZIP_DEFLATED)
 			f.write('brain/words.dat')
@@ -519,8 +516,21 @@ class scrib:
 			self.settings.save()
 			self.brainstats.save()
 			self.version.save()
+			self.clean_up()
 
 			barf(SAV, "Brain saved.")
+
+	def clean_up(self):
+		if self.debug == 1:
+			barf(DBG,"Cleaning up brain.")
+		try:
+			os.remove('brain/words.dat')
+			os.remove('brain/lines.dat')
+			os.remove('brain/version')
+			if self.debug == 1:
+				barf(DBG, "Cleaned up brain mess.")
+		except (OSError, IOError), e:
+			barf(ERR, "Could not remove the files.")
 
 	def auto_rebuild(self):
 		if self.settings.learning == 1:
@@ -789,6 +799,7 @@ class scrib:
 		if owner == 1:
 			# Save the brain
 			if command_list[0] == "!save":
+				msg = "%s Saving brain..." % self.settings.pubsym
 				self.save_all(False)
 				msg = "%s Brain has been saved!" % self.settings.pubsym
 
@@ -1104,14 +1115,6 @@ class scrib:
 			elif command_list[0] == "!quit":
 				# Close the brain
 				barf(SAV, "Saved my brain.")
-				try:
-					os.remove('brain/words.dat')
-					os.remove('brain/lines.dat')
-					os.remove('brain/version')
-					if self.debug == 1:
-						barf(DBG, "Cleaned up brain mess.")
-				except (OSError, IOError), e:
-					barf(ERR, "Could not remove the files.")
 				barf(ACT, "Goodbye!")
 				sys.exit(0)
 

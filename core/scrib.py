@@ -296,7 +296,7 @@ class scrib:
 				import marshal
 				barf(ERR, "Brain version incorrect.")
 				raw_msg = barf(ERR, "Would you like to update the brain? (yes/no)")
-				c = raw_input(raw_msg)
+				c = raw_input(raw_msg+"\033[0m")
 				if c[:1] == 'y':
 					f = open("brain/words.dat", "rb")
 					s = f.read()
@@ -304,7 +304,7 @@ class scrib:
 					if self.version.brain == "0.1.0" or self.version.brain == "0.1.1":
 						self.words = marshal.loads(s)
 					else:
-						self.words = pickle.load(s)
+						self.words = pickle.loads(s)
 					del s
 					f = open("brain/words.dat", "wb")
 					if self.settings.debug == 1:

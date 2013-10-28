@@ -519,6 +519,7 @@ class scrib:
 			self.clean_up()
 
 			barf(SAV, "Brain saved.")
+            sys.exit(0)
 
 	def clean_up(self):
 		if self.debug == 1:
@@ -1114,7 +1115,6 @@ class scrib:
 			# Quit
 			elif command_list[0] == "!quit":
 				# Close the brain
-				barf(SAV, "Saved my brain.")
 				barf(ACT, "Goodbye!")
 				sys.exit(0)
 

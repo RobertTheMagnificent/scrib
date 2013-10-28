@@ -1224,7 +1224,7 @@ class scrib:
 				return ""
 			word = index[randint(0, len(index) - 1)]
 			if self.settings.debug == 1:
-				barf(DBG, "Chosen root word: %s..." % word)
+				barf(DBG, "Chosen root word: %s" % word)
 
 			# Build sentence backwards from "chosen" word
 			sentence = [word]

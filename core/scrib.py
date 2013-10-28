@@ -294,41 +294,45 @@ class scrib:
 			f.close()
 			if s != self.version.brain:
 				import marshal
-				barf(ERR, "Brain version incorrect. Attempting to convert.")
-				f = open("brain/words.dat", "rb")
-				s = f.read()
-				f.close()
-				self.words = marshal.loads(s)
-				del s
-				f = open("brain/words.dat", "wb")
-				if self.settings.debug == 1:
-					barf(DBG, "Applying filter to adjust to new brain system.               This may take several minutes...")
-				self.words = filter_message(body, self)
-				s = pickle.dumps(self.words)
-				f.write(s)
-				f.close()
-				del s
-				if self.settings.debug == 1:
-					barf(DBG, "Words converted.")
-				f = open("brain/lines.dat", "rb")
-				s = f.read()
-				f.close()
-				self.lines = marshal.loads(s)
-				f = open("brain/lines.dat", "wb")
-				s = pickle.dumps(self.lines)
-				f.write(s)
-				f.close()
-				del s
-				if self.settings.debug == 1:
-					barf(DBG, "Lines converted.")
-
-				f = open("brain/version", "wb")
-				f.write(self.version.brain)
-				f.close()
-				if self.settings.debug == 1:
-					barf(DBG, "Version updated.")
-
-				barf(ACT, "Brain converted successfully! Continuing.")
+				barf(ERR, "Brain version incorrect.")
+				c = raw_input("\033[94m"+scrib.get_time()+" \033[91m[!] Would you like to update the brain? (yes/no)\033[0m")
+				if c[:1] == 'y':
+					f = open("brain/words.dat", "rb")
+					s = f.read()
+					f.close()
+					if self.version.brain == "0.1.0" or self.version.brain == "0.1.1"
+						self.words = marshal.loads(s)
+					else:
+						self.words = pickle.load(s)
+					del s
+					f = open("brain/words.dat", "wb")
+					if self.settings.debug == 1:
+						barf(DBG, "Applying filter to adjust to new brain system.               This may take several minutes...")
+					self.words = filter_message(body, self)
+					s = pickle.dumps(self.words)
+					f.write(s)
+					f.close()
+					del s
+					if self.settings.debug == 1:
+						barf(DBG, "Words converted.")
+					f = open("brain/lines.dat", "rb")
+					s = f.read()
+					f.close()
+					self.lines = marshal.loads(s)
+					f = open("brain/lines.dat", "wb")
+					s = pickle.dumps(self.lines)
+					f.write(s)
+					f.close()
+					del s
+					if self.settings.debug == 1:
+						barf(DBG, "Lines converted.")
+      
+					f = open("brain/version", "wb")
+					f.write(self.version.brain)
+					f.close()
+					if self.settings.debug == 1:
+						barf(DBG, "Version updated.")
+					barf(ACT, "Brain converted successfully! Continuing.")
 
 			f = open("brain/words.dat", "rb")
 			s = f.read()

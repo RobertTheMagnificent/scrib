@@ -6,11 +6,9 @@ import sys
 sys.path.append('core/')
 sys.path.append('plugins/')
 
-import os
 import scrib
 import cfgfile
 import PluginManager
-import random
 import traceback
 import time
 
@@ -39,7 +37,7 @@ def scribterm():
 	ModLineIn(my_scrib)
 
 if __name__ == "__main__":
-	
+
 	if "--help" in sys.argv:
 		print "Scrib bot. Usage:"
 		print " start.py [options]"
@@ -55,7 +53,7 @@ if __name__ == "__main__":
 	try:
 		Thread(target = scribirc).start()
 		Thread(target = scribterm).start()
-  		while True: time.sleep(100)
+		while True: time.sleep(100)
 	except KeyboardInterrupt, SystemExit:
 		thread.exit()
 		pass

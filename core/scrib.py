@@ -522,14 +522,6 @@ class scrib:
 
 			barf(SAV, "Brain saved.")
 
-		# Cleaning up the shit
-		#try:
-		#	os.remove('brain/words.dat')
-		#	os.remove('brain/lines.dat')
-		#	os.remove('brain/version')
-		#except (OSError, IOError), e:
-		#	barf(ERR, "Could not remove the files.")
-
 	def auto_rebuild(self):
 		if self.settings.learning == 1:
 			t = time.time()
@@ -1102,16 +1094,25 @@ class scrib:
 
 			# Fortune command
 			elif command_list[0] == "!fortune":
-				msg = self.settings.pubsym + "".join([i for i in os.popen('fortune').readlines()]).replace('\n\n',
-																										   '\n').replace(
-					'\n', ' ')
+				msg = self.settings.pubsym + "" \
+					.join([i for i in os.popen('fortune').readlines()]).replace('\n\n','\n').replace('\n', ' ')
+				msg = filter_message(msg)
 			# Date command
 			elif command_list[0] == "!date":
 				msg = self.settings.pubsym + " It is ".join(i for i in os.popen('date').readlines())
 			# Quit
 			elif command_list[0] == "!quit":
 				# Close the brain
-				barf(SAV, "Saved my brain. Goodbye!")
+				barf(SAV, "Saved my brain.")
+				try:
+					os.remove('brain/words.dat')
+					os.remove('brain/lines.dat')
+					os.remove('brain/version')
+					if self.debug == 1:
+						barf(DBG, "Cleaned up brain mess.")
+				except (OSError, IOError), e:
+					barf(ERR, "Could not remove the files.")
+				barf(ACT, "Goodbye!")
 				sys.exit(0)
 
 			# Save changes

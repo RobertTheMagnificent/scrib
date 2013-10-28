@@ -1052,22 +1052,22 @@ class scrib:
 				# no arguments. list aliases words
 				if len(command_list) == 1:
 					if len(self.settings.aliases) == 0:
-						msg = "%sNo aliases" % self.settings.pubsym
+						msg = "%s No aliases" % self.settings.pubsym
 					else:
-						msg = "%sI will alias the word(s) %s." \
+						msg = "%s I will alias the word(s) %s." \
 							  % (self.settings.pubsym, ", ".join(self.settings.aliases.keys()))
 				# add every word listd to alias list
 				elif len(command_list) == 2:
 					if command_list[1][0] != '~': command_list[1] = '~' + command_list[1]
 					if command_list[1] in self.settings.aliases.keys():
-						msg = "%sThese words : %s are aliases to %s." \
+						msg = "%s These words : %s are aliases to %s." \
 							  % (
 							self.settings.pubsym, " ".join(self.settings.aliases[command_list[1]]), command_list[1] )
 					else:
-						msg = "%sThe alias %s is not known." % (self.settings.pubsym, command_list[1][1:])
+						msg = "%s The alias %s is not known." % (self.settings.pubsym, command_list[1][1:])
 				elif len(command_list) > 2:
 					#create the aliases
-					msg = "%sThe words : " % self.settings.pubsym
+					msg = "%s The words : " % self.settings.pubsym
 					if command_list[1][0] != '~': command_list[1] = '~' + command_list[1]
 					if not (command_list[1] in self.settings.aliases.keys()):
 						self.settings.aliases[command_list[1]] = [command_list[1][1:]]
@@ -1087,7 +1087,7 @@ class scrib:
 					'\n', ' ')
 			# Date command
 			elif command_list[0] == "!date":
-				msg = self.settings.pubsym + "It is ".join(i for i in os.popen('date').readlines())
+				msg = self.settings.pubsym + " It is ".join(i for i in os.popen('date').readlines())
 			# Quit
 			elif command_list[0] == "!quit":
 				# Close the brain

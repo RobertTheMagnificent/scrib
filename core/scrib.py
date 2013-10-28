@@ -328,7 +328,7 @@ class scrib:
 					self.lines = self.unpack(s)
 					if self.debug == 1:
 						barf(DBG, "Applying filter to adjust to new brain system.\n               This may take several minutes...")
-					self.lines = filter_message(self.lines, self)
+					self.auto_rebuild(self)
 					f = open("brain/lines.dat", "wb")
 					s = pickle.dumps(self.lines)
 					f.write(s)
@@ -625,13 +625,6 @@ class scrib:
 			else:
 				return
 
-
-			# single word reply: always output
-			#if len(message.split()) == 1:
-			#	if self.debug == 1:
-			#		barf(DBG, "Replying!")
-			#	io_module.output(message, args)
-			#	return
 			# empty. do not output
 			if message == "":
 				if self.debug == 1:

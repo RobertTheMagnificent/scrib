@@ -519,7 +519,7 @@ class scrib:
 			self.clean_up()
 
 			barf(SAV, "Brain saved.")
-            sys.exit(0)
+			sys.exit(0)
 
 	def clean_up(self):
 		if self.debug == 1:

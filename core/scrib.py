@@ -1054,8 +1054,8 @@ class scrib:
 
 			# remove a word from the censored list
 			elif command_list[0] == "!uncensor":
-                if self.settings.debug == 1:
-                    barf(DBG, "Uncensoring...")
+				if self.settings.debug == 1:
+					barf(DBG, "Uncensoring...")
 				# Remove words listed from the censor list
 				# eg !uncensor tom dick harry
 				for x in xrange(1, len(command_list)):
@@ -1194,10 +1194,10 @@ class scrib:
 				barf(ACT, "\"%s\" vaporized from brain." % x)
 
 	def reply(self, body):
+		"""
+		Reply to a line of text.
+		"""
 		try:
-			"""
-			Reply to a line of text.
-			"""
 			if self.settings.debug == 1:
 				barf(DBG, "Forming a reply...")
 
@@ -1211,15 +1211,14 @@ class scrib:
 			if len(words) == 0:
 				return ""
 
-
 			#remove words on the ignore list
-			#words = filter((lambda x: x not in self.settings.ignore_list and not x.isdigit() ), words)
 			words = [x for x in words if x not in self.settings.ignore_list and not x.isdigit()]
 
 			# Find rarest word (excluding those unknown)
 			index = []
 			known = -1
-			#The word has to bee seen in already 3 contexts differents for being choosen
+
+			# If the word is in at least three contexts, it can be chosen.
 			known_min = 3
 			for x in xrange(0, len(words)):
 				if self.words.has_key(words[x]):
@@ -1237,6 +1236,8 @@ class scrib:
 			if len(index) == 0:
 				return ""
 			word = index[randint(0, len(index) - 1)]
+			if self.settings.debug == 1:
+				barf(DBG, "Chosen root word: %s" % word)
 
 			# Build sentence backwards from "chosen" word
 			sentence = [word]

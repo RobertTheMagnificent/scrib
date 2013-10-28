@@ -237,9 +237,9 @@ class scrib:
 							"no_save": ("If True, Scrib doesn't save his brain and configuration to disk", "False")
 						   })
 
-		debug = self.settings.debug
+		self.debug = self.settings.debug
 
-		if debug == 1:
+		if self.debug == 1:
 			barf(DBG, "Class scrib initialized.")
 
 		# Brain stats
@@ -303,38 +303,43 @@ class scrib:
 				if c[:1] == 'y':
 					timestamp = get_time_for_file()
 					shutil.copyfile("brain/cortex.zip", "brain/cortex-%s.zip" % timestamp)
-					if debug == 1:
-						barf(DBG, "Backup saved to brain/cortex-%s.zip" % timestamp)
+					barf(ACT, "Backup saved to brain/cortex-%s.zip" % timestamp)
+					barf(ACT, "Starting update, may take a few moments.")
 					f = open("brain/words.dat", "rb")
+					if self.debug == 1:
+						barf(DBG, "Reading words...")
 					s = f.read()
 					f.close()
 					self.words = self.unpack(s)
 					del s
+					if self.debug == 1:
+						barf(DBG, "Saving words...")
+					f = open("brain/words.dat", "wb")
 					s = pickle.dumps(self.words)
 					f.write(s)
 					f.close()
 					del s
-					if debug == 1:
+					if self.debug == 1:
 						barf(DBG, "Words converted.")
+						barf(DBG, "Reading lines...")
 					f = open("brain/lines.dat", "rb")
 					s = f.read()
 					f.close()
 					self.lines = self.unpack(s)
-					if debug == 1:
+					if self.debug == 1:
 						barf(DBG, "Applying filter to adjust to new brain system.\n               This may take several minutes...")
-					f = open("brain/words.dat", "wb")
 					self.lines = filter_message(self.lines, self)
 					f = open("brain/lines.dat", "wb")
 					s = pickle.dumps(self.lines)
 					f.write(s)
 					f.close()
 					del s
-					if debug == 1:
+					if self.debug == 1:
 						barf(DBG, "Lines converted.")
 					f = open("brain/version", "wb")
 					f.write(self.version.brain)
 					f.close()
-					if debug == 1:
+					if self.debug == 1:
 						barf(DBG, "Version updated.")
 					barf(ACT, "Brain converted successfully! Continuing.")
 
@@ -428,7 +433,7 @@ class scrib:
 					file = open(filename, 'w+b')
 					file.write(data)
 					file.close()
-				if debug == 1:
+				if self.debug == 1:
 					barf(DBG, "Cortex saved.")
 			except:
 				barf(ERR, "No brain found, or it's broken. Attempting to restore...")
@@ -441,39 +446,39 @@ class scrib:
 			s = pickle.dumps(self.words)
 			f.write(s)
 			f.close()
-			if debug == 1:
+			if self.debug == 1:
 				barf(DBG, "Words saved.")
 			f = open("brain/lines.dat", "wb")
 			s = pickle.dumps(self.lines)
 			f.write(s)
 			f.close()
-			if debug == 1:
+			if self.debug == 1:
 				barf(DBG, "Lines saved.")
 
 			#save the version
 			#f = open("brain/version", "w")
 			#f.write(self.version.brain)
 			#f.close()
-			#if debug == 1:
+			#if self.debug == 1:
 			#	barf(DBG, "Version saved.")
 
 			#zip the files
 			f = zipfile.ZipFile('brain/cortex.zip', 'w', zipfile.ZIP_DEFLATED)
 			f.write('brain/words.dat')
-			if debug == 1:
+			if self.debug == 1:
 				barf(DBG, "Words zipped")
 			f.write('brain/lines.dat')
-			if debug == 1:
+			if self.debug == 1:
 				barf(DBG, "Lines zipped")
 			try:
 				f.write('brain/version')
-				if debug == 1:
+				if self.debug == 1:
 					barf(DBG, "Version zipped")
 			except:
 				f2 = open("brain/version", "w")
 				f2 = write(self.version.brain)
 				f.write('brain/version')
-				if debug == 1:
+				if self.debug == 1:
 					barf(DBG, "Version written.")
 			f.close()
 
@@ -489,7 +494,7 @@ class scrib:
 			wordlist.sort(lambda x, y: cmp(x[1], y[1]))
 			map((lambda x: f.write(str(x[0]) + "\n\r") ), wordlist)
 			f.close()
-			if debug == 1:
+			if self.debug == 1:
 				barf(DBG, "Words written.")
 
 			f = open("brain/sentences.dat", "w")
@@ -501,13 +506,13 @@ class scrib:
 			wordlist.sort(lambda x, y: cmp(y[1], x[1]))
 			map((lambda x: f.write(str(x[0]) + "\n") ), wordlist)
 			f.close()
-			if debug == 1:
+			if self.debug == 1:
 				barf(DBG, "Sentences written.")
 
 			if restart_timer is True:
 				self.autosave = threading.Timer(to_sec("125m"), self.save_all)
 				self.autosave.start()
-				if debug == 1:
+				if self.debug == 1:
 					barf(DBG, "Restart timer started.")
 
 			# Save settings
@@ -557,7 +562,7 @@ class scrib:
 		If not_quiet==0 only respond with taught responses.
 		"""
 
-		if debug == 1:
+		if self.debug == 1:
 			barf(DBG, "Processing message...")
 
 		# add trailing space so sentences are broken up correctly
@@ -570,34 +575,34 @@ class scrib:
 			return
 
 		# Filter out garbage and do some formatting
-		if debug == 1:
+		if self.debug == 1:
 			barf(DBG, "Filtering message...")
 		body = filter_message(body, self)
 
 		# Learn from input
 		if learn == 1:
-			if debug == 1:
+			if self.debug == 1:
 				barf(DBG, "Learning from: " + body)
 			self.learn(body)
 
 		# Make a reply if desired
 		if randint(0, 99) < replyrate:
-			if debug == 1:
+			if self.debug == 1:
 				barf(DBG, "Decided to answer...")
 			message = ""
 
 			#Look if we can find a prepared answer
 			if dbread(body):
-				if debug == 1:
+				if self.debug == 1:
 					barf(DBG, "Using prepared answer.")
 				message = unfilter_reply(dbread(body))
-				if debug == 1:
+				if self.debug == 1:
 					barf(DBG, "Replying with: " + message)
 			if not_quiet == 1:
 				for sentence in self.answers.sentences.keys():
 					pattern = "^%s$" % sentence
 					if re.search(pattern, body):
-						if debug == 1:
+						if self.debug == 1:
 							barf(DBG, "Searching for reply...")
 						message = self.answers.sentences[sentence][
 							randint(0, len(self.answers.sentences[sentence]) - 1)]
@@ -609,13 +614,13 @@ class scrib:
 							self.unfilterd[body] = 0
 
 				if message == "":
-					if debug == 1:
+					if self.debug == 1:
 						barf(DBG, "No prepared answer; thinking...")
 					message = self.reply(body)
-					if debug == 1:
+					if self.debug == 1:
 						barf(DBG, "Reply formed; unfiltering...")
 					message = unfilter_reply(message)
-					if debug == 1:
+					if self.debug == 1:
 						barf(DBG, "Unfiltered message: " + message)
 			else:
 				return
@@ -623,26 +628,26 @@ class scrib:
 
 			# single word reply: always output
 			#if len(message.split()) == 1:
-			#	if debug == 1:
+			#	if self.debug == 1:
 			#		barf(DBG, "Replying!")
 			#	io_module.output(message, args)
 			#	return
 			# empty. do not output
 			if message == "":
-				if debug == 1:
+				if self.debug == 1:
 					barf(DBG, "Not replying; message empty.")
 				return
-			if debug == 1:
+			if self.debug == 1:
 				replying = "Not replying."
 			#  else output
 			if len(message) >= self.settings.length:
 				time.sleep(3)
 			else:
 				time.sleep(.1 * len(message))
-				if debug == 1:
+				if self.debug == 1:
 					replying = "Reply sent."
 				io_module.output(message, args)
-			if debug == 1:
+			if self.debug == 1:
 				barf(DBG, replying)
 
 	def do_commands(self, io_module, body, args, owner):
@@ -897,7 +902,7 @@ class scrib:
 
 			# Remove rare words
 			elif command_list[0] == "!prune":
-				if debug == 1:
+				if self.debug == 1:
 					barf(DBG, "Pruning...")
 				t = time.time()
 
@@ -954,7 +959,7 @@ class scrib:
 
 			# Barf the contents to avoid chat spamming.
 			elif command_list[0] == "!context":
-				if debug == 1:
+				if self.debug == 1:
 					barf(DBG, "Checking contexts...")
 
 				# build context we are looking for
@@ -1006,7 +1011,7 @@ class scrib:
 
 			# Remove a word from the vocabulary [use with care]
 			elif command_list[0] == "!unlearn":
-				if debug == 1:
+				if self.debug == 1:
 					barf(DBG, "Unlearning...")
 				# build context we are looking for
 				context = " ".join(command_list[1:])
@@ -1059,7 +1064,7 @@ class scrib:
 
 			# remove a word from the censored list
 			elif command_list[0] == "!uncensor":
-				if debug == 1:
+				if self.debug == 1:
 					barf(DBG, "Uncensoring...")
 				# Remove words listed from the censor list
 				# eg !uncensor tom dick harry
@@ -1203,7 +1208,7 @@ class scrib:
 		Reply to a line of text.
 		"""
 		try:
-			if debug == 1:
+			if self.debug == 1:
 				barf(DBG, "Forming a reply...")
 
 			# split sentences into list of words
@@ -1241,7 +1246,7 @@ class scrib:
 			if len(index) == 0:
 				return ""
 			word = index[randint(0, len(index) - 1)]
-			if debug == 1:
+			if self.debug == 1:
 				barf(DBG, "Chosen root word: %s" % word)
 
 			# Build sentence backwards from "chosen" word
@@ -1420,7 +1425,7 @@ class scrib:
 
 			# Ignore if the sentence starts with an exclamation
 			if body[0:1] == "!":
-				if debug == 1:
+				if self.debug == 1:
 					barf(ERR, "Not learning: %s" % words)
 				return
 

@@ -389,11 +389,9 @@ if __name__ == "__main__":
 		pass
 	except:
 		traceback.print_exc()
-		c = raw_input(
-			"\033[94m" + scrib.get_time() + " \033[91m[!] Oh no, I've crashed! Would you like to save my brain? (yes/no)\033[0m")
+		c = raw_input(scrib.raw_barf(ERR, "Oh no, I've crashed! Would you like to save my brain? (Y/n) ")
 		if c[:1] == 'n':
 			sys.exit(0)
 	bot.disconnect(bot.settings.quitmsg)
 	my_scrib.save_all(False)
 	del my_scrib
-	sys.exit(0)

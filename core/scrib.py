@@ -427,24 +427,23 @@ class scrib:
 
 	def save_all(self, restart_timer=True):
 		if self.settings.no_save != "True":
-			nozip = "no"
-			barf(SAV, "Writing to my brain...\033[0m")
+			barf(SAV, "Writing to my brain...")
 
-			try:
-				zfile = zipfile.ZipFile('brain/cortex.zip', 'r')
-				for filename in zfile.namelist():
-					data = zfile.read(filename)
-					file = open(filename, 'w+b')
-					file.write(data)
-					file.close()
-				if self.debug == 1:
-					barf(DBG, "Cortex saved.")
-			except:
-				barf(ERR, "No brain found, or it's broken. Attempting to restore...")
-				try:
-					os.remove('brain/cortex.zip')
-				except:
-					pass
+			#try:
+			#	zfile = zipfile.ZipFile('brain/cortex.zip', 'r')
+			#	for filename in zfile.namelist():
+			#		data = zfile.read(filename)
+			#		file = open(filename, 'w+b')
+			#		file.write(data)
+			#		file.close()
+			#	if self.debug == 1:
+			#		barf(DBG, "Cortex saved.")
+			#except:
+			#	barf(ERR, "No brain found, or it's broken. Attempting to restore...")
+			#	try:
+			#		os.remove('brain/cortex.zip')
+			#	except:
+			#		pass
 
 			f = open("brain/words.dat", "wb")
 			s = pickle.dumps(self.words)
@@ -469,15 +468,16 @@ class scrib:
 				barf(DBG, "Lines zipped")
 			try:
 				f.write('brain/version')
+				f.close()
 				if self.debug == 1:
 					barf(DBG, "Version zipped")
 			except:
-				f2 = open("brain/version", "w")
-				f2 = write(self.version.brain)
+				f = open("brain/version", "w")
+				f = write(self.version.brain)
 				f.write('brain/version')
+				f.close()
 				if self.debug == 1:
 					barf(DBG, "Version written.")
-			f.close()
 
 			f = open("brain/words.dat", "w")
 			# write each words known

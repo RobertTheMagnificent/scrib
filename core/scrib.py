@@ -328,7 +328,7 @@ class scrib:
 					self.lines = self.unpack(s)
 					if self.debug == 1:
 						barf(DBG, "Applying filter to adjust to new brain system.\n               This may take several minutes...")
-					self.auto_rebuild(self)
+					self.auto_rebuild()
 					f = open("brain/lines.dat", "wb")
 					s = pickle.dumps(self.lines)
 					f.write(s)

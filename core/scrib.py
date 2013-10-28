@@ -556,6 +556,7 @@ class scrib:
 
 		# Parse commands
 		if body[0] == "!":
+			barf(DBG, "Parsing commands, not generating reply...")
 			self.do_commands(io_module, body, args, owner)
 			return
 
@@ -563,13 +564,11 @@ class scrib:
 		if self.settings.debug == 1:
 			barf(DBG, "Filtering message...")
 		body = filter_message(body, self)
-		if self.settings.debug == 1:
-			barf(DBG, "Filtered message: " + body)
 
 		# Learn from input
 		if learn == 1:
 			if self.settings.debug == 1:
-				barf(DBG, "Learning: " + body)
+				barf(DBG, "Learning from: " + body)
 			self.learn(body)
 
 		# Make a reply if desired
@@ -584,7 +583,7 @@ class scrib:
 					barf(DBG, "Using prepared answer.")
 				message = unfilter_reply(dbread(body))
 				if self.settings.debug == 1:
-					barf(DBG, "Unfiltered message: " + message)
+					barf(DBG, "Replying with: " + message)
 			if not_quiet == 1:
 				for sentence in self.answers.sentences.keys():
 					pattern = "^%s$" % sentence
@@ -622,7 +621,7 @@ class scrib:
 			# empty. do not output
 			if message == "":
 				if self.settings.debug == 1:
-					barf(DBG, "Not replying, message empty.")
+					barf(DBG, "Not replying; message empty.")
 				return
 			if self.settings.debug == 1:
 				replying = "Not replying."
@@ -632,7 +631,7 @@ class scrib:
 			else:
 				time.sleep(.1 * len(message))
 				if self.settings.debug == 1:
-					replying = "Replying!"
+					replying = "Reply sent."
 				io_module.output(message, args)
 			if self.settings.debug == 1:
 				barf(DBG, replying)
@@ -646,7 +645,8 @@ class scrib:
 		command_list = body.split()
 		command_list[0] = command_list[0]
 
-		# Guest commands.
+		# Guest commands. These should be executable by anyone
+		# Unless private = 1
 
 		# Version string
 		if command_list[0] == "!version":
@@ -654,6 +654,8 @@ class scrib:
 			core = self.version.core
 			msg = "%s I am a scrib version %s. My brain version is %s." % (self.settings.pubsym, core, brain)
 
+
+		# These, however, should never be public.
 
 		# Learn/Teach commands
 		if command_list[0] == "!teach" or command_list[0] == "!learn":
@@ -698,7 +700,7 @@ class scrib:
 				except:
 					msg = "%s Sorry, I couldn't forget that!" % (self.settings.pubsym)
 			else:
-				msg = "You have to teach me before you can make me forget it!"
+				msg = "%s You have to teach me before you can make me forget it!" % self.settings.pubsym
 
 		# Find response command
 		if command_list[0] == "!find":
@@ -792,6 +794,7 @@ class scrib:
 				msg = "%s Brain has been saved!" % self.settings.pubsym
 
 			# Command list
+			# TODO: Help should broken into Guest and Owner modules
 			elif command_list[0] == "!help":
 				if len(command_list) > 1:
 					# Help for a specific command
@@ -820,7 +823,6 @@ class scrib:
 					limit = int(command_list[1])
 					self.settings.max_words = limit
 					msg += "now " + command_list[1]
-
 
 			# Check for broken links in the brain
 			elif command_list[0] == "!check":
@@ -859,7 +861,7 @@ class scrib:
 					   num_bad)
 
 			# Rebuild the brain by discarding the word links and
-			# re-parsing each line
+			# Re-parsing each line
 			elif command_list[0] == "!rebuild":
 				if self.settings.learning == 1:
 					t = time.time()
@@ -876,7 +878,7 @@ class scrib:
 					for k in old_lines.keys():
 						self.learn(old_lines[k][0], old_lines[k][1])
 
-					msg = "%sRebuilt brain in %0.2fs. Words %d (%+d), contexts %d (%+d)." % \
+					msg = "%s Rebuilt brain in %0.2fs. Words %d (%+d), contexts %d (%+d)." % \
 						  (self.settings.pubsym,
 						   time.time() - t,
 						   old_num_words,
@@ -886,6 +888,8 @@ class scrib:
 
 			# Remove rare words
 			elif command_list[0] == "!prune":
+				if self.settings.debug == 1:
+					barf(DBG, "Pruning...")
 				t = time.time()
 
 				list = []
@@ -926,7 +930,7 @@ class scrib:
 				for w in list[0:]:
 					self.unlearn(w)
 
-				msg = "%sPurged brain in %0.2fs. %d words removed." % \
+				msg = "%s Purged brain in %0.2fs. %d words removed." % \
 					  (self.settings.pubsym,
 					   time.time() - t,
 					   count)
@@ -939,10 +943,10 @@ class scrib:
 				new = command_list[2]
 				msg = self.replace(old, new)
 
-			# Print contexts [flooding...:-]
+			# Barf the contents to avoid chat spamming.
 			elif command_list[0] == "!context":
-				# This is a large lump of data and should
-				# probably be printed, not module.output XXX
+				if self.settings.debug == 1:
+					barf(DBG, "Checking contexts...")
 
 				# build context we are looking for
 				context = " ".join(command_list[1:])
@@ -962,6 +966,7 @@ class scrib:
 					# get context
 					ctxt = self.lines[x][0]
 					# add leading whitespace for easy sloppy search code
+					# TODO Find a better, less sloppy way to do this crap
 					ctxt = " " + ctxt + " "
 					if ctxt.find(context) != -1:
 						# Avoid duplicates (2 of a word
@@ -985,11 +990,6 @@ class scrib:
 					x += 1
 				if len(c) == 5:
 					return
-				# Disabling as it gets barfed into console.
-				#if len(c) > 10:
-				#	number = len(c)-10
-				#	barf(ACT, "...(%s lines skipped)..." % number)
-				#x = len(c) - 5
 				if x < 5:
 					x = 5
 				while x < len(c):
@@ -1001,6 +1001,8 @@ class scrib:
 
 			# Remove a word from the vocabulary [use with care]
 			elif command_list[0] == "!unlearn":
+				if self.settings.debug == 1:
+					barf(DBG, "Unlearning...")
 				# build context we are looking for
 				context = " ".join(command_list[1:])
 				if context == "":
@@ -1052,17 +1054,19 @@ class scrib:
 
 			# remove a word from the censored list
 			elif command_list[0] == "!uncensor":
-				# Remove everyone listd from the ignore list
-				# eg !unignore tom dick harry
+                if self.settings.debug == 1:
+                    barf(DBG, "Uncensoring...")
+				# Remove words listed from the censor list
+				# eg !uncensor tom dick harry
 				for x in xrange(1, len(command_list)):
 					try:
 						self.settings.censored.remove(command_list[x])
-						msg = "%s%s is uncensored." % (self.settings.pubsym, command_list[x])
+						msg = "%s %s is uncensored." % (self.settings.pubsym, command_list[x])
 					except ValueError, e:
 						pass
 
 			elif command_list[0] == "!alias":
-				# no arguments. list aliases words
+				# List aliases words
 				if len(command_list) == 1:
 					if len(self.settings.aliases) == 0:
 						msg = "%s No aliases" % self.settings.pubsym
@@ -1450,8 +1454,7 @@ class scrib:
 
 			cleanbody = " ".join(words)
 
-			# This line no longer works in Python 2.7.5...
-			#hashval = hash(cleanbody)
+			# This allows for use on 64-bit systems
 			hashval = ctypes.c_int32(hash(cleanbody)).value
 
 			# Check that context isn't already known

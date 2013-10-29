@@ -3,6 +3,7 @@
 
 from random import *
 from barf import *
+from plugins import PluginManager
 import ctypes
 import sys
 import os
@@ -185,13 +186,12 @@ def filter_message(message, bot):
 
 	return message
 
-
 class scrib:
 	import cfgfile
 
 	# Main command list
 	commandlist = "Owner commands:\n!alias, !censor, !check, !context, !learning, !limit, !prune, !rebuild, !replace, !save, !uncensor, !unlearn\nPublic commands:\n!date, !fortune, !help, !known, !owner, !version, !words"
-	commanddict = {
+	core_commanddict = {
 		"alias": "Usage: !alias : Show the difference aliases\n!alias <alias> : show the words attached to this alias\n!alias <alias> <word> : link the word to the alias.",
 		"censor": "Usage: !censor [word1 [...]]\nPrevent the bot using one or more words. Without arguments lists the currently censored words.",
 		"check": "Usage: !check\nChecks the brain for broken links. Shouldn't happen, but worth trying if you get KeyError crashes.",
@@ -217,6 +217,8 @@ class scrib:
 		"version": "Usage: !version\nDisplay what version of Scrib we are running.",
 		"words": "Usage: !words\nDisplay how many words are known."
 	}
+
+	commanddict = dict(core_commanddict.items() + PluginManager.ScribPlugin.plugin_commands.items())
 
 	def __init__(self):
 		"""
@@ -428,6 +430,7 @@ class scrib:
 		if self.settings.no_save != "True":
 			barf(SAV, "Writing to my brain...")
 
+			# In the process of cleaning this.
 			#try:
 			#	zfile = zipfile.ZipFile('brain/cortex.zip', 'r')
 			#	for filename in zfile.namelist():
@@ -574,7 +577,9 @@ class scrib:
 
 		# Parse commands
 		if body[0] == "!":
-			barf(DBG, "Parsing commands, not generating reply...")
+			barf(DBG, "Parsing commands...")
+			#if body[0] not in commandlist:
+				# do something
 			self.do_commands(io_module, body, args, owner)
 			return
 

@@ -23,7 +23,7 @@ IRC._remove_connection = my_remove_connection
 
 import scrib
 import cfgfile
-import PluginManager
+from plugins import PluginManager
 import traceback
 import thread
 
@@ -36,7 +36,6 @@ class ModIRC(SingleServerIRCBot):
 
 	# We are going to store the owner's host mask :3
 	owner_mask = []
-	commanddict = dict(scrib.commanddict.items() + PluginManager.ScribPlugin.plugin_commands.items())
 
 	def __init__(self, my_scrib, args):
 		"""
@@ -298,7 +297,8 @@ class ModIRC(SingleServerIRCBot):
 				scrib.barf(scrib.DBG, "Command: %s" % command_list[0])
 				scrib.barf(scrib.DBG, "Command list: %s" % str(command_list))
 			if command_list[0][1:] in self.commanddict:
-				msg = "%s %s" % (scrib.settings.pubsym, PluginManager.sendMessage(command_list[0][1:], command_list, self, c))
+				msg = "%s %s" % (self.scrib.settings.pubsym, PluginManager.sendMessage(command_list[0][1:], command_list, self, c))
+
 
 			if command_list[0] == "!reload" and len(command_list) == 2:
 				msg = PluginManager.reloadPlugin(command_list[1])

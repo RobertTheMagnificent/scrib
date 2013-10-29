@@ -1,8 +1,10 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
+import datetime
 import time
 
 # Message Codes
+DEF = '\033[0m'
 ACT = '\033[93m [~] '
 MSG = '\033[94m [-] '
 SAV = '\033[92m [#] '
@@ -24,5 +26,11 @@ def get_time():
 	"""
 	return time.strftime("\033[0m[%H:%M:%S]", time.localtime(time.time()))
 
+def get_time_for_file():
+	return "%s-%s" % (datetime.date.today(), time.strftime("%H%M%S",time.localtime(time.time())))
+
 def barf(msg_code, message):
-		print get_time() + msg_code + message
+	print raw_barf(msg_code, message)
+
+def raw_barf(msg_code, message):
+	return get_time() + msg_code + message + DEF

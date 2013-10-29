@@ -6,6 +6,7 @@ from barf import *
 import ctypes
 import sys
 import os
+import shutil
 import fileinput
 import cPickle as pickle
 import struct
@@ -92,8 +93,7 @@ def unfilter_reply(message):
 	message = message.replace(" ; ", "; ")
 	# Fixes I and I contractions
 	message = message.replace(" i ", " I ")
-	# This was causing issues with words ending with 'i'
-	#message = message.replace(" i'", " I'")
+	message = message.replace(" i'", " I'")
 	# Fixes the common issues with the teach system
 	message = message.replace("$C4", "||")
 	message = message.replace("$b7", "|-:")
@@ -245,7 +245,9 @@ class scrib:
 							"no_save": ("If True, Scrib doesn't save his brain and configuration to disk", "False")
 						   })
 
-		if self.settings.debug == 1:
+		self.debug = self.settings.debug
+
+		if self.debug == 1:
 			barf(DBG, "Class scrib initialized.")
 
 		# Brain stats
@@ -300,42 +302,58 @@ class scrib:
 		try:
 			f = open("brain/version", "rb")
 			s = f.read()
+			barf(MSG, "Current brain version is %s " % s)
 			f.close()
 			if s != self.version.brain:
 				import marshal
-				barf(ERR, "Brain version incorrect. Attempting to convert.")
-				f = open("brain/words.dat", "rb")
-				s = f.read()
-				f.close()
-				self.words = marshal.loads(s)
-				del s
-				f = open("brain/words.dat", "wb")
-				s = pickle.dumps(self.words)
-				f.write(s)
-				f.close()
-				del s
-				if self.settings.debug == 1:
-					barf(DBG, "Words converted.")
+				barf(ERR, "Brain version incorrect.")
+				c = raw_input(raw_barf(ERR, "Would you like to update the brain? (Y/n) "))
+				if c[:1].lower() != 'n':
+					timestamp = get_time_for_file()
+					shutil.copyfile("brain/cortex.zip", "brain/cortex-%s.zip" % timestamp)
+					barf(ACT, "Backup saved to brain/cortex-%s.zip" % timestamp)
+					barf(ACT, "Starting update, may take a few moments.")
+					f = open("brain/words.dat", "rb")
+					if self.debug == 1:
+						barf(DBG, "Reading words...")
+					s = f.read()
+					f.close()
+					self.words = self.unpack(s)
+					del s
+					if self.debug == 1:
+						barf(DBG, "Saving words...")
+					f = open("brain/words.dat", "wb")
+					s = pickle.dumps(self.words)
+					f.write(s)
+					f.close()
+					del s
+					if self.debug == 1:
+						barf(DBG, "Words converted.")
+						barf(DBG, "Reading lines...")
+					f = open("brain/lines.dat", "rb")
+					s = f.read()
+					f.close()
+					self.lines = self.unpack(s)
+					if self.debug == 1:
+						barf(DBG, "Applying filter to adjust to new brain system.\n               This may take several minutes...")
+					self.auto_rebuild()
+					f = open("brain/lines.dat", "wb")
+					s = pickle.dumps(self.lines)
+					f.write(s)
+					f.close()
+					del s
+					if self.debug == 1:
+						barf(DBG, "Lines converted.")
+					f = open("brain/version", "wb")
+					f.write(self.version.brain)
+					f.close()
+					if self.debug == 1:
+						barf(DBG, "Version updated.")
+					barf(ACT, "Brain converted successfully! Continuing.")
 
-				f = open("brain/lines.dat", "rb")
-				s = f.read()
-				f.close()
-				self.lines = marshal.loads(s)
-				f = open("brain/lines.dat", "wb")
-				s = pickle.dumps(self.lines)
-				f.write(s)
-				f.close()
-				del s
-				if self.settings.debug == 1:
-					barf(DBG, "Lines converted.")
-
-				f = open("brain/version", "wb")
-				f.write(self.version.brain)
-				f.close()
-				if self.settings.debug == 1:
-					barf(DBG, "Version updated.")
-
-				barf(ACT, "Brain converted successfully! Continuing.")
+					if self.debug == 1:
+						barf(DBG, "Brain saved.")
+					self.clean_up()
 
 			f = open("brain/words.dat", "rb")
 			s = f.read()
@@ -407,66 +425,67 @@ class scrib:
 
 		self.settings.save()
 
+	# For unpacking a brain. This is just quick and dirty, should be replaced...
+	def unpack(self, file):
+		if self.version.brain == "0.1.0" or self.version.brain == "0.1.1":
+			stuff = marshal.loads(file)
+		else:
+			stuff = pickle.loads(file)
+		return stuff
+
 	def save_all(self, restart_timer=True):
 		if self.settings.no_save != "True":
-			nozip = "no"
-			barf(SAV, "Writing to my brain...\033[0m")
+			barf(SAV, "Writing to my brain...")
 
-			try:
-				zfile = zipfile.ZipFile('brain/cortex.zip', 'r')
-				for filename in zfile.namelist():
-					data = zfile.read(filename)
-					file = open(filename, 'w+b')
-					file.write(data)
-					file.close()
-				if self.settings.debug == 1:
-					barf(DBG, "Cortex saved.")
-			except:
-				barf(ERR, "No brain found, or it's broken. Attempting to restore...")
-				try:
-					os.remove('brain/cortex.zip')
-				except:
-					pass
+			#try:
+			#	zfile = zipfile.ZipFile('brain/cortex.zip', 'r')
+			#	for filename in zfile.namelist():
+			#		data = zfile.read(filename)
+			#		file = open(filename, 'w+b')
+			#		file.write(data)
+			#		file.close()
+			#	if self.debug == 1:
+			#		barf(DBG, "Cortex saved.")
+			#except:
+			#	barf(ERR, "No brain found, or it's broken. Attempting to restore...")
+			#	try:
+			#		os.remove('brain/cortex.zip')
+			#	except:
+			#		pass
 
 			f = open("brain/words.dat", "wb")
 			s = pickle.dumps(self.words)
 			f.write(s)
 			f.close()
-			if self.settings.debug == 1:
+			if self.debug == 1:
 				barf(DBG, "Words saved.")
 			f = open("brain/lines.dat", "wb")
 			s = pickle.dumps(self.lines)
 			f.write(s)
 			f.close()
-			if self.settings.debug == 1:
+			if self.debug == 1:
 				barf(DBG, "Lines saved.")
-
-			#save the version
-			f = open("brain/version", "w")
-			f.write(self.version.brain)
-			f.close()
-			if self.settings.debug == 1:
-				barf(DBG, "Version saved.")
 
 			#zip the files
 			f = zipfile.ZipFile('brain/cortex.zip', 'w', zipfile.ZIP_DEFLATED)
 			f.write('brain/words.dat')
-			if self.settings.debug == 1:
+			if self.debug == 1:
 				barf(DBG, "Words zipped")
 			f.write('brain/lines.dat')
-			if self.settings.debug == 1:
+			if self.debug == 1:
 				barf(DBG, "Lines zipped")
 			try:
 				f.write('brain/version')
-				if self.settings.debug == 1:
+				f.close()
+				if self.debug == 1:
 					barf(DBG, "Version zipped")
 			except:
-				f2 = open("brain/version", "w")
-				f2 = write(self.version.brain)
+				f = open("brain/version", "w")
+				f = write(self.version.brain)
 				f.write('brain/version')
-				if self.settings.debug == 1:
+				f.close()
+				if self.debug == 1:
 					barf(DBG, "Version written.")
-			f.close()
 
 			f = open("brain/words.dat", "w")
 			# write each words known
@@ -480,7 +499,7 @@ class scrib:
 			wordlist.sort(lambda x, y: cmp(x[1], y[1]))
 			map((lambda x: f.write(str(x[0]) + "\n\r") ), wordlist)
 			f.close()
-			if self.settings.debug == 1:
+			if self.debug == 1:
 				barf(DBG, "Words written.")
 
 			f = open("brain/sentences.dat", "w")
@@ -492,27 +511,34 @@ class scrib:
 			wordlist.sort(lambda x, y: cmp(y[1], x[1]))
 			map((lambda x: f.write(str(x[0]) + "\n") ), wordlist)
 			f.close()
-			if self.settings.debug == 1:
+			if self.debug == 1:
 				barf(DBG, "Sentences written.")
 
 			if restart_timer is True:
 				self.autosave = threading.Timer(to_sec("125m"), self.save_all)
 				self.autosave.start()
-				if self.settings.debug == 1:
+				if self.debug == 1:
 					barf(DBG, "Restart timer started.")
 
 			# Save settings
 			self.settings.save()
 			self.brainstats.save()
 			self.version.save()
+			self.clean_up()
 
 			barf(SAV, "Brain saved.")
+			sys.exit(1)
 
-		# Cleaning up the shit
+	def clean_up(self):
+		barf(DBG, "clean_up used but not implemented...")
+		#if self.debug == 1:
+		#	barf(DBG,"Cleaning up brain.")
 		#try:
-		#	os.remove('brain/words.dat')
-		#	os.remove('brain/lines.dat')
-		#	os.remove('brain/version')
+			#os.remove('brain/words.dat')
+			#os.remove('brain/lines.dat')
+			#os.remove('brain/version')
+			#if self.debug == 1:
+			#	barf(DBG, "Cleaned up brain mess.")
 		#except (OSError, IOError), e:
 		#	barf(ERR, "Could not remove the files.")
 
@@ -530,7 +556,8 @@ class scrib:
 			self.brainstats.num_contexts = 0
 
 			for k in old_lines.keys():
-				self.learn(old_lines[k][0], old_lines[k][1])
+				filtered_line = filter_message(old_lines[k][0], self)
+				self.learn(filtered_line, old_lines[k][1])
 
 			# Restarts the timer
 			self.autorebuild = threading.Timer(to_sec("71h"), self.auto_rebuild)
@@ -548,7 +575,7 @@ class scrib:
 		If not_quiet==0 only respond with taught responses.
 		"""
 
-		if self.settings.debug == 1:
+		if self.debug == 1:
 			barf(DBG, "Processing message...")
 
 		# add trailing space so sentences are broken up correctly
@@ -561,34 +588,34 @@ class scrib:
 			return
 
 		# Filter out garbage and do some formatting
-		if self.settings.debug == 1:
+		if self.debug == 1:
 			barf(DBG, "Filtering message...")
 		body = filter_message(body, self)
 
 		# Learn from input
 		if learn == 1:
-			if self.settings.debug == 1:
+			if self.debug == 1:
 				barf(DBG, "Learning from: " + body)
 			self.learn(body)
 
 		# Make a reply if desired
 		if randint(0, 99) < replyrate:
-			if self.settings.debug == 1:
+			if self.debug == 1:
 				barf(DBG, "Decided to answer...")
 			message = ""
 
 			#Look if we can find a prepared answer
 			if dbread(body):
-				if self.settings.debug == 1:
+				if self.debug == 1:
 					barf(DBG, "Using prepared answer.")
 				message = unfilter_reply(dbread(body))
-				if self.settings.debug == 1:
+				if self.debug == 1:
 					barf(DBG, "Replying with: " + message)
 			if not_quiet == 1:
 				for sentence in self.answers.sentences.keys():
 					pattern = "^%s$" % sentence
 					if re.search(pattern, body):
-						if self.settings.debug == 1:
+						if self.debug == 1:
 							barf(DBG, "Searching for reply...")
 						message = self.answers.sentences[sentence][
 							randint(0, len(self.answers.sentences[sentence]) - 1)]
@@ -600,40 +627,33 @@ class scrib:
 							self.unfilterd[body] = 0
 
 				if message == "":
-					if self.settings.debug == 1:
+					if self.debug == 1:
 						barf(DBG, "No prepared answer; thinking...")
 					message = self.reply(body)
-					if self.settings.debug == 1:
+					if self.debug == 1:
 						barf(DBG, "Reply formed; unfiltering...")
 					message = unfilter_reply(message)
-					if self.settings.debug == 1:
+					if self.debug == 1:
 						barf(DBG, "Unfiltered message: " + message)
 			else:
 				return
 
-
-			# single word reply: always output
-			#if len(message.split()) == 1:
-			#	if self.settings.debug == 1:
-			#		barf(DBG, "Replying!")
-			#	io_module.output(message, args)
-			#	return
 			# empty. do not output
 			if message == "":
-				if self.settings.debug == 1:
+				if self.debug == 1:
 					barf(DBG, "Not replying; message empty.")
 				return
-			if self.settings.debug == 1:
+			if self.debug == 1:
 				replying = "Not replying."
 			#  else output
 			if len(message) >= self.settings.length:
 				time.sleep(3)
 			else:
 				time.sleep(.1 * len(message))
-				if self.settings.debug == 1:
+				if self.debug == 1:
 					replying = "Reply sent."
 				io_module.output(message, args)
-			if self.settings.debug == 1:
+			if self.debug == 1:
 				barf(DBG, replying)
 
 	def do_commands(self, io_module, body, args, owner):
@@ -790,6 +810,7 @@ class scrib:
 		if owner == 1:
 			# Save the brain
 			if command_list[0] == "!save":
+				msg = "%s Saving brain..." % self.settings.pubsym
 				self.save_all(False)
 				msg = "%s Brain has been saved!" % self.settings.pubsym
 
@@ -888,7 +909,7 @@ class scrib:
 
 			# Remove rare words
 			elif command_list[0] == "!prune":
-				if self.settings.debug == 1:
+				if self.debug == 1:
 					barf(DBG, "Pruning...")
 				t = time.time()
 
@@ -945,7 +966,7 @@ class scrib:
 
 			# Barf the contents to avoid chat spamming.
 			elif command_list[0] == "!context":
-				if self.settings.debug == 1:
+				if self.debug == 1:
 					barf(DBG, "Checking contexts...")
 
 				# build context we are looking for
@@ -1001,7 +1022,7 @@ class scrib:
 
 			# Remove a word from the vocabulary [use with care]
 			elif command_list[0] == "!unlearn":
-				if self.settings.debug == 1:
+				if self.debug == 1:
 					barf(DBG, "Unlearning...")
 				# build context we are looking for
 				context = " ".join(command_list[1:])
@@ -1054,7 +1075,7 @@ class scrib:
 
 			# remove a word from the censored list
 			elif command_list[0] == "!uncensor":
-				if self.settings.debug == 1:
+				if self.debug == 1:
 					barf(DBG, "Uncensoring...")
 				# Remove words listed from the censor list
 				# eg !uncensor tom dick harry
@@ -1099,16 +1120,16 @@ class scrib:
 
 			# Fortune command
 			elif command_list[0] == "!fortune":
-				msg = self.settings.pubsym + "".join([i for i in os.popen('fortune').readlines()]).replace('\n\n',
-																										   '\n').replace(
-					'\n', ' ')
+				msg = self.settings.pubsym + "" \
+					.join([i for i in os.popen('fortune').readlines()]).replace('\n\n','\n').replace('\n', ' ')
+				msg = filter_message(msg)
 			# Date command
 			elif command_list[0] == "!date":
 				msg = self.settings.pubsym + " It is ".join(i for i in os.popen('date').readlines())
 			# Quit
 			elif command_list[0] == "!quit":
 				# Close the brain
-				barf(SAV, "Saved my brain. Goodbye!")
+				barf(ACT, "Goodbye!")
 				sys.exit(0)
 
 			# Save changes
@@ -1198,7 +1219,7 @@ class scrib:
 		Reply to a line of text.
 		"""
 		try:
-			if self.settings.debug == 1:
+			if self.debug == 1:
 				barf(DBG, "Forming a reply...")
 
 			# split sentences into list of words
@@ -1236,7 +1257,7 @@ class scrib:
 			if len(index) == 0:
 				return ""
 			word = index[randint(0, len(index) - 1)]
-			if self.settings.debug == 1:
+			if self.debug == 1:
 				barf(DBG, "Chosen root word: %s" % word)
 
 			# Build sentence backwards from "chosen" word
@@ -1415,7 +1436,7 @@ class scrib:
 
 			# Ignore if the sentence starts with an exclamation
 			if body[0:1] == "!":
-				if self.settings.debug == 1:
+				if self.debug == 1:
 					barf(ERR, "Not learning: %s" % words)
 				return
 

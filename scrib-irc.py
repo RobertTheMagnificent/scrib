@@ -264,7 +264,8 @@ class ModIRC(SingleServerIRCBot):
 			for x in self.channels[target].users():
 				x = re.sub("[\&\%\+\@\~]","", x)
 				if x:
-					body = body.replace(x+":", "#nick:")
+					# Disabled due to bug #76
+					#body = body.replace(x+":", "#nick:")
 					body = body.replace("@ "+x, "@ #nick")
 
 		if body == "": return
@@ -293,7 +294,7 @@ class ModIRC(SingleServerIRCBot):
 		### Owner commands (Which is all of them for now)
 		if source in self.owners and e.source() in self.owner_mask:
 			# Only accept commands that are in the Command List
-			if self.scrib.settings.debug == 1:
+			if self.scrib.debug == 1:
 				scrib.barf(scrib.DBG, "Command: %s" % command_list[0])
 				scrib.barf(scrib.DBG, "Command list: %s" % str(command_list))
 			if command_list[0][1:] in self.commanddict:
@@ -389,8 +390,7 @@ if __name__ == "__main__":
 		pass
 	except:
 		traceback.print_exc()
-		c = raw_input(
-			"\033[94m" + scrib.get_time() + " \033[91m[!] Oh no, I've crashed! Would you like to save my brain? (yes/no)\033[0m")
+		c = raw_input(scrib.raw_barf(ERR, "Oh no, I've crashed! Would you like to save my brain? (Y/n) ")
 		if c[:1] == 'n':
 			sys.exit(0)
 	bot.disconnect(bot.settings.quitmsg)

@@ -23,7 +23,7 @@ class ModFileIn:
 		buffer = f.read()
 		f.close()
 
-		if Scrib.settings.debug == 1:
+		if Scrib.debug == 1:
 			barf(DBG, "Scrib: %s" % Scrib.settings)
 		before = "I knew "+`Scrib.brainstats.num_words`+" words ("+`len(Scrib.lines)`+" lines) before reading "+sys.argv[1]
 		buffer = scrib.filter_message(buffer, Scrib)

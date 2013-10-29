@@ -484,8 +484,7 @@ class scrib:
 					barf(DBG, "Version zipped")
 			except:
 				f = open("brain/version", "w")
-				f = write(self.version.brain)
-				f.write('brain/version')
+				f.write(self.version.brain)
 				f.close()
 				if self.debug == 1:
 					barf(DBG, "Version written.")

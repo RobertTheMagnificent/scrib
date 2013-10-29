@@ -390,7 +390,7 @@ if __name__ == "__main__":
 		pass
 	except:
 		traceback.print_exc()
-		c = raw_input(scrib.raw_barf(ERR, "Oh no, I've crashed! Would you like to save my brain? (Y/n) "))
+		c = raw_input(scrib.raw_barf(scrib.ERR, "Oh no, I've crashed! Would you like to save my brain? (Y/n) "))
 		if c[:1] == 'n':
 			sys.exit(0)
 	bot.disconnect(bot.settings.quitmsg)

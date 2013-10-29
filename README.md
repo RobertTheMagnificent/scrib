@@ -1,9 +1,10 @@
 Scrib, the IRC ChatBot
 ======================
 <pre>
-License:		GNU GPLv2
-Authors:        See AUTHORS
+License:	GNU GPLv2
+Authors:	See AUTHORS
 </pre>
+[![Build Status](https://travis-ci.org/scoundrels/scrib.png?branch=master)](https://travis-ci.org/scoundrels/scrib)
 
 Scrib is an IRC learning chat bot that self-optimizes. It can also be taught through various commands.
 

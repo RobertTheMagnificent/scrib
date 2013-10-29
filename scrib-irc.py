@@ -298,9 +298,9 @@ class ModIRC(SingleServerIRCBot):
 				scrib.barf(scrib.DBG, "Command: %s" % command_list[0])
 				scrib.barf(scrib.DBG, "Command list: %s" % str(command_list))
 			if command_list[0][1:] in self.commanddict:
-				msg = PluginManager.sendMessage(command_list[0][1:], command_list, self, c)
-			# Doesn't work yet. :(
-			if command_list[0] == "!reload" and len(command_list) == 1:
+				msg = "%s %s" % (scrib.settings.pubsym, PluginManager.sendMessage(command_list[0][1:], command_list, self, c))
+
+			if command_list[0] == "!reload" and len(command_list) == 2:
 				msg = PluginManager.reloadPlugin(command_list[1])
 
 			self.scrib.settings.save()

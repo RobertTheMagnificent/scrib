@@ -118,74 +118,6 @@ def unfilter_reply(message):
 	return message
 
 
-def filter_message(message, bot):
-	"""
-	Make easier to learn and reply to.
-	"""
-
-	# remove garbage
-	message = message.replace("\"", "")
-	message = message.replace("\n", " ")
-	message = message.replace("\r", " ")
-
-	# remove matching brackets
-	index = 0
-	try:
-		while 1:
-			index = message.index("(", index)
-			# Remove matching ) bracket
-			i = message.index(")", index + 1)
-			message = message[0:i] + message[i + 1:]
-			# And remove the (
-			message = message[0:index] + message[index + 1:]
-	except ValueError, e:
-		pass
-
-	# Strips out urls not ignored before...
-	message = re.sub("([a-zA-Z0-9\-_]+?\.)*[a-zA-Z0-9\-_]+?\.[a-zA-Z]{2,5}(\/[a-zA-Z0-9]*)*", "", message)
-
-	# Strips out mIRC Control codes
-	ccstrip = re.compile("\x1f|\x02|\x12|\x0f|\x16|\x03(?:\d{1,2}(?:,\d{1,2})?)?", re.UNICODE)
-	message = ccstrip.sub("", message)
-
-	# Few of my fixes...
-	message = message.replace(": ", " : ")
-	message = message.replace("; ", " ; ")
-	# ^--- because some : and ; might be smileys...
-	message = message.replace("`", "'")
-
-	message = message.replace("?", " ? ")
-	message = message.replace("!", " ! ")
-	message = message.replace(".", " . ")
-	message = message.replace(",", " , ")
-
-	# Fixes broken emoticons...
-	message = message.replace("^ . ^", "^.^")
-	message = message.replace("- . -", "-.-")
-	message = message.replace("0 . o", "0.o")
-	message = message.replace("o . o", "o.o")
-	message = message.replace("O . O", "O.O")
-	message = message.replace("< . <", "<.<")
-	message = message.replace("> . >", ">.>")
-	message = message.replace("> . <", ">.<")
-	message = message.replace(": ?", ":?")
-	message = message.replace(":- ?", ":-?")
-	message = message.replace(", , l , ,", ",,l,,")
-	message = message.replace("@ . @", "@.@")
-
-	words = message.split()
-	for x in xrange(0, len(words)):
-		#is there aliases ?
-		for z in bot.settings.aliases.keys():
-			for alias in bot.settings.aliases[z]:
-				pattern = "^%s$" % alias
-				if re.search(pattern, words[x]):
-					words[x] = z
-
-	message = " ".join(words)
-
-	return message
-
 class scrib:
 	import cfgfile
 
@@ -558,7 +490,7 @@ class scrib:
 			self.brainstats.num_contexts = 0
 
 			for k in old_lines.keys():
-				filtered_line = filter_message(old_lines[k][0], self)
+				filtered_line = self.filter_message(old_lines[k][0])
 				self.learn(filtered_line, old_lines[k][1])
 
 			# Restarts the timer
@@ -594,7 +526,7 @@ class scrib:
 		# Filter out garbage and do some formatting
 		if self.debug == 1:
 			barf(DBG, "Filtering message...")
-		body = filter_message(body, self)
+		body = self.filter_message(body)
 
 		# Learn from input
 		if learn == 1:
@@ -659,6 +591,74 @@ class scrib:
 				io_module.output(message, args)
 			if self.debug == 1:
 				barf(DBG, replying)
+
+	def filter_message(bot, message):
+		"""
+		Make easier to learn and reply to.
+		"""
+
+		# remove garbage
+		message = message.replace("\"", "")
+		message = message.replace("\n", " ")
+		message = message.replace("\r", " ")
+
+		# remove matching brackets
+		index = 0
+		try:
+			while 1:
+				index = message.index("(", index)
+				# Remove matching ) bracket
+				i = message.index(")", index + 1)
+				message = message[0:i] + message[i + 1:]
+				# And remove the (
+				message = message[0:index] + message[index + 1:]
+		except ValueError, e:
+			pass
+
+		# Strips out urls not ignored before...
+		message = re.sub("([a-zA-Z0-9\-_]+?\.)*[a-zA-Z0-9\-_]+?\.[a-zA-Z]{2,5}(\/[a-zA-Z0-9]*)*", "", message)
+
+		# Strips out mIRC Control codes
+		ccstrip = re.compile("\x1f|\x02|\x12|\x0f|\x16|\x03(?:\d{1,2}(?:,\d{1,2})?)?", re.UNICODE)
+		message = ccstrip.sub("", message)
+
+		# Few of my fixes...
+		message = message.replace(": ", " : ")
+		message = message.replace("; ", " ; ")
+		# ^--- because some : and ; might be smileys...
+		message = message.replace("`", "'")
+
+		message = message.replace("?", " ? ")
+		message = message.replace("!", " ! ")
+		message = message.replace(".", " . ")
+		message = message.replace(",", " , ")
+
+		# Fixes broken emoticons...
+		message = message.replace("^ . ^", "^.^")
+		message = message.replace("- . -", "-.-")
+		message = message.replace("0 . o", "0.o")
+		message = message.replace("o . o", "o.o")
+		message = message.replace("O . O", "O.O")
+		message = message.replace("< . <", "<.<")
+		message = message.replace("> . >", ">.>")
+		message = message.replace("> . <", ">.<")
+		message = message.replace(": ?", ":?")
+		message = message.replace(":- ?", ":-?")
+		message = message.replace(", , l , ,", ",,l,,")
+		message = message.replace("@ . @", "@.@")
+
+		words = message.split()
+		for x in xrange(0, len(words)):
+			#is there aliases ?
+			for z in bot.settings.aliases.keys():
+				for alias in bot.settings.aliases[z]:
+					pattern = "^%s$" % alias
+					if re.search(pattern, words[x]):
+						words[x] = z
+
+		message = " ".join(words)
+
+		return message
 
 	def do_commands(self, io_module, body, args, owner):
 		"""
@@ -917,7 +917,7 @@ class scrib:
 					barf(DBG, "Pruning...")
 
 				io_module.output("Pruning is currently disabled. You can use !unlearn to remove words individually.", args)
-
+				return
 				t = time.time()
 
 				list = []
@@ -1131,7 +1131,7 @@ class scrib:
 			elif command_list[0] == "!fortune":
 				msg = self.settings.pubsym + "" \
 					.join([i for i in os.popen('fortune').readlines()]).replace('\n\n','\n').replace('\n', ' ')
-				msg = filter_message(msg)
+				msg = self.filter_message(msg)
 			# Date command
 			elif command_list[0] == "!date":
 				msg = self.settings.pubsym + " It is ".join(i for i in os.popen('date').readlines())

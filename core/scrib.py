@@ -518,7 +518,7 @@ class scrib:
 			self.clean_up()
 
 			barf(SAV, "Brain saved.")
-			sys.exit(1)
+
 
 	def clean_up(self):
 		barf(DBG, "clean_up used but not implemented...")

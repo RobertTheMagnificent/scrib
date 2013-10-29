@@ -907,6 +907,9 @@ class scrib:
 			elif command_list[0] == "!prune":
 				if self.debug == 1:
 					barf(DBG, "Pruning...")
+
+				io_module.output("Pruning is currently disabled. You can use !unlearn to remove words individually.", args)
+
 				t = time.time()
 
 				list = []
@@ -929,7 +932,6 @@ class scrib:
 							char += 1
 						if c.isdigit():
 							digit += 1
-
 
 					# If the word limit is lower than this
 					c = len(self.words[w])

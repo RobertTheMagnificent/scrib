@@ -264,7 +264,8 @@ class ModIRC(SingleServerIRCBot):
 			for x in self.channels[target].users():
 				x = re.sub("[\&\%\+\@\~]","", x)
 				if x:
-					body = body.replace(x+":", "#nick:")
+					# Disabled due to bug #76
+					#body = body.replace(x+":", "#nick:")
 					body = body.replace("@ "+x, "@ #nick")
 
 		if body == "": return

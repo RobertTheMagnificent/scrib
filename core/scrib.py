@@ -93,8 +93,7 @@ def unfilter_reply(message):
 	message = message.replace(" ; ", "; ")
 	# Fixes I and I contractions
 	message = message.replace(" i ", " I ")
-	# This was causing issues with words ending with 'i'
-	#message = message.replace(" i'", " I'")
+	message = message.replace(" i'", " I'")
 	# Fixes the common issues with the teach system
 	message = message.replace("$C4", "||")
 	message = message.replace("$b7", "|-:")

@@ -654,7 +654,7 @@ class scrib:
 			if len(message) >= self.settings.length:
 				time.sleep(3)
 			else:
-				time.sleep(.1 * len(message))
+				time.sleep(.075 * len(message))
 				if self.debug == 1:
 					replying = "Reply sent."
 				io_module.output(message, args)

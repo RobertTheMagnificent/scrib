@@ -982,7 +982,7 @@ class scrib:
 					return
 
 				find_context = " ".join(command_list[1:])
-				num_contexts = len(context)
+				num_contexts = ""
 
 
 				# Build context list
@@ -1006,10 +1006,13 @@ class scrib:
 							c.append(self.lines[x][0])
 				x = 0
 
-
-				barf(ACT, "=========================================")
-				barf(ACT, "Printing %s contexts containing \033[1m'%s'" % (num_contexts, find_context))
-				barf(ACT, "=========================================")
+				if num_contexts != "":
+					barf(ACT, "=========================================")
+					barf(ACT, "Printing %s contexts containing \033[1m'%s'" % (num_contexts, find_context))
+					barf(ACT, "=========================================")
+				else:
+					barf(ACT, "=========================================")
+					barf(ACT, "No contexts to print containing \033[1m'%s'" % find_context)
 
 				while x < 5:
 					if x < len(c):

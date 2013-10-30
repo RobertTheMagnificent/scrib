@@ -6,12 +6,13 @@ Authors:	See AUTHORS
 </pre>
 [![Build Status](https://travis-ci.org/scoundrels/scrib.png?branch=master)](https://travis-ci.org/scoundrels/scrib)
 
-Scrib is an IRC learning chat bot that self-optimizes. It can also be taught through various commands.
+Scrib is a learning chat bot that self-optimizes. It can also be taught through various commands.
 
 Scrib's origins lie within the sources of Pyborg, which was written by Tom Morton and Sébastian Dailly. It was a simple Markov chain-driven bot, similar to MegaHAL, but with the unique ability to learn patterns of speech by figuring out what words go together well. This gives the bot the ability to come up with its own replies, as well as repeating previously learned phrases. There have been pieces absorbed from the Alia fork of Pyborg, as well.
 
 Though Scrib is based on Pyborg, very little of the bot is compatible with any other Pyborg (including the original)! The intention is to morph this bot into something more robust, while maintaining speed, reliability and providing extendability though use of the PluginManager.
 
+IRC is no longer the main focus of scrib, but rather, one of the several ways to interact.
 
 What You'll Need
 ----------------

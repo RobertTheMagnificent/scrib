@@ -10,7 +10,8 @@ from core import scrib
 	#assert scrib.scrib.replace(scrib, "this", "that") == "that"
 
 def test_help():
-	assert file('README.md') != ''
+	assert file('scrib-irc.py') != ''
+
 #scrib = scrib.scrib()
 
 #test_scrib_replace(scrib)

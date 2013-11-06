@@ -112,10 +112,13 @@ Notes
 * feedme.py lets you fill scrib's brain with text from a file.
 * Will be moving to using PyBrain. Maybe. Eventually.
 
+
+```
 [!] = Error
 [#] = loading/saving brain
 [~] = action
 [-] = message
+```
 
 TODO
 ====

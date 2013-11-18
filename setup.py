@@ -5,9 +5,9 @@ from setuptools import setup
 
 settings = cfgfile.cfgset()
 settings.load('VERSION', 
-				{'brain': ('Brain version', ''), 
-				'core': ('Core version', '')
-				})
+		{'brain': ('Brain version', ''), 
+		'core': ('Core version', '')
+		})
 
 long_description = open('README.md', 'r').read()
 

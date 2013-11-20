@@ -122,7 +122,7 @@ class scrib:
 	import cfgfile
 
 	# Main command list
-	commandlist = "Owner commands:\n!alias, !censor, !check, !context, !learning, !limit, !prune, !rebuild, !replace, !save, !uncensor, !unlearn\nPublic commands:\n!date, !fortune, !help, !known, !owner, !version, !words"
+	commandlist = "Owner commands:\n!alias, !censor, !check, !context, !learning, !limit, !rebuild, !replace, !save, !uncensor, !unlearn\nPublic commands:\n!date, !fortune, !help, !known, !owner, !version, !words"
 	core_commanddict = {
 		"alias": "Usage: !alias : Show the difference aliases\n!alias <alias> : show the words attached to this alias\n!alias <alias> <word> : link the word to the alias.",
 		"censor": "Usage: !censor [word1 [...]]\nPrevent the bot using one or more words. Without arguments lists the currently censored words.",
@@ -135,7 +135,6 @@ class scrib:
 		"find": "Owner command. Usage: !find trigger\nFinds all matches to the trigger word or phrase and displays the amount of matches",
 		"responses": "Owner command. Usage: !responses\nDisplays the total number of trigger/response pairs the bot has learned",
 		"limit": "Usage: !limit [number]\nSet the number of words that Scrib can learn.",
-		"prune": "Usage: !prune [number]\nRemove all occurrences of the words that appears in less than <number> contexts.",
 		"rebuild": "Usage: !rebuild\nRebuilds brain links from the lines of known text. Takes a while. You probably don't need to do it unless the brain is very screwed.",
 		"replace": "Usage: !replace <old> <new>\nReplace all occurrences of word <old> in the brain with <new>.",
 		"save": "Usage: !save\nSave Scrib's brain.",
@@ -916,7 +915,7 @@ class scrib:
 				if self.debug == 1:
 					barf(DBG, "Pruning...")
 
-				io_module.output("Pruning is currently disabled. You can use !unlearn to remove words individually.", args)
+				io_module.output("Pruning has been removed. You can use !unlearn to remove words individually.", args)
 				return
 				t = time.time()
 

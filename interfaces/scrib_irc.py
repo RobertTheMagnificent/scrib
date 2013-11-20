@@ -368,17 +368,6 @@ class ModIRC(SingleServerIRCBot):
 
 
 if __name__ == "__main__":
-
-	if "--help" in sys.argv:
-		print "Scrib irc bot. Usage:"
-		print " scrib-irc.py [options]"
-		print " -s   server:port"
-		print " -c   channel"
-		print " -n   nickname"
-		print "Defaults stored in scrib-irc.cfg"
-		print
-		sys.exit(0)
-	# start the scrib
 	my_scrib = scrib.scrib()
 	bot = ModIRC(my_scrib, sys.argv)
 	try:

@@ -29,4 +29,4 @@ if __name__ == "__main__":
 				os.system("interfaces/feedme.py %s" % sys.argv[2])
 
 	else:
-		help()
+		os.system("interfaces/default.py")

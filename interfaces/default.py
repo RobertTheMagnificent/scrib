@@ -1,16 +1,17 @@
-#!/usr/bin/env python
-#
-# Scrib Offline line input module
-
-import string
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+# Scrib default LineIn interface.
 import sys
+import os
 
-sys.path.append('core/')
-sys.path.append('plugins/')
+sys.path.append(os.path.abspath(os.path.dirname(__file__) + '/../'))
 
-from barf import *
-import scrib
-import PluginManager
+from core import barf
+from core import scrib
+from plugins import PluginManager
+import traceback
+import time
+import string
 
 class ModLineIn:
 		"""
@@ -26,12 +27,12 @@ class ModLineIn:
 				self.start()
 
 		def start(self):
-				barf(ACT, "Scrib offline chat!")
-				barf(ACT, "Type !quit to leave")
-				barf(ACT, "Enter your name?\033[0m")
+				barf.barf(barf.ACT, "Scrib offline chat!")
+				barf.barf(barf.ACT, "Type !quit to leave")
+				barf.barf(barf.ACT, "Enter your name?\033[0m")
 				name = raw_input("> ")
 				time.sleep(1)
-				scrib.barf(scrib.MSG, "Hello %s." %name)
+				barf.barf(barf.MSG, "Hello %s." %name)
 				while 1:
 						try:
 								body = raw_input("> ")
@@ -58,15 +59,19 @@ class ModLineIn:
 				Output a line of text.
 				"""
 				message = message.replace("#nick", args)
-				barf(MSG, message + "\033[0m")
+				barf.barf(barf.MSG, message + "\033[0m")
 
 if __name__ == "__main__":
-		# start the pyborg
 		my_scrib = scrib.scrib()
 		try:
-				ModLineIn(my_scrib)
+			ModLineIn(my_scrib)
 		except SystemExit:
-				pass
+			pass
+		except:
+			traceback.print_exc()
+			c = raw_input(barf.raw_barf(barf.ERR, "Oh no, I've crashed! Would you like to save my brain? (Y/n) "))
+			if c[:1] == 'n':
+				sys.exit(0)
 		my_scrib.save_all(False)
 		del my_scrib
 

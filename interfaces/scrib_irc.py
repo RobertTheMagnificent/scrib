@@ -1,10 +1,9 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
-
 import sys
-# See scrib.py
-sys.path.append('core/')
-sys.path.append('plugins/')
+import os
+
+sys.path.append(os.path.abspath(os.path.dirname(__file__) + '/../'))
 
 try:
 	from ircbot import *
@@ -21,8 +20,8 @@ def my_remove_connection(self, connection):
 
 IRC._remove_connection = my_remove_connection
 
-import scrib
-import cfgfile
+from core import scrib
+from core import cfgfile
 from plugins import PluginManager
 import traceback
 import thread
@@ -42,7 +41,6 @@ class ModIRC(SingleServerIRCBot):
 		"""
 		Args will be sys.argv (command prompt arguments)
 		"""
-		# Scribbington
 		self.scrib = my_scrib
 		# load settings
 

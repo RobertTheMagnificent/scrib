@@ -1,68 +1,24 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 import sys
-
-# See scrib.py
-sys.path.append('core/')
-sys.path.append('plugins/')
-
-import scrib
-import cfgfile
-import PluginManager
-import traceback
-import time
-
-from scrib_irc import ModIRC
-from chat import ModLineIn
-
-import thread
-from threading import Thread
-
-class scribtalk:
-		"""
-		Let's interface Scrib with ALL OF THE modules!
-		"""
-		# Command list for this module
-		commandlist = "LineIn Module Commands:\n!quit"
-		commanddict = { "quit": "Usage: !quit\nQuits Scrib and saves the dictionary" }
-
-		def __init__(self, my_scrib):
-				self.scrib = my_scrib
-				self.start()
-
-def scribirc():
-	bot.our_start()
-
-def scribterm():
-	ModLineIn(my_scrib)
+import os
 
 if __name__ == "__main__":
 
-	if "--help" in sys.argv:
+	def help():
 		print "Scrib bot. Usage:"
-		print " start.py [options]"
-		print " -s   server:port"
-		print " -c   channel"
-		print " -n   nickname"
-		print "Defaults stored in scrib-irc.cfg"
-		print
+		print "\tstart.py [options]"
+		print "\t--irc (connection info stored in conf/scrib-irc.cfg\n"
 		sys.exit(0)
-	# start the scrib
-	my_scrib = scrib.scrib()
-	bot = ModIRC(my_scrib, sys.argv)
-	try:
-		Thread(target = scribirc).start()
-		Thread(target = scribterm).start()
-		while True: time.sleep(100)
-	except KeyboardInterrupt, SystemExit:
-		thread.exit()
-		pass
-	except:
-		traceback.print_exc()
-		c = raw_input("\033[94m"+scrib.get_time()+" \033[91m[!] Oh no, I've crashed! Would you like to save my brain? (yes/no)\033[0m")
-		if c[:1] == 'n':
-			sys.exit(0)
-	bot.disconnect(bot.settings.quitmsg)
-	my_scrib.save_all(False)
-	del my_scrib
 
+	if "--help" in sys.argv:
+		help()
+	
+	if "--irc" in sys.argv:
+		if os.path.isfile("interfaces/scrib_irc.py"):
+			os.system("interfaces/scrib_irc.py")
+		else:
+			print "No IRC interface. Exiting."
+			exit(0)
+	else:
+		help()

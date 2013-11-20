@@ -27,6 +27,8 @@ if __name__ == "__main__":
 		if sys.argv[2]:
 			if os.path.isfile("interfaces/feedme.py"):
 				os.system("interfaces/feedme.py %s" % sys.argv[2])
+		exit(0)
 
 	else:
 		os.system("interfaces/default.py")
+		exit(0)

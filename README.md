@@ -97,21 +97,12 @@ Plugins
 -------
 _(These are bundles that extend functionality through other services)_
 * Twitter (Tweet last statement and/or select statements to tweet on bot's own)
- * !tweet
+ * !tweet (requires: pip install twitter)
  * More TBD
-
-Optional
---------
-* [megahal](http://megahal.alioth.debian.org/) Most distros: install megahal
-* [espeak](http://espeak.sourceforge.net/) Most distros: install espeak
-* [Python Twitter Tools](http://mike.verdone.ca/twitter/) Most distros: easy_install twitter (For Twitter plugin)
-MegaHAL is an alternative parser that is totally unsupported and kind of, well, deprecated. At some point, it should probably be decoupled from scrib.
 
 Notes
 -----
 * feedme.py lets you fill scrib's brain with text from a file.
-* Will be moving to using PyBrain. Maybe. Eventually.
-
 
 ```
 [!] = Error

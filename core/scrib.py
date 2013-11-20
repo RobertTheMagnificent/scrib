@@ -224,21 +224,21 @@ class scrib:
 		# Read the brain
 		barf(SAV, "Reading my brain...")
 		try:
-			zfile = zipfile.ZipFile('brain/cortex.zip', 'r')
-			for filename in zfile.namelist():
-				data = zfile.read(filename)
-				file = open(filename, 'w+b')
-				file.write(data)
-				file.close()
+			if os.path.exists('brain/cortex.zip'):
+				zfile = zipfile.ZipFile('brain/cortex.zip', 'r')
+				for filename in zfile.namelist():
+					data = zfile.read(filename)
+					file = open(filename, 'w+b')
+					file.write(data)
+					file.close()
 		except (EOFError, IOError), e:
-			barf(ERR, "No zip found, or perhaps corrupt? Attempting to recover.")
+			barf(ERR, "No brain found.")
 		try:
 			f = open("brain/version", "rb")
-			s = f.read()
-			barf(MSG, "Current brain version is %s " % s)
+			v = f.read()
+			barf(MSG, "Current brain version is %s " % v)
 			f.close()
-			if s != self.version.brain:
-				import marshal
+			if v != self.version.brain:
 				barf(ERR, "Brain version incorrect.")
 				c = raw_input(raw_barf(ERR, "Would you like to update the brain? (Y/n) "))
 				if c[:1].lower() != 'n':
@@ -251,7 +251,7 @@ class scrib:
 						barf(DBG, "Reading words...")
 					s = f.read()
 					f.close()
-					self.words = self.unpack(s)
+					self.words = self.unpack(s, v)
 					del s
 					if self.debug == 1:
 						barf(DBG, "Saving words...")
@@ -266,7 +266,7 @@ class scrib:
 					f = open("brain/lines.dat", "rb")
 					s = f.read()
 					f.close()
-					self.lines = self.unpack(s)
+					self.lines = self.unpack(s, v)
 					if self.debug == 1:
 						barf(DBG, "Applying filter to adjust to new brain system.\n               This may take several minutes...")
 					self.auto_rebuild()
@@ -359,8 +359,10 @@ class scrib:
 		self.settings.save()
 
 	# For unpacking a brain. This is just quick and dirty, should be replaced...
-	def unpack(self, file):
-		if self.version.brain == "0.1.0" or self.version.brain == "0.1.1":
+	def unpack(self, file, version):
+		oldversions = ['0.0.1', '0.1.0', '0.1.1']
+		if version in oldversions:
+			import marshal
 			stuff = marshal.loads(file)
 		else:
 			stuff = pickle.loads(file)
@@ -1156,11 +1158,11 @@ class scrib:
 			c = " " + self.lines[x][0] + " "
 			if c.find(context) != -1:
 				# Split line up
-				wlist = self.lines[x][0].split()
-				# add touched words to list
-				for w in wlist:
-					if not w in wordlist:
-						wordlist.append(w)
+				#wlist = self.lines[x][0].split()
+				## add touched words to list
+				#for w in wlist:
+				#	if not w in wordlist:
+				#		wordlist.append(w)
 				dellist.append(x)
 				del self.lines[x]
 		words = self.words

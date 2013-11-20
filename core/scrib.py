@@ -169,6 +169,7 @@ class scrib:
 		self.settings.load("conf/scrib.cfg",
 						   {"max_words": ("max limits in the number of words known", 6000),
 							"learning": ("Allow the bot to learn", 1),
+							"length": ("Max length bot reply can be, otherwise filtered", 25),
 							"ignore_list": ("Words that can be ignored for the answer", ['!.', '?.', "'", ',', ';']),
 							"censored": ("Don't learn the sentence if one of those words is found", []),
 							"num_aliases": ("Total of aliases known", 0),

@@ -155,15 +155,6 @@ class scrib:
 		"""
 		Open the brain. Resize as required.
 		"""
-
-		#if os.path.exists("conf/scrib.cfg") = :
-		#	try:
-		#
-		#	except:
-		#		barf(ERR, "No scrib.cfg file found. Creating a new one.")
-		#		open("conf/scrib.cfg", "w")
-
-
 		# Attempt to load settings
 		self.settings = self.cfgfile.cfgset()
 		self.settings.load("conf/scrib.cfg",
@@ -287,7 +278,6 @@ class scrib:
 
 					if self.debug == 1:
 						barf(DBG, "Brain saved.")
-					self.clean_up()
 
 			f = open("brain/words.dat", "rb")
 			s = f.read()
@@ -373,23 +363,6 @@ class scrib:
 		if self.settings.no_save != "True":
 			barf(SAV, "Writing to my brain...")
 
-			# In the process of cleaning this.
-			#try:
-			#	zfile = zipfile.ZipFile('brain/cortex.zip', 'r')
-			#	for filename in zfile.namelist():
-			#		data = zfile.read(filename)
-			#		file = open(filename, 'w+b')
-			#		file.write(data)
-			#		file.close()
-			#	if self.debug == 1:
-			#		barf(DBG, "Cortex saved.")
-			#except:
-			#	barf(ERR, "No brain found, or it's broken. Attempting to restore...")
-			#	try:
-			#		os.remove('brain/cortex.zip')
-			#	except:
-			#		pass
-
 			f = open("brain/words.dat", "wb")
 			s = pickle.dumps(self.words)
 			f.write(s)
@@ -460,23 +433,8 @@ class scrib:
 			self.settings.save()
 			self.brainstats.save()
 			self.version.save()
-			self.clean_up()
 
 			barf(SAV, "Brain saved.")
-
-
-	def clean_up(self):
-		barf(DBG, "clean_up used but not implemented...")
-		#if self.debug == 1:
-		#	barf(DBG,"Cleaning up brain.")
-		#try:
-			#os.remove('brain/words.dat')
-			#os.remove('brain/lines.dat')
-			#os.remove('brain/version')
-			#if self.debug == 1:
-			#	barf(DBG, "Cleaned up brain mess.")
-		#except (OSError, IOError), e:
-		#	barf(ERR, "Could not remove the files.")
 
 	def auto_rebuild(self):
 		if self.settings.learning == 1:

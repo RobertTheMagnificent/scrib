@@ -96,14 +96,9 @@ _(These are only available to listed bot owners)_
 Plugins
 -------
 _(These are bundles that extend functionality through other services)_
-* Twitter (Tweet last statement and/or select statements to tweet on bot's own)
- * !tweet (requires: pip install twitter)
- * More TBD
 
 Notes
 -----
-* feedme.py lets you fill scrib's brain with text from a file.
-
 ```
 [!] = Error
 [#] = loading/saving brain

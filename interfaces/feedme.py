@@ -3,10 +3,12 @@
 # I eat ASCII
 
 import sys
+import os
 
-sys.path.append('core')
-from barf import *
-import scrib
+sys.path.append(os.path.abspath(os.path.dirname(__file__) + '/../'))
+
+from core import barf
+from core import scrib
 
 class ModFileIn:
 	"""
@@ -24,21 +26,21 @@ class ModFileIn:
 		f.close()
 
 		if Scrib.debug == 1:
-			barf(DBG, "Scrib: %s" % Scrib.settings)
+			barf.barf(barf.DBG, "Scrib: %s" % Scrib.settings)
 		before = "I knew "+`Scrib.brainstats.num_words`+" words ("+`len(Scrib.lines)`+" lines) before reading "+sys.argv[1]
-		buffer = scrib.filter_message(buffer, Scrib)
+		buffer = Scrib.filter_message(buffer)
 		# Learn from input
 		try:
-			barf(MSG, buffer)
+			barf.barf(barf.MSG, buffer)
 			Scrib.learn(buffer)
 		except KeyboardInterrupt, e:
 			# Close database cleanly
-			barf(ERR, "Early termination.")
+			barf.barf(barf.ERR, "Early termination.")
 		after = "I know "+`Scrib.brainstats.num_words`+" words ("+`len(Scrib.lines)`+" lines) now."
 		del Scrib
 		
-		barf(ACT, before)
-		barf(ACT, after)
+		barf.barf(barf.ACT, before)
+		barf.barf(barf.ACT, after)
 
 	def shutdown(self):
 		pass
@@ -51,7 +53,7 @@ class ModFileIn:
 
 if __name__ == "__main__":
 	if len(sys.argv) < 2:
-		barf(scrib.ERR, "Please specify a filename.")
+		barf.barf(barf.ERR, "Please specify a filename.")
 		sys.exit()
 	# start the scrib
 	my_scrib = scrib.scrib()

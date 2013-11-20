@@ -917,49 +917,6 @@ class scrib:
 
 				io_module.output("Pruning has been removed. You can use !unlearn to remove words individually.", args)
 				return
-				t = time.time()
-
-				list = []
-				count = 0
-
-				if len(command_list) == 2:
-				# Occurrences to erase
-					c_max = command_list[1]
-				else:
-					c_max = 0
-
-				c_max = int(c_max)
-
-				for w in self.words.keys():
-
-					digit = 0
-					char = 0
-					for c in w:
-						if c.isalpha():
-							char += 1
-						if c.isdigit():
-							digit += 1
-
-					# If the word limit is lower than this
-					c = len(self.words[w])
-					if c < 2 or ( digit and char ):
-						list.append(w)
-						count += 1
-						if count == c_max:
-							break
-
-				if c_max < 1:
-					io_module.output("%s %s words to remove" % (self.settings.pubsym, count), args)
-					return
-
-				# Remove the words
-				for w in list[0:]:
-					self.unlearn(w)
-
-				msg = "%s Purged brain in %0.2fs. %d words removed." % \
-					  (self.settings.pubsym,
-					   time.time() - t,
-					   count)
 
 			# Change a typo in the brain
 			elif command_list[0] == "!replace":
@@ -1154,7 +1111,7 @@ class scrib:
 		try:
 			pointers = self.words[old]
 		except KeyError, e:
-			return self.settings.pubsym + old + "%s %s not known."
+			return "%s %s not known." % (self.settings.pubsym, old)
 		changed = 0
 
 		for x in pointers:

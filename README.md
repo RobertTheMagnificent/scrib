@@ -18,6 +18,14 @@ What You'll Need
 ----------------
 * [python-irclib](http://python-irclib.sourceforge.net) Most distros: install python-irclib
 
+How to Start
+------------
+Scrib comes with three 'interfaces' by default:
+
+* Command line: 'python start.py' starts the default command interface.
+* IRC: 'python start.py --irc'
+* Feedme: 'python start.py --feedme file.txt' This is used to 'feed' plain text files into scrib.
+
 Initial Setup
 -------------
 * Please edit the configuration files in conf/ before running.

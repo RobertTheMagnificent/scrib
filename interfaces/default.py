@@ -27,12 +27,12 @@ class ModLineIn:
 				self.start()
 
 		def start(self):
-				barf.barf(barf.ACT, "Scrib offline chat!")
-				barf.barf(barf.ACT, "Type !quit to leave")
-				barf.barf(barf.ACT, "Enter your name?\033[0m")
+				barf.Barf('ACT', "Scrib offline chat!")
+				barf.Barf('ACT', "Type !quit to leave")
+				barf.Barf('ACT', "Enter your name?\033[0m")
 				name = raw_input("> ")
 				time.sleep(1)
-				barf.barf(barf.MSG, "Hello %s." %name)
+				barf.Barf('MSG', "Hello %s." %name)
 				while 1:
 						try:
 								body = raw_input("> ")
@@ -59,7 +59,7 @@ class ModLineIn:
 				Output a line of text.
 				"""
 				message = message.replace("#nick", args)
-				barf.barf(barf.MSG, message + "\033[0m")
+				barf.Barf('MSG', message + "\033[0m")
 
 if __name__ == "__main__":
 		my_scrib = scrib.scrib()
@@ -69,7 +69,7 @@ if __name__ == "__main__":
 			pass
 		except:
 			traceback.print_exc()
-			c = raw_input(barf.raw_barf(barf.ERR, "Oh no, I've crashed! Would you like to save my brain? (Y/n) "))
+			c = raw_input(barf.raw_barf('ERR', "Oh no, I've crashed! Would you like to save my brain? (Y/n) "))
 			if c[:1] == 'n':
 				sys.exit(0)
 		my_scrib.save_all(False)

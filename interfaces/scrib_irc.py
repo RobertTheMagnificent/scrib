@@ -21,6 +21,7 @@ def my_remove_connection(self, connection):
 IRC._remove_connection = my_remove_connection
 
 from core import scrib
+from core import barf
 from core import cfgfile
 from plugins import PluginManager
 import traceback
@@ -97,13 +98,13 @@ class ModIRC(SingleServerIRCBot):
 					pass
 
 	def our_start(self):
-		scrib.barf(scrib.ACT, "Connecting to \033[1m%s" % self.settings.servers)
+		barf.Barf('ACT', "Connecting to \033[1m%s" % self.settings.servers)
 		SingleServerIRCBot.__init__(self, self.settings.servers, self.settings.myname, self.settings.realname, 2)
 
 		self.start()
 
 	def on_welcome(self, c, e):
-		scrib.barf(scrib.ACT, "Joining \033[1m%s" % self.chans)
+		barf.Barf('ACT', "Joining \033[1m%s" % self.chans)
 		for i in self.chans:
 			c.join(i)
 
@@ -137,7 +138,7 @@ class ModIRC(SingleServerIRCBot):
 			reason = ""
 
 		if kicked == self.settings.myname:
-			scrib.barf(scrib.ACT, "%s was kicked off %s by %s (%s)" % (kicked, target, kicker, reason))
+			barf.Barf('ACT', "%s was kicked off %s by %s (%s)" % (kicked, target, kicker, reason))
 
 	def on_privmsg(self, c, e):
 		self.on_msg(c, e)
@@ -154,7 +155,7 @@ class ModIRC(SingleServerIRCBot):
 
 	def _on_disconnect(self, c, e):
 		# self.channels = IRCDict()
-		scrib.barf(scrib.ACT, "Disconnected..")
+		barf.Barf('ACT', "Disconnected..")
 		self.connection.execute_delayed(self.reconnection_interval, self._connected_checker)
 
 
@@ -171,7 +172,7 @@ class ModIRC(SingleServerIRCBot):
 		# First message from owner 'locks' the owner host mask
 		if not e.source() in self.owner_mask and source in self.owners:
 			self.owner_mask.append(e.source())
-			scrib.barf(scrib.ACT, "My owner is \033[0m%s" % e.source())
+			barf.Barf('ACT', "My owner is \033[0m%s" % e.source())
 
 		# Message text
 		if len(e.arguments()) == 1:
@@ -200,23 +201,23 @@ class ModIRC(SingleServerIRCBot):
 
 		# WHOOHOOO!!
 		if target == self.settings.myname or source == self.settings.myname:
-			scrib.barf(scrib.MSG, "%s <%s> \033[0m%s" % (target, source, body))
+			barf.Barf('MSG', "%s <%s> \033[0m%s" % (target, source, body))
 
 		# Ignore self.
 		if source == self.settings.myname: return
 
 		# Ignore selected nicks
 		if self.settings.ignorelist.count(source) > 0 and self.settings.replyIgnored == 1:
-			scrib.barf(scrib.ACT, "Not learning from %s" % source)
+			barf.Barf('ACT', "Not learning from %s" % source)
 			learn = 0
 		elif self.settings.ignorelist.count(source) > 0:
-			scrib.barf(scrib.ACT, "Ignoring %s" % source)
+			barf.Barf('ACT', "Ignoring %s" % source)
 			return
 
 		# private mode. disable commands for non owners
 		if (not source in self.owners) and self.settings.private:
 			while body[:1] == "!":
-				scrib.barf(scrib.ACT, "Private mode is on, ignoring command: %s" % body)
+				barf.Barf('ACT', "Private mode is on, ignoring command: %s" % body)
 				return
 
 		if body == "":
@@ -225,7 +226,7 @@ class ModIRC(SingleServerIRCBot):
 		# Ignore quoted messages
 		if body[0] == "<" or body[0:1] == "\"" or body[0:1] == " <" or body[0] == "[":
 			if self.settings.debug == 1:
-				scrib.barf(scrib.DBG, "Ignoring quoted text.")
+				barf.Barf('DBG', "Ignoring quoted text.")
 			return
 
 		# We want replies reply_chance%, if speaking is on
@@ -236,7 +237,7 @@ class ModIRC(SingleServerIRCBot):
 		if self.nick_check(body) == 1:
 			replyrate = nickreplyrate
 			if self.settings.debug == 1:
-				scrib.barf(scrib.DBG, "Responding to Highlight")
+				barf.Barf('DBG', "Responding to Highlight")
 
 		# Always reply to private messages
 		if e.eventtype() == "privmsg":
@@ -256,7 +257,7 @@ class ModIRC(SingleServerIRCBot):
 					if self.irc_commands(body, source, target, c, e) == 1: return
 			except: pass
 
-			scrib.barf(scrib.MSG, "%s <%s> \033[0m%s" % (target, source, body))
+			barf.Barf('MSG', "%s <%s> \033[0m%s" % (target, source, body))
 			body = body.replace(self.settings.myname, "#nick")
 			body = body.replace(self.settings.myname.lower(), "#nick")
 			for x in self.channels[target].users():
@@ -269,7 +270,7 @@ class ModIRC(SingleServerIRCBot):
 		if body == "": return
 
 		if self.settings.debug == 1:
-			scrib.barf(scrib.DBG, "Body empty, no reply.")
+			barf.Barf('DBG', "Body empty, no reply.")
 
 
 		# Pass on to scrib
@@ -293,8 +294,8 @@ class ModIRC(SingleServerIRCBot):
 		if source in self.owners and e.source() in self.owner_mask:
 			# Only accept commands that are in the Command List
 			if self.scrib.debug == 1:
-				scrib.barf(scrib.DBG, "Command: %s" % command_list[0])
-				scrib.barf(scrib.DBG, "Command list: %s" % str(command_list))
+				barf.Barf('DBG', "Command: %s" % command_list[0])
+				barf.Barf('DBG', "Command list: %s" % str(command_list))
 			if command_list[0][1:] in self.commanddict:
 				msg = "%s %s" % (self.scrib.settings.pubsym, PluginManager.sendMessage(command_list[0][1:], command_list, self, c))
 
@@ -323,7 +324,7 @@ class ModIRC(SingleServerIRCBot):
 		Output a line of text. args = (body, source, target, c, e)
 		"""
 		if not self.connection.is_connected():
-			scrib.barf(scrib.ERR, "Can't send reply : not connected to server")
+			barf.Barf('ERR', "Can't send reply : not connected to server")
 			return
 
 		# Unwrap arguments
@@ -342,16 +343,16 @@ class ModIRC(SingleServerIRCBot):
 		# Joins replies and public messages
 		if e.eventtype() == "join" or e.eventtype() == "quit" or e.eventtype() == "part" or e.eventtype() == "pubmsg":
 			if action == 0:
-				scrib.barf(scrib.MSG, "%s <%s> \033[0m%s" % ( target, self.settings.myname, message))
+				barf.Barf('MSG', "%s <%s> \033[0m%s" % ( target, self.settings.myname, message))
 				c.privmsg(target, message)
 			else:
-				scrib.barf(scrib.MSG, "%s <%s> /me \033[0m%s" % ( target, self.settings.myname, message))
+				barf.Barf('MSG', "%s <%s> /me \033[0m%s" % ( target, self.settings.myname, message))
 				c.action(target, message)
 		# Private messages
 		elif e.eventtype() == "privmsg":
 			# normal private msg
 			if action == 0:
-				scrib.barf(scrib.MSG, "%s <%s> \033[0m%s" % ( source, self.settings.myname, message))
+				barf.Barf('MSG', "%s <%s> \033[0m%s" % ( source, self.settings.myname, message))
 				c.privmsg(source, message)
 				# send copy to owner
 				if not source in self.owners:
@@ -359,7 +360,7 @@ class ModIRC(SingleServerIRCBot):
 					c.privmsg(','.join(self.owners), "(To   " + source + ") " + message)
 			# ctcp action priv msg
 			else:
-				scrib.barf(scrib.MSG, "%s <%s> /me \033[0m%s" % ( target, self.settings.myname, message))
+				barf.Barf('MSG', "%s <%s> /me \033[0m%s" % ( target, self.settings.myname, message))
 				c.action(source, message)
 				# send copy to owner
 				if not source in self.owners:
@@ -378,7 +379,7 @@ if __name__ == "__main__":
 		pass
 	except:
 		traceback.print_exc()
-		c = raw_input(scrib.raw_barf(scrib.ERR, "Oh no, I've crashed! Would you like to save my brain? (Y/n) "))
+		c = raw_input(barf.raw_barf('ERR', "Oh no, I've crashed! Would you like to save my brain? (Y/n) "))
 		if c[:1] == 'n':
 			sys.exit(0)
 	bot.disconnect(bot.settings.quitmsg)

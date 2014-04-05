@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from random import *
-from barf import *
+import barf
 from plugins import PluginManager
 import ctypes
 import sys
@@ -173,7 +173,7 @@ class scrib:
 		self.debug = self.settings.debug
 
 		if self.debug == 1:
-			barf(DBG, "Class scrib initialized.")
+			barf.Barf('DBG', "Class scrib initialized.")
 
 		# Brain stats
 		self.brainstats = self.cfgfile.cfgset()
@@ -214,7 +214,7 @@ class scrib:
 			dbwrite("hello", "hi #nick")
 
 		# Read the brain
-		barf(SAV, "Reading my brain...")
+		barf.Barf('SAV', "Reading my brain...")
 		try:
 			if os.path.exists('brain/cortex.zip'):
 				zfile = zipfile.ZipFile('brain/cortex.zip', 'r')
@@ -224,43 +224,43 @@ class scrib:
 					file.write(data)
 					file.close()
 		except (EOFError, IOError), e:
-			barf(ERR, "No brain found.")
+			barf.Barf('ERR', "No brain found.")
 		try:
 			f = open("brain/version", "rb")
 			v = f.read()
-			barf(MSG, "Current brain version is %s " % v)
+			barf.Barf('MSG', "Current brain version is %s " % v)
 			f.close()
 			if v != self.version.brain:
-				barf(ERR, "Brain version incorrect.")
-				c = raw_input(raw_barf(ERR, "Would you like to update the brain? (Y/n) "))
+				barf.Barf('ERR', "Brain version incorrect.")
+				c = raw_input(raw_barf.Barf('ERR', "Would you like to update the brain? (Y/n) "))
 				if c[:1].lower() != 'n':
 					timestamp = get_time_for_file()
 					shutil.copyfile("brain/cortex.zip", "brain/cortex-%s.zip" % timestamp)
-					barf(ACT, "Backup saved to brain/cortex-%s.zip" % timestamp)
-					barf(ACT, "Starting update, may take a few moments.")
+					barf.Barf('ACT', "Backup saved to brain/cortex-%s.zip" % timestamp)
+					barf.Barf('ACT', "Starting update, may take a few moments.")
 					f = open("brain/words.dat", "rb")
 					if self.debug == 1:
-						barf(DBG, "Reading words...")
+						barf.Barf('DBG', "Reading words...")
 					s = f.read()
 					f.close()
 					self.words = self.unpack(s, v)
 					del s
 					if self.debug == 1:
-						barf(DBG, "Saving words...")
+						barf.Barf('DBG', "Saving words...")
 					f = open("brain/words.dat", "wb")
 					s = pickle.dumps(self.words)
 					f.write(s)
 					f.close()
 					del s
 					if self.debug == 1:
-						barf(DBG, "Words converted.")
-						barf(DBG, "Reading lines...")
+						barf.Barf('DBG', "Words converted.")
+						barf.Barf('DBG', "Reading lines...")
 					f = open("brain/lines.dat", "rb")
 					s = f.read()
 					f.close()
 					self.lines = self.unpack(s, v)
 					if self.debug == 1:
-						barf(DBG, "Applying filter to adjust to new brain system.\n               This may take several minutes...")
+						barf.Barf('DBG', "Applying filter to adjust to new brain system.\n               This may take several minutes...")
 					self.auto_rebuild()
 					f = open("brain/lines.dat", "wb")
 					s = pickle.dumps(self.lines)
@@ -268,16 +268,16 @@ class scrib:
 					f.close()
 					del s
 					if self.debug == 1:
-						barf(DBG, "Lines converted.")
+						barf.Barf('DBG', "Lines converted.")
 					f = open("brain/version", "wb")
 					f.write(self.version.brain)
 					f.close()
 					if self.debug == 1:
-						barf(DBG, "Version updated.")
-					barf(ACT, "Brain converted successfully! Continuing.")
+						barf.Barf('DBG', "Version updated.")
+					barf.Barf('ACT', "Brain converted successfully! Continuing.")
 
 					if self.debug == 1:
-						barf(DBG, "Brain saved.")
+						barf.Barf('DBG', "Brain saved.")
 
 			f = open("brain/words.dat", "rb")
 			s = f.read()
@@ -293,11 +293,11 @@ class scrib:
 			# Create new brain
 			self.words = {}
 			self.lines = {}
-			barf(ERR, "New brain generated.")
+			barf.Barf('ERR', "New brain generated.")
 
 		# Is a resizing required?
 		if len(self.words) != self.brainstats.num_words:
-			barf(ACT, "Updating my brain's information...")
+			barf.Barf('ACT', "Updating my brain's information...")
 			self.brainstats.num_words = len(self.words)
 			num_contexts = 0
 			# Get number of contexts
@@ -312,7 +312,7 @@ class scrib:
 		for x in self.settings.aliases.keys():
 			count += len(self.settings.aliases[x])
 		if count != self.settings.num_aliases:
-			barf(ACT, "Check brain for new aliases.")
+			barf.Barf('ACT', "Check brain for new aliases.")
 			self.settings.num_aliases = count
 
 			for x in self.words.keys():
@@ -361,40 +361,40 @@ class scrib:
 
 	def save_all(self, restart_timer=True):
 		if self.settings.no_save != "True":
-			barf(SAV, "Writing to my brain...")
+			barf.Barf('SAV', "Writing to my brain...")
 
 			f = open("brain/words.dat", "wb")
 			s = pickle.dumps(self.words)
 			f.write(s)
 			f.close()
 			if self.debug == 1:
-				barf(DBG, "Words saved.")
+				barf.Barf('DBG', "Words saved.")
 			f = open("brain/lines.dat", "wb")
 			s = pickle.dumps(self.lines)
 			f.write(s)
 			f.close()
 			if self.debug == 1:
-				barf(DBG, "Lines saved.")
+				barf.Barf('DBG', "Lines saved.")
 
 			#zip the files
 			f = zipfile.ZipFile('brain/cortex.zip', 'w', zipfile.ZIP_DEFLATED)
 			f.write('brain/words.dat')
 			if self.debug == 1:
-				barf(DBG, "Words zipped")
+				barf.Barf('DBG', "Words zipped")
 			f.write('brain/lines.dat')
 			if self.debug == 1:
-				barf(DBG, "Lines zipped")
+				barf.Barf('DBG', "Lines zipped")
 			try:
 				f.write('brain/version')
 				f.close()
 				if self.debug == 1:
-					barf(DBG, "Version zipped")
+					barf.Barf('DBG', "Version zipped")
 			except:
 				f = open("brain/version", "w")
 				f.write(self.version.brain)
 				f.close()
 				if self.debug == 1:
-					barf(DBG, "Version written.")
+					barf.Barf('DBG', "Version written.")
 
 			f = open("brain/words.dat", "w")
 			# write each words known
@@ -409,7 +409,7 @@ class scrib:
 			map((lambda x: f.write(str(x[0]) + "\n\r") ), wordlist)
 			f.close()
 			if self.debug == 1:
-				barf(DBG, "Words written.")
+				barf.Barf('DBG', "Words written.")
 
 			f = open("brain/sentences.dat", "w")
 			# write each words known
@@ -421,20 +421,20 @@ class scrib:
 			map((lambda x: f.write(str(x[0]) + "\n") ), wordlist)
 			f.close()
 			if self.debug == 1:
-				barf(DBG, "Sentences written.")
+				barf.Barf('DBG', "Sentences written.")
 
 			if restart_timer is True:
 				self.autosave = threading.Timer(to_sec("125m"), self.save_all)
 				self.autosave.start()
 				if self.debug == 1:
-					barf(DBG, "Restart timer started.")
+					barf.Barf('DBG', "Restart timer started.")
 
 			# Save settings
 			self.settings.save()
 			self.brainstats.save()
 			self.version.save()
 
-			barf(SAV, "Brain saved.")
+			barf.Barf('SAV', "Brain saved.")
 
 	def auto_rebuild(self):
 		if self.settings.learning == 1:
@@ -470,14 +470,14 @@ class scrib:
 		"""
 
 		if self.debug == 1:
-			barf(DBG, "Processing message...")
+			barf.Barf('DBG', "Processing message...")
 
 		# add trailing space so sentences are broken up correctly
 		body = body + " "
 
 		# Parse commands
 		if body[0] == "!":
-			barf(DBG, "Parsing commands...")
+			barf.Barf('DBG', "Parsing commands...")
 			#if body[0] not in commandlist:
 				# do something
 			self.do_commands(io_module, body, args, owner)
@@ -485,34 +485,34 @@ class scrib:
 
 		# Filter out garbage and do some formatting
 		if self.debug == 1:
-			barf(DBG, "Filtering message...")
+			barf.Barf('DBG', "Filtering message...")
 		body = self.filter_message(body)
 
 		# Learn from input
 		if learn == 1:
 			if self.debug == 1:
-				barf(DBG, "Learning from: " + body)
+				barf.Barf('DBG', "Learning from: " + body)
 			self.learn(body)
 
 		# Make a reply if desired
 		if randint(0, 99) < replyrate:
 			if self.debug == 1:
-				barf(DBG, "Decided to answer...")
+				barf.Barf('DBG', "Decided to answer...")
 			message = ""
 
 			#Look if we can find a prepared answer
 			if dbread(body):
 				if self.debug == 1:
-					barf(DBG, "Using prepared answer.")
+					barf.Barf('DBG', "Using prepared answer.")
 				message = unfilter_reply(dbread(body))
 				if self.debug == 1:
-					barf(DBG, "Replying with: " + message)
+					barf.Barf('DBG', "Replying with: " + message)
 			if not_quiet == 1:
 				for sentence in self.answers.sentences.keys():
 					pattern = "^%s$" % sentence
 					if re.search(pattern, body):
 						if self.debug == 1:
-							barf(DBG, "Searching for reply...")
+							barf.Barf('DBG', "Searching for reply...")
 						message = self.answers.sentences[sentence][
 							randint(0, len(self.answers.sentences[sentence]) - 1)]
 						break
@@ -524,20 +524,20 @@ class scrib:
 
 				if message == "":
 					if self.debug == 1:
-						barf(DBG, "No prepared answer; thinking...")
+						barf.Barf('DBG', "No prepared answer; thinking...")
 					message = self.reply(body)
 					if self.debug == 1:
-						barf(DBG, "Reply formed; unfiltering...")
+						barf.Barf('DBG', "Reply formed; unfiltering...")
 					message = unfilter_reply(message)
 					if self.debug == 1:
-						barf(DBG, "Unfiltered message: " + message)
+						barf.Barf('DBG', "Unfiltered message: " + message)
 			else:
 				return
 
 			# empty. do not output
 			if message == "":
 				if self.debug == 1:
-					barf(DBG, "Not replying; message empty.")
+					barf.Barf('DBG', "Not replying; message empty.")
 				return
 			if self.debug == 1:
 				replying = "Not replying."
@@ -550,7 +550,7 @@ class scrib:
 					replying = "Reply sent."
 				io_module.output(message, args)
 			if self.debug == 1:
-				barf(DBG, replying)
+				barf.Barf('DBG', replying)
 
 	def filter_message(bot, message):
 		"""
@@ -822,14 +822,14 @@ class scrib:
 
 						# Nasty critical error we should fix
 						if not self.lines.has_key(line_idx):
-							barf(ACT, "Removing broken link '%s' -> %d." % (w, line_idx))
+							barf.Barf('ACT', "Removing broken link '%s' -> %d." % (w, line_idx))
 							num_broken = num_broken + 1
 							del wlist[i]
 						else:
 							# Check pointed to word is correct
 							split_line = self.lines[line_idx][0].split()
 							if split_line[word_num] != w:
-								barf(ACT, "Line '%s' word %d is not '%s' as expected." % \
+								barf.Barf('ACT', "Line '%s' word %d is not '%s' as expected." % \
 										  (self.lines[line_idx][0],
 										   word_num, w))
 								num_bad = num_bad + 1
@@ -837,7 +837,7 @@ class scrib:
 					if len(wlist) == 0:
 						del self.words[w]
 						self.brainstats.num_words = self.brainstats.num_words - 1
-						barf(ACT, "\"%s\" vaporized from brain." % w)
+						barf.Barf('ACT', "\"%s\" vaporized from brain." % w)
 
 				msg = "%s Checked my brain in %0.2fs. Fixed links: %d broken, %d bad." % \
 					  (self.settings.pubsym,
@@ -874,7 +874,7 @@ class scrib:
 			# Remove rare words
 			elif command_list[0] == "!prune":
 				if self.debug == 1:
-					barf(DBG, "Pruning...")
+					barf.Barf('DBG', "Pruning...")
 
 				io_module.output("Pruning has been removed. You can use !unlearn to remove words individually.", args)
 				return
@@ -890,7 +890,7 @@ class scrib:
 			# Barf the contents to avoid chat spamming.
 			elif command_list[0] == "!context":
 				if self.debug == 1:
-					barf(DBG, "Checking contexts...")
+					barf.Barf('DBG', "Checking contexts...")
 
 				# build context we are looking for
 				context = " ".join(command_list[1:])
@@ -923,17 +923,17 @@ class scrib:
 				x = 0
 
 				if num_contexts != "":
-					barf(ACT, "=========================================")
-					barf(ACT, "Printing %s contexts containing \033[1m'%s'" % (num_contexts, find_context))
-					barf(ACT, "=========================================")
+					barf.Barf('ACT', "=========================================")
+					barf.Barf('ACT', "Printing %s contexts containing \033[1m'%s'" % (num_contexts, find_context))
+					barf.Barf('ACT', "=========================================")
 				else:
-					barf(ACT, "=========================================")
-					barf(ACT, "No contexts to print containing \033[1m'%s'" % find_context)
+					barf.Barf('ACT', "=========================================")
+					barf.Barf('ACT', "No contexts to print containing \033[1m'%s'" % find_context)
 
 				while x < 5:
 					if x < len(c):
 						lines = c
-						barf(ACT, "%s" % lines[x])
+						barf.Barf('ACT', "%s" % lines[x])
 					x += 1
 				if len(c) == 5:
 					return
@@ -941,20 +941,20 @@ class scrib:
 					x = 5
 				while x < len(c):
 					lines = c
-					barf(ACT, "%s" % lines[x])
+					barf.Barf('ACT', "%s" % lines[x])
 					x += 1
 
-				barf(ACT, "=========================================")
+				barf.Barf('ACT', "=========================================")
 
 			# Remove a word from the vocabulary [use with care]
 			elif command_list[0] == "!unlearn":
 				if self.debug == 1:
-					barf(DBG, "Unlearning...")
+					barf.Barf('DBG', "Unlearning...")
 				# build context we are looking for
 				context = " ".join(command_list[1:])
 				if context == "":
 					return
-				barf(ACT, "Looking for: %s" % context)
+				barf.Barf('ACT', "Looking for: %s" % context)
 				# Unlearn contexts containing 'context'
 				t = time.time()
 				self.unlearn(context)
@@ -1002,7 +1002,7 @@ class scrib:
 			# remove a word from the censored list
 			elif command_list[0] == "!uncensor":
 				if self.debug == 1:
-					barf(DBG, "Uncensoring...")
+					barf.Barf('DBG', "Uncensoring...")
 				# Remove words listed from the censor list
 				# eg !uncensor tom dick harry
 				for x in xrange(1, len(command_list)):
@@ -1055,7 +1055,7 @@ class scrib:
 			# Quit
 			elif command_list[0] == "!quit":
 				# Close the brain
-				barf(ACT, "Goodbye!")
+				barf.Barf('ACT', "Goodbye!")
 				sys.exit(0)
 
 			# Save changes
@@ -1082,7 +1082,7 @@ class scrib:
 			number = self.lines[l][1]
 			if line[w] != old:
 				# fucked brain
-				barf(ERR, "Broken link: %s %s" % (x, self.lines[l][0] ))
+				barf.Barf('ERR', "Broken link: %s %s" % (x, self.lines[l][0] ))
 				continue
 			else:
 				line[w] = new
@@ -1138,211 +1138,214 @@ class scrib:
 			if len(words[x]) == 0:
 				del words[x]
 				self.brainstats.num_words = self.brainstats.num_words - 1
-				barf(ACT, "\"%s\" vaporized from brain." % x)
+				barf.Barf('ACT', "\"%s\" vaporized from brain." % x)
 
 	def reply(self, body):
 		"""
 		Reply to a line of text.
 		"""
-		try:
-			if self.debug == 1:
-				barf(DBG, "Forming a reply...")
+		if self.debug == 1:
+			barf.Barf('DBG', "Forming a reply...")
 
-			# split sentences into list of words
-			_words = body.split(" ")
-			words = []
-			for i in _words:
-				words += i.split()
-			del _words
+		# split sentences into list of words
+		_words = body.split(" ")
+		words = []
+		for i in _words:
+			words += i.split()
+		del _words
 
-			if len(words) == 0:
-				return ""
+		if len(words) == 0:
+			return ""
 
-			#remove words on the ignore list
-			words = [x for x in words if x not in self.settings.ignore_list and not x.isdigit()]
+		#remove words on the ignore list
+		words = [x for x in words if x not in self.settings.ignore_list and not x.isdigit()]
 
-			# Find rarest word (excluding those unknown)
-			index = []
-			known = -1
+		# Find rarest word (excluding those unknown)
+		index = []
+		known = -1
 
-			# If the word is in at least three contexts, it can be chosen.
-			known_min = 3
-			for x in xrange(0, len(words)):
-				if self.words.has_key(words[x]):
-					k = len(self.words[words[x]])
-				else:
-					continue
-				if (known == -1 or k < known) and k > known_min:
-					index = [words[x]]
-					known = k
-					continue
-				elif k == known:
-					index.append(words[x])
-					continue
-			# Index now contains list of rarest known words in sentence
-			if len(index) == 0:
-				return ""
-			word = index[randint(0, len(index) - 1)]
-			if self.debug == 1:
-				barf(DBG, "Chosen root word: %s" % word)
+		# If the word is in at least three contexts, it can be chosen.
+		known_min = 3
+		for x in xrange(0, len(words)):
+			if self.words.has_key(words[x]):
+				k = len(self.words[words[x]])
+			else:
+				continue
+			if (known == -1 or k < known) and k > known_min:
+				index = [words[x]]
+				known = k
+				continue
+			elif k == known:
+				index.append(words[x])
+				continue
+		# Index now contains list of rarest known words in sentence
+		if len(index) == 0:
+			return ""
+		word = index[randint(0, len(index) - 1)]
+		if self.debug == 1:
+			barf.Barf('DBG', "Chosen root word: %s" % word)
 
-			# Build sentence backwards from "chosen" word
-			sentence = [word]
-			done = 0
-			while done == 0:
-				#create a brain which will contain all the words we can find before the "chosen" word
-				pre_words = {"": 0}
-				#this is to prevent a case where we have an ignore_listd word
-				word = str(sentence[0].split(" ")[0])
-				for x in xrange(0, len(self.words[word]) - 1):
-					l, w = struct.unpack("iH", self.words[word][x])
+		# Build sentence backwards from "chosen" word
+		sentence = [word]
+		done = 0
+		while done == 0:
+			#create a brain which will contain all the words we can find before the "chosen" word
+			pre_words = {"": 0}
+			#this is to prevent a case where we have an ignore_listd word
+			word = str(sentence[0].split(" ")[0])
+			for x in xrange(0, len(self.words[word]) - 1):
+				l, w = struct.unpack("iH", self.words[word][x])
+				try:
 					context = self.lines[l][0]
-					num_context = self.lines[l][1]
-					cwords = context.split()
-					#if the word is not the first of the context, look to the previous one
-					if cwords[w] != word:
-						print context
-					if w:
-						#look if we can find a pair with the choosen word, and the previous one
-						if len(sentence) > 1 and len(cwords) > w + 1:
-							if sentence[1] != cwords[w + 1]:
-								continue
-
-						#if the word is in ignore_list, look to the previous word
-						look_for = cwords[w - 1]
-						if look_for in self.settings.ignore_list and w > 1:
-							look_for = cwords[w - 2] + " " + look_for
-
-						#saves how many times we can find each word
-						if not (pre_words.has_key(look_for)):
-							pre_words[look_for] = num_context
-						else:
-							pre_words[look_for] += num_context
-
-
-					else:
-						pre_words[""] += num_context
-
-				#Sort the words
-				list = pre_words.items()
-				list.sort(lambda x, y: cmp(y[1], x[1]))
-
-				numbers = [list[0][1]]
-				for x in xrange(1, len(list)):
-					numbers.append(list[x][1] + numbers[x - 1])
-
-				#take one of them from the list (randomly)
-				mot = randint(0, numbers[len(numbers) - 1])
-				for x in xrange(0, len(numbers)):
-					if mot <= numbers[x]:
-						mot = list[x][0]
-						break
-
-				#if the word is already chosen, pick the next one
-				while mot in sentence:
-					x += 1
-					if x >= len(list) - 1:
-						mot = ''
-					mot = list[x][0]
-
-				mot = mot.split(" ")
-				mot.reverse()
-				if mot == ['']:
-					done = 1
-				else:
-					map((lambda x: sentence.insert(0, x) ), mot)
-
-			pre_words = sentence
-			sentence = sentence[-2:]
-
-			# Now build sentence forwards from "chosen" word
-
-			#We've got
-			#cwords:	...	cwords[w-1]	cwords[w]	cwords[w+1]	cwords[w+2]
-			#sentence:	...	sentence[-2]	sentence[-1]	look_for	look_for ?
-
-			#we are looking, for a cwords[w] known, and maybe a cwords[w-1] known, what will be the cwords[w+1] to choose.
-			#cwords[w+2] is need when cwords[w+1] is in ignored list
-
-
-			done = 0
-			while done == 0:
-				#create a brain which will contain all the words we can find before the "chosen" word
-				post_words = {"": 0}
-				word = str(sentence[-1].split(" ")[-1])
-				for x in xrange(0, len(self.words[word])):
-					l, w = struct.unpack("iH", self.words[word][x])
-					context = self.lines[l][0]
-					num_context = self.lines[l][1]
-					cwords = context.split()
-					#look if we can find a pair with the chosen word, and the next one
-					if len(sentence) > 1:
-						if sentence[len(sentence) - 2] != cwords[w - 1]:
+				except KeyError:
+					break
+				num_context = self.lines[l][1]
+				cwords = context.split()
+				#if the word is not the first of the context, look to the previous one
+				if cwords[w] != word:
+					print context
+				if w:
+					#look if we can find a pair with the choosen word, and the previous one
+					if len(sentence) > 1 and len(cwords) > w + 1:
+						if sentence[1] != cwords[w + 1]:
 							continue
 
-					if w < len(cwords) - 1:
-						#if the word is in ignore_list, look to the next word
-						look_for = cwords[w + 1]
-						if look_for in self.settings.ignore_list and w < len(cwords) - 2:
-							look_for = look_for + " " + cwords[w + 2]
+					#if the word is in ignore_list, look to the previous word
+					look_for = cwords[w - 1]
+					if look_for in self.settings.ignore_list and w > 1:
+						look_for = cwords[w - 2] + " " + look_for
 
-						if not (post_words.has_key(look_for)):
-							post_words[look_for] = num_context
-						else:
-							post_words[look_for] += num_context
+					#saves how many times we can find each word
+					if not (pre_words.has_key(look_for)):
+						pre_words[look_for] = num_context
 					else:
-						post_words[""] += num_context
-				#Sort the words
-				list = post_words.items()
-				list.sort(lambda x, y: cmp(y[1], x[1]))
-				numbers = [list[0][1]]
+						pre_words[look_for] += num_context
 
-				for x in xrange(1, len(list)):
-					numbers.append(list[x][1] + numbers[x - 1])
 
-				#take one of them from the list (randomly)
-				mot = randint(0, numbers[len(numbers) - 1])
-				for x in xrange(0, len(numbers)):
-					if mot <= numbers[x]:
-						mot = list[x][0]
-						break
-
-				x = -1
-				while mot in sentence:
-					x += 1
-					if x >= len(list) - 1:
-						mot = ''
-						break
-					mot = list[x][0]
-
-				mot = mot.split(" ")
-				if mot == ['']:
-					done = 1
 				else:
-					map((lambda x: sentence.append(x) ), mot)
+					pre_words[""] += num_context
 
-			sentence = pre_words[:-2] + sentence
+			#Sort the words
+			list = pre_words.items()
+			list.sort(lambda x, y: cmp(y[1], x[1]))
 
-			#Replace aliases
-			for x in xrange(0, len(sentence)):
-				if sentence[x][0] == "~": sentence[x] = sentence[x][1:]
+			numbers = [list[0][1]]
+			for x in xrange(1, len(list)):
+				numbers.append(list[x][1] + numbers[x - 1])
 
-			#Insert space between each words
-			map((lambda x: sentence.insert(1 + x * 2, " ") ), xrange(0, len(sentence) - 1))
+			#take one of them from the list (randomly)
+			mot = randint(0, numbers[len(numbers) - 1])
+			for x in xrange(0, len(numbers)):
+				if mot <= numbers[x]:
+					mot = list[x][0]
+					break
 
-			#correct the ' & , spaces problem
-			#the code is not very good and can be improved but it does the job...
-			for x in xrange(0, len(sentence)):
-				if sentence[x] == "'":
-					sentence[x - 1] = ""
-					sentence[x + 1] = ""
-				if sentence[x] == ",":
-					sentence[x - 1] = ""
+			#if the word is already chosen, pick the next one
+			while mot in sentence:
+				x += 1
+				if x >= len(list) - 1:
+					mot = ''
+				mot = list[x][0]
 
-			#return as string..
-			return "".join(sentence)
-		except:
-			return ""
+			mot = mot.split(" ")
+			mot.reverse()
+			if mot == ['']:
+				done = 1
+			else:
+				map((lambda x: sentence.insert(0, x) ), mot)
+
+		pre_words = sentence
+		sentence = sentence[-2:]
+
+		# Now build sentence forwards from "chosen" word
+
+		#We've got
+		#cwords:	...	cwords[w-1]	cwords[w]	cwords[w+1]	cwords[w+2]
+		#sentence:	...	sentence[-2]	sentence[-1]	look_for	look_for ?
+
+		#we are looking, for a cwords[w] known, and maybe a cwords[w-1] known, what will be the cwords[w+1] to choose.
+		#cwords[w+2] is need when cwords[w+1] is in ignored list
+
+
+		done = 0
+		while done == 0:
+			#create a brain which will contain all the words we can find before the "chosen" word
+			post_words = {"": 0}
+			word = str(sentence[-1].split(" ")[-1])
+			for x in xrange(0, len(self.words[word])):
+				l, w = struct.unpack("iH", self.words[word][x])
+				try:
+					context = self.lines[l][0]
+				except KeyError:
+					break
+				num_context = self.lines[l][1]
+				cwords = context.split()
+				#look if we can find a pair with the chosen word, and the next one
+				if len(sentence) > 1:
+					if sentence[len(sentence) - 2] != cwords[w - 1]:
+						continue
+
+				if w < len(cwords) - 1:
+					#if the word is in ignore_list, look to the next word
+					look_for = cwords[w + 1]
+					if look_for in self.settings.ignore_list and w < len(cwords) - 2:
+						look_for = look_for + " " + cwords[w + 2]
+
+					if not (post_words.has_key(look_for)):
+						post_words[look_for] = num_context
+					else:
+						post_words[look_for] += num_context
+				else:
+					post_words[""] += num_context
+			#Sort the words
+			list = post_words.items()
+			list.sort(lambda x, y: cmp(y[1], x[1]))
+			numbers = [list[0][1]]
+
+			for x in xrange(1, len(list)):
+				numbers.append(list[x][1] + numbers[x - 1])
+
+			#take one of them from the list (randomly)
+			mot = randint(0, numbers[len(numbers) - 1])
+			for x in xrange(0, len(numbers)):
+				if mot <= numbers[x]:
+					mot = list[x][0]
+					break
+
+			x = -1
+			while mot in sentence:
+				x += 1
+				if x >= len(list) - 1:
+					mot = ''
+					break
+				mot = list[x][0]
+
+			mot = mot.split(" ")
+			if mot == ['']:
+				done = 1
+			else:
+				map((lambda x: sentence.append(x) ), mot)
+
+		sentence = pre_words[:-2] + sentence
+
+		#Replace aliases
+		for x in xrange(0, len(sentence)):
+			if sentence[x][0] == "~": sentence[x] = sentence[x][1:]
+
+		#Insert space between each words
+		map((lambda x: sentence.insert(1 + x * 2, " ") ), xrange(0, len(sentence) - 1))
+
+		#correct the ' & , spaces problem
+		#the code is not very good and can be improved but it does the job...
+		for x in xrange(0, len(sentence)):
+			if sentence[x] == "'":
+				sentence[x - 1] = ""
+				sentence[x + 1] = ""
+			if sentence[x] == ",":
+				sentence[x - 1] = ""
+
+		#return as string..
+		return "".join(sentence)
 
 	def learn(self, body, num_context=1):
 		"""
@@ -1363,7 +1366,7 @@ class scrib:
 			# Ignore if the sentence starts with an exclamation
 			if body[0:1] == "!":
 				if self.debug == 1:
-					barf(ERR, "Not learning: %s" % words)
+					barf.Barf('ERR', "Not learning: %s" % words)
 				return
 
 			vowels = "aÃ Ã¢eÃ©Ã¨ÃªiÃ®Ã¯oÃ¶Ã´uÃ¼Ã»y"
@@ -1383,7 +1386,7 @@ class scrib:
 				for censored in self.settings.censored:
 					pattern = "^%s$" % censored
 					if re.search(pattern, words[x]):
-						barf(ACT, "Censored word %s" % words[x])
+						barf.Barf('ACT', "Censored word %s" % words[x])
 						return
 
 				if len(words[x]) > 13 \
@@ -1425,7 +1428,7 @@ class scrib:
 			#is max_words reached, don't learn more
 			if self.brainstats.num_words >= self.settings.max_words:
 				self.settings.learning = 0
-				barf(ERR, "Had to turn off learning- max_words limit reached!")
+				barf.Barf('ERR', "Had to turn off learning- max_words limit reached!")
 
 		# Split body text into sentences and parse them
 		# one by one.

@@ -28,7 +28,10 @@ class Barf:
 			if code not in self.msg_codes:
 				code = "DEF"
 
-			print self.barf(code, message, time)
+			if code == "TAB":
+				print self.timeless_barf(code, message)
+			else:
+				print self.barf(code, message, time)
 
 	def disable(self):
 		DEF = ''

@@ -1,3 +1,5 @@
+from core import barf
+
 process_table = {}
 plugin_commands = {}
 plugin_aliases = []

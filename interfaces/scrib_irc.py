@@ -51,8 +51,8 @@ class ModIRC(SingleServerIRCBot):
 							"realname": ("Reported 'real name'", "Scrib"),
 							"filter": ("Do we filter our replies or just blindly speak?", 1),
 							"owners": ("Owner(s) nickname", ["OwnerNick"]),
-							"servers": ("IRC Server to connect to (server, port [,password])", [("irc.starchat.net", 6667)]),
-							"chans": ("Channels to auto-join", ["#test"]),
+							"servers": ("IRC Server to connect to (server, port [,password])", [("irc.freenode.net", 6667)]),
+							"chans": ("Channels to auto-join", ["#scoundrels"]),
 							"speaking": ("Allow the bot to talk on channels", 1),
 							"private": ("Hide the fact we are a bot", 0),
 							"ignorelist": ("Ignore these nicknames:", []),
@@ -60,7 +60,6 @@ class ModIRC(SingleServerIRCBot):
 							"reply_chance": ("Chance of reply (%) per message", 33),
 							"nick_reply_chance": ("Chance of reply (%) per message when mentioned", 100),
 							"quitmsg": ("IRC quit message", "Bye :-("),
-							"debug": ("Toggle debug messages.", 0),
 							"password": ("password for control the bot (Edit manually !)", "")
 						   })
 

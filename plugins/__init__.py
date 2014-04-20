@@ -1,5 +1,4 @@
-import os
-import sys
+import os, sys
 from plugins import ScribPlugin
 from core import barf
 

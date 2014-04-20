@@ -167,7 +167,7 @@ class scrib:
 							"debug": ("Debug mode adds verbose output to terminal", 0),
 							"aliases": ("A list of similar words", {}),
 							"pubsym": ("Symbol to append to cmd msgs in public", "!"),
-							"debug": ("Whether or not we show IRC debug commands in the terminal", 0)
+							"debug": ("Whether or not we show IRC debug commands in the terminal", 0),
 							"no_save": ("If True, Scrib doesn't save his brain and configuration to disk", "False")
 						   })
 

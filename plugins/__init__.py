@@ -17,8 +17,8 @@ for module in os.listdir(os.path.dirname(plugin_dir)):
 				library_list.append(module)
 			except ImportError as e:
 				barf.Barf('ERR', "Failed to load plugin ( IE ):   \033[1m%s" % module_name)
-				print e
+				barf.Barf('TAB', e)
 
 			except NameError as e:
 				barf.Barf('ERR', "Failed to load plugin ( NE ):   \033[1m%s" % module_name)
-				print e
+				barf.Barf('TAB', e)

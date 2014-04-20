@@ -167,6 +167,7 @@ class scrib:
 							"debug": ("Debug mode adds verbose output to terminal", 0),
 							"aliases": ("A list of similar words", {}),
 							"pubsym": ("Symbol to append to cmd msgs in public", "!"),
+							"debug": ("Whether or not we show IRC debug commands in the terminal", 0)
 							"no_save": ("If True, Scrib doesn't save his brain and configuration to disk", "False")
 						   })
 
@@ -190,8 +191,8 @@ class scrib:
 
 		self.version = self.cfgfile.cfgset()
 		self.version.load("VERSION",
-						  {"core": ("Core version of Scrib", 0),
-						   "brain": ("Brain version of Scrib", 0),
+						  {"core": ("Core version of Scrib", '0.8.1'),
+						   "brain": ("Brain version of Scrib", '0.1.3'),
 						  })
 
 		# Starts the timers:
@@ -232,7 +233,7 @@ class scrib:
 			f.close()
 			if v != self.version.brain:
 				barf.Barf('ERR', "Brain version incorrect.")
-				c = raw_input(raw_barf.Barf('ERR', "Would you like to update the brain? (Y/n) "))
+				c = raw_input(barf.Barf('ERR', "Would you like to update the brain? (Y/n) "))
 				if c[:1].lower() != 'n':
 					timestamp = get_time_for_file()
 					shutil.copyfile("brain/cortex.zip", "brain/cortex-%s.zip" % timestamp)

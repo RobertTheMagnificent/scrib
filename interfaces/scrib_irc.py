@@ -296,13 +296,13 @@ class ModIRC(SingleServerIRCBot):
 				barf.Barf('DBG', "Command: %s" % command_list[0])
 				barf.Barf('DBG', "Command list: %s" % str(command_list))
 			if command_list[0][1:] in self.commanddict:
-				msg = "%s %s" % (self.scrib.settings.pubsym, PluginManager.sendMessage(command_list[0][1:], command_list, self, c))
+				msg = "%s %s" % (self.self.settings.pubsym, PluginManager.sendMessage(command_list[0][1:], command_list, self, c))
 
 
 			if command_list[0] == "!reload" and len(command_list) == 2:
 				msg = PluginManager.reloadPlugin(command_list[1])
 
-			self.scrib.settings.save()
+			self.self.settings.save()
 			self.settings.save()
 
 		if msg == "":
@@ -378,7 +378,7 @@ if __name__ == "__main__":
 		pass
 	except:
 		traceback.print_exc()
-		c = raw_input(barf.raw_barf('ERR', "Oh no, I've crashed! Would you like to save my brain? (Y/n) "))
+		c = raw_input(barf.Barf('ERR', "Oh no, I've crashed! Would you like to save my brain? (Y/n) "))
 		if c[:1] == 'n':
 			sys.exit(0)
 	bot.disconnect(bot.settings.quitmsg)

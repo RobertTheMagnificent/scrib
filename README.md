@@ -13,6 +13,8 @@ Though Scrib is based on Pyborg, very little of the bot is compatible with any o
 
 IRC is no longer the main focus of scrib, but rather, one of the several ways to interact.
 
+As of version 1.0.0, this is considered final. We are moving on to a complete rewrite.
+
 What You'll Need
 ----------------
 * [python-irclib](http://python-irclib.sourceforge.net) Most distros: install python-irclib

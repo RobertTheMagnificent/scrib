@@ -4,7 +4,6 @@ Scrib, the IRC ChatBot
 License:	GNU GPLv2
 Authors:	See AUTHORS
 </pre>
-[![Build Status](https://travis-ci.org/scoundrels/scrib.png?branch=master)](https://travis-ci.org/scoundrels/scrib) [![Gitter chat](https://badges.gitter.im/scoundrels/scrib.png)](https://gitter.im/scoundrels/scrib)
 
 Scrib is a learning chat bot that self-optimizes. It can also be taught through various commands.
 
@@ -13,6 +12,8 @@ Scrib's origins lie within the sources of Pyborg, which was written by Tom Morto
 Though Scrib is based on Pyborg, very little of the bot is compatible with any other Pyborg (including the original)! The intention is to morph this bot into something more robust, while maintaining speed, reliability and providing extendability though use of the PluginManager.
 
 IRC is no longer the main focus of scrib, but rather, one of the several ways to interact.
+
+As of version 1.0.0, this is considered final. We are moving on to a complete rewrite.
 
 What You'll Need
 ----------------

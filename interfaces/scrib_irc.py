@@ -60,6 +60,7 @@ class ModIRC(SingleServerIRCBot):
 							"reply_chance": ("Chance of reply (%) per message", 33),
 							"nick_reply_chance": ("Chance of reply (%) per message when mentioned", 100),
 							"quitmsg": ("IRC quit message", "Bye :-("),
+							"debug": ("IRC debug messages in terminal", 0),
 							"password": ("password for control the bot (Edit manually !)", "")
 						   })
 

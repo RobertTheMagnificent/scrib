@@ -109,32 +109,47 @@ def unfilter_reply(message):
 	emoticons = """(: :) :( ): :D D: :O O: :P XD DX :3 XP x.x x_x ^_^ O_O O.O :9 :B :c c:""".split()
 	pattern = "|".join(map(re.escape, emoticons))
 	emoticon = re.search(pattern, message, re.IGNORECASE)
+	
+	# Init some strings so it does't barf later
+	extra = ""
+	emote = ""
+	
 	if not emoticon == None:
 		emoticon = "%s" % emoticon.group()
 		message = message.replace(emoticon, emoticon.upper())
+		emotebeg = re.search(pattern, message).start()
+		emoteend = re.search(pattern, message).end()
+		if not emotebeg == 0:
+			emotebeg = emotebeg - 1
+		emote = message[emotebeg:emoteend]
+		print emote
+		message = message[:emotebeg]
+		print message
+		extra = message[emoteend:]
+		print extra
+		
 		# Fixes the annoying XP capitalization in words...
 		message = message.replace("XP", "xp")
 		message = message.replace(" xp", " XP")
 		message = message.replace("XX", "xx")
-		emopos = re.search(pattern, message).start()
-		if not emopos == 0:
-			emopos = emopos - 1
-			emote = message[emopos:]
-			message = message[:emopos]
-			if not message.endswith(('.', '!', '?')):
-				message = message + "." + emote
-			else:
-				message = message + emote
-				
+		
 		# Fix O.O, O_O, :O, and O: capitalization
-		message = message.replace("O.O", "o.o")
-		message = message.replace("O_O", "o_o")
-		message = message.replace(":O", ":o")
-		message = message.replace("O:", "o:")
-	else:
-		if not message == "":
-			if not message.endswith(('.', '!', '?')):
-				message = message + "."
+		emote = emote.replace("O.O", "o.o")
+		emote = emote.replace("O_O", "o_o")
+		emote = emote.replace(":O", ":o")
+		emote = emote.replace("O:", "o:")
+		
+	if not message == "":
+		if not message.endswith(('.', '!', '?')):
+			message = message + "."
+			
+	if not extra == "":
+		if not extra.endswith(('.', '!', '?')):
+			extra = extra + "."
+			message = message + extra
+			
+	if not emote == "":
+		message = message + emote
 
 	return message
 

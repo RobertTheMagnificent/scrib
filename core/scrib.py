@@ -82,6 +82,8 @@ def unfilter_reply(message):
 	This undoes the phrase mangling the central code does
 	so the bot sounds more human :P
 	"""
+	
+	barf.Barf('DBG', "Orig Message: %s" % message)
 
 	# Had to write my own initial capitalizing code *sigh*
 	message = "%s%s" % (message[:1].upper(), message[1:])
@@ -105,14 +107,16 @@ def unfilter_reply(message):
 	message = message.replace("$b2", "=|")
 	message = message.replace("$b1", ":|")
 	
-	# New emoticon filter that tries to catch almost all variations
-	eyes, nose, mouth = r":;8X=", r"-~'^", r")(></\|DPO39"
-	pattern1 = "[%s][%s]?[%s]" % tuple(map(re.escape, [eyes, nose, mouth]))
-	pattern2 = "[%s][%s]?[%s]" % tuple(map(re.escape, [mouth, nose, eyes]))
-	
+	# New emoticon filter that tries to catch almost all variations	
+	eyes, nose, mouth = r":;8BX=", r"-~'^O", r")(></\|DPo39"
+	pattern1 = "[\s][%s][%s]?[%s][\s]" % tuple(map(re.escape, [eyes, nose, mouth]))
+	pattern2 = "[\s][%s][%s]?[%s][\s]" % tuple(map(re.escape, [mouth, nose, eyes]))
 	eye, horzmouth = r"^vou*@#sxz~-=+", r"-_o.wv"
-	pattern3 = "[%s][%s][%s]" % tuple(map(re.escape, [eye, horzmouth, eye]))
+	pattern3 = "[\s][%s][%s][%s][\s]" % tuple(map(re.escape, [eye, horzmouth, eye]))
 
+	# Add whitespace for less false positives; it will be stripped out of the string later
+	if not message == "":
+		message = " " + message + " "
 	emoticon = re.search(pattern1, message, re.IGNORECASE)
 	pattern = pattern1
 	if emoticon == None:
@@ -128,15 +132,21 @@ def unfilter_reply(message):
 	
 	if not emoticon == None:
 		emoticon = "%s" % emoticon.group()
-		#message = message.replace(emoticon, emoticon.upper())
 		emotebeg = re.search(pattern, message, re.IGNORECASE).start()
 		emoteend = re.search(pattern, message, re.IGNORECASE).end()
+		
+		# Remove the whitespace we added earlier
+		message = message.strip()
+		
 		if not emotebeg == 0:
 			emotebeg = emotebeg - 1
+		if emotebeg == 0:
+			emoteend = emoteend - 2
 		emote = message[emotebeg:emoteend]
 		barf.Barf('DBG', "Emote found: %s" % emote)
-		message = message[:emotebeg]
+		new_message = message[:emotebeg]
 		extra = message[emoteend:]
+		message = new_message
 		
 		# Fixes the annoying XP capitalization in words...
 		message = message.replace("XP", "xp")
@@ -144,16 +154,19 @@ def unfilter_reply(message):
 		message = message.replace("XX", "xx")
 		
 	if not message == "":
+		# Remove whitespace if it wasn't removed earlier
+		message = message.strip()
 		if not message.endswith(('.', '!', '?')):
 			message = message + "."
 			
 	if not extra == "":
+		extra = extra[1:]
 		if not extra.endswith(('.', '!', '?')):
 			extra = extra + "."
-			message = message + extra
+		extra = extra + " "
 			
 	if not emote == "":
-		message = message + emote
+		message = message + extra + emote
 
 	return message
 
@@ -648,6 +661,7 @@ class scrib:
 		message = message.replace(":- ?", ":-?")
 		message = message.replace(", , l , ,", ",,l,,")
 		message = message.replace("@ . @", "@.@")
+		message = message.replace("D :", "D:")
 
 		words = message.split()
 		for x in xrange(0, len(words)):

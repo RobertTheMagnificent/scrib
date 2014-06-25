@@ -106,7 +106,7 @@ def unfilter_reply(message):
 	message = message.replace("$b1", ":|")
 	# Fixes emoticons that don't work in lowercase
 	# Needs to add support for D: and DX
-	emoticons = """(: :) :( ): :D D: :O O: :P XD DX :3 XP x.x x_x ^_^ o_o o.o :9 :B :c c:""".split()
+	emoticons = """(: :) :( ): :D D: :O O: :P XD DX :3 XP x.x x_x ^_^ O_O O.O :9 :B :c c:""".split()
 	pattern = "|".join(map(re.escape, emoticons))
 	emoticon = re.search(pattern, message, re.IGNORECASE)
 	if not emoticon == None:
@@ -125,6 +125,12 @@ def unfilter_reply(message):
 				message = message + "." + emote
 			else:
 				message = message + emote
+				
+		# Fix O.O, O_O, :O, and O: capitalization
+		message = message.replace("O.O", "o.o")
+		message = message.replace("O_O", "o_o")
+		message = message.replace(":O", ":o")
+		message = message.replace("O:", "o:")
 	else:
 		if not message == "":
 			if not message.endswith(('.', '!', '?')):

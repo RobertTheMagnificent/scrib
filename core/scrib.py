@@ -291,17 +291,17 @@ class scrib:
 			self.lines = pickle.loads(s)
 			del s
 
-			import json
-			barf.Barf('SAV', "Saving lines.json")
-			f = open("lines.json", "wb")
-			s = {}
-			for k,v in self.lines.items():
-				barf.Barf('DBG', "Saving lines to lines.json")
-				#v[0] = v[0].decode('utf-8', 'ignore')
-				s.update({k:v})
-			f.write(json.dumps(s, sort_keys=True, indent=4, separators=(',', ': ')))
-			f.close()
-			del f, s
+#			import json
+#			barf.Barf('SAV', "Saving lines.json")
+#			f = open("lines.json", "wb")
+#			s = {}
+#			for k,v in self.lines.items():
+#				barf.Barf('DBG', "Saving lines to lines.json")
+#				v[0] = v[0].decode('utf-8', 'ignore')
+#				s.update({k:v})
+#			f.write(json.dumps(s, sort_keys=True, indent=4, separators=(',', ': ')))
+#			f.close()
+#			del f, s
 
 		except (EOFError, IOError), e:
 			# Create new brain

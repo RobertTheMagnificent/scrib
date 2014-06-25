@@ -122,11 +122,8 @@ def unfilter_reply(message):
 		if not emotebeg == 0:
 			emotebeg = emotebeg - 1
 		emote = message[emotebeg:emoteend]
-		print emote
 		message = message[:emotebeg]
-		print message
 		extra = message[emoteend:]
-		print extra
 		
 		# Fixes the annoying XP capitalization in words...
 		message = message.replace("XP", "xp")

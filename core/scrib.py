@@ -111,7 +111,7 @@ def unfilter_reply(message):
 	eyes, nose, mouth = r":;8BX=", r"-~'^O", r")(></\|DPo39"
 	pattern1 = "[\s][%s][%s]?[%s][\s]" % tuple(map(re.escape, [eyes, nose, mouth]))
 	pattern2 = "[\s][%s][%s]?[%s][\s]" % tuple(map(re.escape, [mouth, nose, eyes]))
-	eye, horzmouth = r"^vou*@#sxz~-=+", r"-_o.wv"
+	eye, horzmouth = r"^><vou*@#sxz~-=+", r"-_o.wv"
 	pattern3 = "[\s][%s][%s][%s][\s]" % tuple(map(re.escape, [eye, horzmouth, eye]))
 
 	# Add whitespace for less false positives; it will be stripped out of the string later

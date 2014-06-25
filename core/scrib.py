@@ -106,7 +106,7 @@ def unfilter_reply(message):
 	message = message.replace("$b1", ":|")
 	
 	# New emoticon filter that tries to catch almost all variations
-	eyes, nose, mouth = r":;8BX=", r"-~'^", r")(></\|DPO39"
+	eyes, nose, mouth = r":;8X=", r"-~'^", r")(></\|DPO39"
 	pattern1 = "[%s][%s]?[%s]" % tuple(map(re.escape, [eyes, nose, mouth]))
 	pattern2 = "[%s][%s]?[%s]" % tuple(map(re.escape, [mouth, nose, eyes]))
 	

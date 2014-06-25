@@ -108,9 +108,10 @@ def unfilter_reply(message):
 	message = message.replace("$b1", ":|")
 	
 	# New emoticon filter that tries to catch almost all variations	
-	eyes, nose, mouth = r":;8BX=", r"-~'^O", r")(></\|DPo39"
-	pattern1 = "[\s][%s][%s]?[%s][\s]" % tuple(map(re.escape, [eyes, nose, mouth]))
-	pattern2 = "[\s][%s][%s]?[%s][\s]" % tuple(map(re.escape, [mouth, nose, eyes]))
+	eyes, nose, mouth = r":;8BX=", r"-~'^O", r")(></\|CDPo39"
+	# Removed nose from the pattern for the sake of my sanity
+	pattern1 = "[\s][%s][%s][\s]" % tuple(map(re.escape, [eyes, mouth]))
+	pattern2 = "[\s][%s][%s][\s]" % tuple(map(re.escape, [mouth, eyes]))
 	eye, horzmouth = r"^><vou*@#sxz~-=+", r"-_o.wv"
 	pattern3 = "[\s][%s][%s][%s][\s]" % tuple(map(re.escape, [eye, horzmouth, eye]))
 
@@ -156,11 +157,14 @@ def unfilter_reply(message):
 	if not message == "":
 		# Remove whitespace if it wasn't removed earlier
 		message = message.strip()
+		if message.endswith(','):
+			message = message[:-1]
 		if not message.endswith(('.', '!', '?')):
 			message = message + "."
 			
 	if not extra == "":
 		extra = extra[1:]
+		extra = "%s%s" % (extra[:1].upper(), extra[1:])
 		if not extra.endswith(('.', '!', '?')):
 			extra = extra + "."
 		extra = extra + " "
@@ -675,6 +679,8 @@ class scrib:
 		message = message.replace(", , l , ,", ",,l,,")
 		message = message.replace("@ . @", "@.@")
 		message = message.replace("D :", "D:")
+		message = message.replace("c :", "c:")
+		message = message.replace("C :", "C:")
 
 		words = message.split()
 		for x in xrange(0, len(words)):

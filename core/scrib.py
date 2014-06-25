@@ -106,14 +106,47 @@ def unfilter_reply(message):
 	message = message.replace("$b1", ":|")
 	# Fixes emoticons that don't work in lowercase
 	# Needs to add support for D: and DX
-	emoticon = re.search("(:|x|;|=|8){1}(-)*(p|x|d){1}", message, re.IGNORECASE)
+	emoticons = """(: :) :( ): :D D: :O O: :P XD DX :3 XP x.x x_x ^_^ O_O O.O :9 :B :c c:""".split()
+	pattern = "|".join(map(re.escape, emoticons))
+	emoticon = re.search(pattern, message, re.IGNORECASE)
+	
+	# Init some strings so it does't barf later
+	extra = ""
+	emote = ""
+	
 	if not emoticon == None:
 		emoticon = "%s" % emoticon.group()
 		message = message.replace(emoticon, emoticon.upper())
+		emotebeg = re.search(pattern, message).start()
+		emoteend = re.search(pattern, message).end()
+		if not emotebeg == 0:
+			emotebeg = emotebeg - 1
+		emote = message[emotebeg:emoteend]
+		message = message[:emotebeg]
+		extra = message[emoteend:]
+		
 		# Fixes the annoying XP capitalization in words...
 		message = message.replace("XP", "xp")
 		message = message.replace(" xp", " XP")
 		message = message.replace("XX", "xx")
+		
+		# Fix O.O, O_O, :O, and O: capitalization
+		emote = emote.replace("O.O", "o.o")
+		emote = emote.replace("O_O", "o_o")
+		emote = emote.replace(":O", ":o")
+		emote = emote.replace("O:", "o:")
+		
+	if not message == "":
+		if not message.endswith(('.', '!', '?')):
+			message = message + "."
+			
+	if not extra == "":
+		if not extra.endswith(('.', '!', '?')):
+			extra = extra + "."
+			message = message + extra
+			
+	if not emote == "":
+		message = message + emote
 
 	return message
 

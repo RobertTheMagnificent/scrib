@@ -13,7 +13,7 @@ Though Scrib is based on Pyborg, very little of the bot is compatible with any o
 
 IRC is no longer the main focus of scrib, but rather, one of the several ways to interact.
 
-As of version 1.0.0, this is considered final. We are moving on to a complete rewrite.
+Post 1.1 release, we are migrating the scrib brain system to mysql to alleviate a great many problems.
 
 What You'll Need
 ----------------

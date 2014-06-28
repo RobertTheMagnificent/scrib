@@ -747,7 +747,8 @@ class scrib:
 							msg = msg + 'off'
 							self.settings.learning = 0
 							self.settings._defaults['learning'] = 0
-		
+
+			# Publicly accessible commands
 			if cmds[0] == 'help':
 				if owner == 0 or owner == 1:
 					msg = "General commands: "
@@ -761,6 +762,36 @@ class scrib:
 
 			if cmds[0] == "version":
 				interface.output('This is a scrib version '+self.version, args)
+
+			elif cmds[0] == "alias":
+				# List aliases words
+				if len(cmds) == 1:
+					if len(self.settings.aliases) == 0:
+						msg = "No aliases"
+					else:
+						msg = "I will alias the word(s) %s." \
+							  % (", ".join(self.settings.aliases.keys()))
+				# add every word listd to alias list
+				elif len(cmds) == 2:
+					if cmds[1][0] != '~': cmds[1] = '~' + cmds[1]
+					if cmds[1] in self.settings.aliases.keys():
+						msg = "These words : %s are aliases to %s." \
+							  % (" ".join(self.settings.aliases[cmds[1]]), cmds[1] )
+					else:
+						msg = "The alias %s is not known." % cmds[1][1:]
+				elif len(cmds) > 2:
+					#create the aliases
+					if cmds[1][0] != '~': cmds[1] = '~' + cmds[1]
+					if not (cmds[1] in self.settings.aliases.keys()):
+						self.settings.aliases[cmds[1]] = [cmds[1][1:]]
+						self.replace(cmds[1][1:], cmds[1])
+						msg += cmds[1][1:] + " "
+					for x in xrange(2, len(cmds)):
+						msg += "%s " % cmds[x]
+						self.settings.aliases[cmds[1]].append(cmds[x])
+						#replace each words by his alias
+						self.replace(cmds[x], cmds[1])
+					msg += "have been aliased to %s." % cmds[1]
 
 
 		if cmds[0] not in self.commands:

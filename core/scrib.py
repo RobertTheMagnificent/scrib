@@ -1164,7 +1164,6 @@ class scrib:
 							msg += x + "(0) "
 
 		if cmds[0] not in self.commands:
-			print self.commands
 			msg = cmds[0] + " is not a registered command."
 
 		if msg != "":

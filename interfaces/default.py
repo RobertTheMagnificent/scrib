@@ -28,7 +28,6 @@ class ModLineIn:
 				self.scrib.barf('ACT', "Type !quit to leave")
 				self.scrib.barf('ACT', "Enter your name?\033[0m")
 				name = raw_input("> ")
-				time.sleep(1)
 				self.scrib.barf('MSG', "Hello %s." %name)
 				while 1:
 						try:

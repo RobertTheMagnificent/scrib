@@ -184,7 +184,7 @@ class scrib:
 		self.timers_started = False
 
 		# This is where we do some ownership command voodoo.
-		self.owner_commands = ['alias', 'censor', 'check', 'context', 'learn', 'learning', 'limit', 'rebuild', 'replace', 'replyrate', 'save', 'uncensor', 'unlearn', 'quit']
+		self.owner_commands = ['alias', 'forget', 'censor', 'check', 'context', 'learn', 'learning', 'limit', 'rebuild', 'replace', 'replyrate', 'save', 'uncensor', 'unlearn', 'quit']
 		self.general_commands = ['date', 'help', 'known', 'owner', 'version', 'words']
 		self.plugin_commands = PluginManager.plugin_commands
 		self.commands = self.general_commands + self.owner_commands + self.plugin_commands
@@ -337,8 +337,10 @@ class scrib:
 			for x in self.lines.keys():
 				num_contexts += len(self.lines[x][0].split())
 			self.brainstats.num_contexts = num_contexts
+			self.barf('ACT', "%s words and %s contexts found" % ( self.brainstats.num_words, self.brainstats.num_contexts ))
 			# Save new values
 			self.brainstats.save()
+			self.barf('ACT', "%s words and %s contexts loaded" % ( self.brainstats.num_words, self.brainstats.num_contexts ))
 
 		# Is an aliases update required ?
 		count = 0
@@ -630,8 +632,7 @@ class scrib:
 			if message == "":
 				if self.debug == 1:
 					self.barf('DBG', "Message empty.")
-					replying = "Not replying."
-				return
+				replying = "Not replying."
 			else:
 				time.sleep(.075 * len(message))
 				if self.debug == 1:
@@ -661,6 +662,7 @@ class scrib:
 				# And remove the (
 				message = message[0:index] + message[index + 1:]
 		except ValueError, e:
+			#bot.barf('ERR', "Filter: %s" % e)
 			pass
 
 		# Strips out urls not ignored before...

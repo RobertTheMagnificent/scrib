@@ -76,4 +76,4 @@ if __name__ == "__main__":
 			if c[:1] == 'n':
 				sys.exit(0)
 		del my_scrib
-
+		sys.exit(0)

@@ -20,8 +20,6 @@ import brain
 import cfg
 from plugins import PluginManager
 
-timers_started = 0
-
 def get_time_for_file():
 	return "%s-%s" % (datetime.date.today(), time.strftime("%H%M%S",time.localtime(time.time())))
 
@@ -193,7 +191,7 @@ class scrib:
 		self.version = "1.1.1"
 
 		# This is where we do some ownership command voodoo.
-		self.owner_commands = ['alias', 'censor', 'check', 'context', 'learning', 'limit', 'rebuild', 'replace', 'save', 'uncensor', 'unlearn', 'quit']
+		self.owner_commands = ['alias', 'censor', 'check', 'context', 'learn', 'learning', 'limit', 'rebuild', 'replace', 'save', 'uncensor', 'unlearn', 'quit']
 		self.general_commands = ['help', 'known', 'owner', 'version', 'words']
 		self.plugin_commands = PluginManager.plugin_aliases
 		self.commands = self.general_commands + self.owner_commands + self.plugin_commands
@@ -209,8 +207,7 @@ class scrib:
 							"reply_length": 140,
 							"learning": 1,
 							"debug": 0,
-							"max_words": 6000,
-							"learning": 1,
+							"max_words": 9001,
 							"length": 140,
 							"censored": [],
 							"num_aliases": 0,
@@ -236,22 +233,6 @@ class scrib:
 							"sentences": {}
 							})
 		self.unfilterd = {}
-
-		# Starts the timers:
-		global timers_started
-		if timers_started is False:
-			try:
-				self.autosave = threading.Timer(to_sec("125m"), self.save_all)
-				self.autosave.start()
-				self.autopurge = threading.Timer(to_sec("5h"), self.auto_optimise)
-				self.autopurge.start()
-				self.autorebuild = threading.Timer(to_sec("71h"), self.auto_rebuild)
-				self.autorebuild.start()
-				timers_started = True
-			except SystemExit, e:
-				self.autosave.cancel()
-				self.autopurge.cancel()
-				self.autorebuild.cancel()
 
 		if dbread("hello") is None:
 			dbwrite("hello", "hi #nick")
@@ -415,7 +396,7 @@ class scrib:
 			stuff = pickle.loads(file)
 		return stuff
 
-	def save_all(self, interface, restart_timer=True):
+	def save_all(self, interface):
 		self.barf('SAV', "Writing to my brain...")
 
 		f = open("brain/words.dat", "wb")
@@ -478,12 +459,6 @@ class scrib:
 		if self.debug == 1:
 			self.barf('DBG', "Sentences written.")
 
-		if restart_timer is True:
-			self.autosave = threading.Timer(to_sec("125m"), self.save_all)
-			self.autosave.start()
-			if self.debug == 1:
-				self.barf('DBG', "Restart timer started.")
-
 		# Save settings
 		self.settings.save()
 		self.brainstats.save()
@@ -509,15 +484,6 @@ class scrib:
 			for k in old_lines.keys():
 				filtered_line = self.filter(old_lines[k][0])
 				self.learn(filtered_line, old_lines[k][1])
-
-			# Restarts the timer
-			self.autorebuild = threading.Timer(to_sec("71h"), self.auto_rebuild)
-			self.autorebuild.start()
-
-	def kill_timers(self):
-		self.autosave.cancel()
-		self.autopurge.cancel()
-		self.autorebuild.cancel()
 
 	def process(self, interface, body, replyrate, learn, args, owner=0, muted=0):
 		"""
@@ -703,16 +669,303 @@ class scrib:
 		if cmds[0] in self.commands:
 			# Owner commands
 			if owner == 1:
-				if cmds[0] == 'quit':
-					self.save_all(interface, False)
+				if cmds[0] == "learn":
+					try:
+						key = ' '.join(cmds[1:]).split("|")[0].strip()
+						key = re.sub("[\.\,\?\*\"\'!]", "", key)
+						rnum = int(len(' '.join(cmds[1:]).split("|")) - 1)
+						if "#nick" in key:
+							msg = "Yeah, that won't work."
+						else:
+							value = teach_filter(' '.join(cmds[1:]).split("|")[1].strip())
+							dbwrite(key[0:], value[0:])
+							if rnum > 1:
+								array = ' '.join(cmds[1:]).split("|")
+								rcount = 1
+								for value in array:
+									if rcount == 1:
+										rcount = rcount + 1
+									else:
+										dbwrite(key[0:], teach_filter(value[0:].strip()))
+							else:
+								value = ' '.join(cmds[1:]).split("|")[1].strip()
+								dbwrite(key[0:], teach_filter(value[0:]))
+							msg = "New response learned for %s" % key
+					except Exception, e:
+						msg = "I couldn't learn that: %s" % e
+
+				elif cmds[0] == "forget":
+					if os.path.isfile("brain/prepared.dat"):
+						try:
+							key = ' '.join(cmds[1:]).strip()
+							for line in fileinput.input("brain/prepared.dat", inplace=1):
+								data = line.split(":=:")[0]
+								dlen = r'\b.{2,}\b'
+								if re.search(dlen, key, re.IGNORECASE):
+									if key.lower() in data.lower() or data.lower() in key.lower():
+										pass
+								else:
+									print line.strip()
+								msg = "Poof! '%s' is gone." % key
+						except Exception, e:
+							msg = "Sorry, I couldn't forget that: %s" % e
+					else:
+						msg = "I cannot forget what I do not know."
+
+				elif cmds[0] == "find":
+					if os.path.isfile("brain/prepared.dat"):
+						rcount = 0
+						matches = ""
+						key = ' '.join(cmds[1:]).strip()
+						file = open("brain/prepared.dat")
+						for line in file.readlines():
+							data = line.split(":=:")[0]
+							dlen = r'\b.{2,}\b'
+							if re.search(dlen, key, re.IGNORECASE):
+								if key.lower() in data.lower() or data.lower() in key.lower():
+									if key.lower() is "":
+										pass
+									else:
+										rcount = rcount + 1
+										if matches == "":
+											matches = data
+										else:
+											matches = matches + ", " + data
+						file.close()
+						if rcount < 1:
+							msg = "I have no match for %s" % (key)
+						elif rcount == 1:
+							msg = "I found 1 match: %s" % (matches)
+						else:
+							msg = "I found %d matches: %s" % (rcount, matches)
+					else:
+						msg = "Sorry, but I don't know know what you're on about."
+
+				elif cmds[0] == "responses":
+					if os.path.isfile("brain/prepared.dat"):
+						rcount = 0
+						file = open("brain/prepared.dat")
+						for line in file.readlines():
+							if line is "":
+								pass
+							else:
+								rcount = rcount + 1
+						file.close()
+						if rcount < 1:
+							msg = "I've learned no responses"
+						elif rcount == 1:
+							msg = "I've learned only 1 response"
+						else:
+							msg = "I've learned %d responses" % rcount
+					else:
+						msg = "You need to teach me something first!"
+
+				elif cmds[0] == "limit":
+					msg = "The max limit is "
+					if len(cmds) == 1:
+						msg += str(self.settings.max_words)
+					else:
+						limit = int(cmds[1])
+						self.settings.max_words = limit
+						msg += "now " + cmds[1]
+
+				# Check for broken links in the brain
+				elif cmds[0] == "check":
+					t = time.time()
+					num_broken = 0
+					num_bad = 0
+					for w in self.words.keys():
+						wlist = self.words[w]
+
+						for i in xrange(len(wlist) - 1, -1, -1):
+							line_idx, word_num = struct.unpack("iH", wlist[i])
+
+							# Nasty critical error we should fix
+							if not self.lines.has_key(line_idx):
+								self.barf('ACT', "Removing broken link '%s' -> %d." % (w, line_idx))
+								num_broken = num_broken + 1
+								del wlist[i]
+							else:
+								# Check pointed to word is correct
+								split_line = self.lines[line_idx][0].split()
+								if split_line[word_num] != w:
+									self.barf('ACT', "Line '%s' word %d is not '%s' as expected." % \
+											  (self.lines[line_idx][0],
+											   word_num, w))
+									num_bad = num_bad + 1
+									del wlist[i]
+						if len(wlist) == 0:
+							del self.words[w]
+							self.brainstats.num_words = self.brainstats.num_words - 1
+							self.barf('ACT', "\"%s\" vaporized from brain." % w)
+
+					msg = "Checked my brain in %0.2fs. Fixed links: %d broken, %d bad." % \
+						  (
+						   time.time() - t,
+						   num_broken,
+						   num_bad)
+
+				elif cmds[0] == "!rebuild":
+					if self.settings.learning == 1:
+						t = time.time()
+
+						old_lines = self.lines
+						old_num_words = self.brainstats.num_words
+						old_num_contexts = self.brainstats.num_contexts
+
+						self.words = {}
+						self.lines = {}
+						self.brainstats.num_words = 0
+						self.brainstats.num_contexts = 0
+
+						for k in old_lines.keys():
+							self.learn(old_lines[k][0], old_lines[k][1])
+
+						msg = "Rebuilt brain in %0.2fs. Words %d (%+d), contexts %d (%+d)." % \
+							  (
+							   time.time() - t,
+							   old_num_words,
+							   self.brainstats.num_words - old_num_words,
+							   old_num_contexts,
+							   self.brainstats.num_contexts - old_num_contexts)
+
+				elif cmds[0] == "replace":
+					if len(cmds) < 3:
+						return
+					old = cmds[1]
+					new = cmds[2]
+					msg = self.replace(old, new)
+
+				elif cmds[0] == "context":
+					if self.debug == 1:
+						self.barf('DBG', "Checking contexts...")
+
+					# build context we are looking for
+					context = " ".join(cmds[1:])
+					if context == "":
+						return
+
+					find_context = " ".join(cmds[1:])
+					num_contexts = ""
+
+					# Build context list
+					context = " " + context + " "
+					c = []
+					# Search through contexts
+					for x in self.lines.keys():
+						# get context
+						ctxt = self.lines[x][0]
+						# add leading whitespace for easy sloppy search code
+						# TODO Find a better, less sloppy way to do this crap
+						ctxt = " " + ctxt + " "
+						if ctxt.find(context) != -1:
+							# Avoid duplicates (2 of a word
+							# in a single context)
+							num_contexts = len(c) + 1
+							if len(c) == 0:
+								c.append(self.lines[x][0])
+							elif c[len(c) - 1] != self.lines[x][0]:
+								c.append(self.lines[x][0])
+					x = 0
+
+					if num_contexts != "":
+						self.barf('ACT', "=========================================")
+						self.barf('ACT', "Printing contexts containing \033[1m'%s'" % (num_contexts, find_context))
+						self.barf('ACT', "=========================================")
+					else:
+						self.barf('ACT', "=========================================")
+						self.barf('ACT', "No contexts to print containing \033[1m'%s'" % find_context)
+
+					while x < 5:
+						if x < len(c):
+							lines = c
+							self.barf('ACT', "%s" % lines[x])
+						x += 1
+					if len(c) == 5:
+						return
+					if x < 5:
+						x = 5
+					while x < len(c):
+						lines = c
+						self.barf('ACT', "%s" % lines[x])
+						x += 1
+
+					self.barf('ACT', "=========================================")
+
+				# Remove a word from the vocabulary [use with care]
+				elif cmds[0] == "unlearn":
+					if self.debug == 1:
+						self.barf('DBG', "Unlearning...")
+					# build context we are looking for
+					context = " ".join(cmds[1:])
+					if context == "":
+						return
+					self.barf('ACT', "Looking for: %s" % context)
+					# Unlearn contexts containing 'context'
+					t = time.time()
+					self.unlearn(context)
+					# we don't actually check if anything was
+					# done..
+					msg = "Unlearn done in %0.2fs" % ( time.time() - t)
+					msg += " You may want to !check the brain, to be safe."
+
+				elif cmds[0] == "learning":
+					msg = "Learning mode "
+					if len(cmds) == 1:
+						if self.settings.learning == 0:
+							msg += "off"
+						else:
+							msg += "on"
+					else:
+						toggle = cmds[1]
+						if toggle == "on":
+							msg += "on"
+							self.settings.learning = 1
+						else:
+							msg += "off"
+							self.settings.learning = 0
+
+				elif cmds[0] == "censor":
+					# no arguments. list censored words
+					if len(cmds) == 1:
+						if len(self.settings.censored) == 0:
+							msg = "No words censored."
+						else:
+							msg = "I will not use the word(s) %s" % (
+								 ", ".join(self.settings.censored))
+					# add every word listd to censored list
+					else:
+						for x in xrange(1, len(cmds)):
+							if cmds[x] in self.settings.censored:
+								msg += "is already censored." % ( cmds[x])
+							else:
+								self.settings.censored.append(cmds[x])
+								self.unlearn(cmds[x])
+								msg += "is now censored." % ( cmds[x])
+							msg += "\n"
+
+				elif cmds[0] == "uncensor":
+					if self.debug == 1:
+						self.barf('DBG', "Uncensoring...")
+					# Remove words listed from the censor list
+					# eg !uncensor tom dick harry
+					for x in xrange(1, len(cmds)):
+						try:
+							self.settings.censored.remove(cmds[x])
+							msg = "is uncensored." % ( cmds[x])
+						except ValueError, e:
+							pass
+
+				elif cmds[0] == 'quit':
+					self.save_all(interface)
 					self.barf('MSG', 'Goodbye!')
 					sys.exit(0)
 			
-				if cmds[0] == 'save':
+				elif cmds[0] == 'save':
 					self.barf('SAV', 'User initiated save')
 					self.save_all(interface)
 
-				if cmds[0] == 'debug':
+				elif cmds[0] == 'debug':
 					msg = "debug mode "
 					if len(cmds) == 1:
 						if self.settings.debug == 0:
@@ -730,7 +983,7 @@ class scrib:
 							self.settings.debug = 0
 							self.settings._defaults['debug'] = 0
 
-				if cmds[0] == 'learning':
+				elif cmds[0] == 'learning':
 					msg = "Learning mode "
 					if len(cmds) == 1:
 						if self.settings.learning == 0:
@@ -760,7 +1013,7 @@ class scrib:
 					msg = msg + "\n%s :: Plugin commands: " % sym
 					msg = msg + ', '.join(str(cmd) for cmd in self.plugin_commands)
 
-			if cmds[0] == "version":
+			elif cmds[0] == "version":
 				msg = 'scrib: %s; brain: %s' % ( self.version, self.brain.version )
 
 			elif cmds[0] == "alias":
@@ -793,6 +1046,39 @@ class scrib:
 						self.replace(cmds[x], cmds[1])
 					msg += "have been aliased to %s." % cmds[1]
 
+			elif cmds[0] == "words":
+				num_w = self.brainstats.num_words
+				num_c = self.brainstats.num_contexts
+				num_l = len(self.lines)
+				if num_w != 0:
+					num_cpw = num_c / float(num_w) # contexts per word
+				else:
+					num_cpw = 0.0
+				msg = "I know %d words (%d contexts, %.2f per word), 1%d lines." % (
+					 num_w, num_c, num_cpw, num_l)
+
+			elif cmds[0] == "known":
+				if len(cmds) == 2:
+					# single word specified
+					word = cmds[1]
+					if self.words.has_key(word):
+						c = len(self.words[word])
+						msg = "is known (%d contexts)" % ( word, c)
+					else:
+						msg = "is unknown." % ( word)
+				elif len(cmds) > 2:
+					# multiple words.
+					words = []
+					for x in cmds[1:]:
+						words.append(x)
+					msg = "Number of contexts: "
+					for x in words:
+						if self.words.has_key(x):
+							c = len(self.words[x])
+							msg += x + "(" + str(c) + ") "
+						else:
+							msg += x + "(0) "
+
 
 		if cmds[0] not in self.commands:
 			msg = cmds[0] + " is not a registered command."
@@ -809,7 +1095,7 @@ class scrib:
 		try:
 			pointers = self.words[old]
 		except KeyError, e:
-			return "%s %s not known." % (self.settings.symbol, old)
+			return "%s is not known." % old
 		changed = 0
 
 		for x in pointers:
@@ -833,7 +1119,7 @@ class scrib:
 		else:
 			self.words[new] = self.words[old]
 		del self.words[old]
-		return "%s %d instances of %s replaced with %s" % ( self.settings.symbol, changed, old, new )
+		return "%d instances of %s replaced with %s" % ( changed, old, new )
 
 	def unlearn(self, context):
 		"""

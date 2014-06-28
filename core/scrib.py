@@ -1014,6 +1014,7 @@ class scrib:
 				elif cmds[0] == 'save':
 					self.barf('SAV', 'User initiated save')
 					self.save_all(interface)
+					msg = "Saved!"
 
 				elif cmds[0] == 'debug':
 					msg = "debug mode "
@@ -1085,13 +1086,13 @@ class scrib:
 			if cmds[0] == 'help':
 				if owner == 0 or owner == 1:
 					msg = "General commands: "
-					msg = msg + ', '.join(str(cmd) for cmd in self.general_commands)
+					msg += ', '.join(str(cmd) for cmd in self.general_commands)
 				if owner == 1:
-					msg = msg + "\n%s :: Owner commands: " % sym
-					msg = msg + ', '.join(str(cmd) for cmd in self.owner_commands)
+					msg += " :: Owner commands: "
+					msg += ', '.join(str(cmd) for cmd in self.owner_commands)
 				if self.plugin_commands:
-					msg = msg + "\n%s :: Plugin commands: " % sym
-					msg = msg + ', '.join(str(cmd) for cmd in self.plugin_commands)
+					msg += " :: Plugin commands: "
+					msg += ', '.join(str(cmd) for cmd in self.plugin_commands)
 
 			elif cmds[0] == "version":
 				msg = 'scrib: %s; brain: %s' % ( self.version, self.brain.version )

@@ -328,13 +328,13 @@ class scrib:
 			self.barf('ERR', "New brain generated.")
 
 		self.barf('ACT', "Calculating words and contexts...")
-		self.brainstats.num_words = len(self.words)
+		self.brainstats['num_words'] = len(self.words)
 		num_contexts = 0
 		# Get number of contexts
 		for x in self.lines.keys():
 			num_contexts += len(self.lines[x][0].split())
-		self.brainstats.num_contexts = num_contexts
-		self.barf('ACT', "%s words and %s contexts loaded" % ( self.brainstats.num_words, self.brainstats.num_contexts ))
+		self.brainstats['num_contexts'] = num_contexts
+		self.barf('ACT', "%s words and %s contexts loaded" % ( self.brainstats['num_words'], self.brainstats['num_contexts'] ))
 
 		# Is an aliases update required ?
 		count = 0
@@ -511,13 +511,13 @@ class scrib:
 			t = time.time()
 
 			old_lines = self.lines
-			old_num_words = self.brainstats.num_words
-			old_num_contexts = self.brainstats.num_contexts
+			old_num_words = self.brainstats['num_words']
+			old_num_contexts = self.brainstats['num_contexts']
 
 			self.words = {}
 			self.lines = {}
-			self.brainstats.num_words = 0
-			self.brainstats.num_contexts = 0
+			self.brainstats['num_words'] = 0
+			self.brainstats['num_contexts'] = 0
 
 			for k in old_lines.keys():
 				filtered_line = self.filter(old_lines[k][0])
@@ -525,9 +525,9 @@ class scrib:
 			msg = "Rebuilt brain in %0.2fs. Words %d (%+d), contexts %d (%+d)." % \
 				  (time.time() - t,
 				   old_num_words,
-				   self.brainstats.num_words - old_num_words,
+				   self.brainstats['num_words'] - old_num_words,
 				   old_num_contexts,
-				   self.brainstats.num_contexts - old_num_contexts)
+				   self.brainstats['num_contexts'] - old_num_contexts)
 
 			# Restarts the timer
 			self.autorebuild = threading.Timer(self.to_sec("71h"), self.auto_rebuild)
@@ -852,7 +852,7 @@ class scrib:
 									del wlist[i]
 						if len(wlist) == 0:
 							del self.words[w]
-							self.brainstats.num_words = self.brainstats.num_words - 1
+							self.brainstats['num_words'] = self.brainstats['num_words'] - 1
 							self.barf('ACT', "\"%s\" vaporized from brain." % w)
 
 					msg = "Checked my brain in %0.2fs. Fixed links: %d broken, %d bad." % \
@@ -1095,8 +1095,8 @@ class scrib:
 				msg = "It is ".join(i for i in os.popen('date').readlines())
 
 			elif cmds[0] == "words":
-				num_w = self.brainstats.num_words
-				num_c = self.brainstats.num_contexts
+				num_w = self.brainstats['num_words']
+				num_c = self.brainstats['num_contexts']
 				num_l = len(self.lines)
 				if num_w != 0:
 					num_cpw = num_c / float(num_w) # contexts per word
@@ -1161,7 +1161,7 @@ class scrib:
 				changed += 1
 
 		if self.words.has_key(new):
-			self.brainstats.num_words -= 1
+			self.brainstats['num_words'] -= 1
 			self.words[new].extend(self.words[old])
 		else:
 			self.words[new] = self.words[old]
@@ -1204,10 +1204,10 @@ class scrib:
 				# Check for any of the deleted contexts
 				if unpack("iH", word_contexts[y])[0] in dellist:
 					del word_contexts[y]
-					self.brainstats.num_contexts = self.brainstats.num_contexts - 1
+					self.brainstats['num_contexts'] = self.brainstats['num_contexts'] - 1
 			if len(words[x]) == 0:
 				del words[x]
-				self.brainstats.num_words = self.brainstats.num_words - 1
+				self.brainstats['num_words'] = self.brainstats['num_words'] - 1
 				self.barf('ACT', "\"%s\" vaporized from brain." % x)
 
 	def reply(self, body):
@@ -1468,9 +1468,9 @@ class scrib:
 				elif ( "-" in words[x] or "_" in words[x] ):
 					words[x] = "#nick"
 
-			num_w = self.brainstats.num_words
+			num_w = self.brainstats['num_words']
 			if num_w != 0:
-				num_cpw = self.brainstats.num_contexts / float(num_w) # contexts per word
+				num_cpw = self.brainstats['num_contexts'] / float(num_w) # contexts per word
 			else:
 				num_cpw = 0
 
@@ -1491,13 +1491,13 @@ class scrib:
 							self.words[words[x]].append(struct.pack("iH", hashval, x))
 						else:
 							self.words[words[x]] = [struct.pack("iH", hashval, x)]
-							self.brainstats.num_words += 1
-						self.brainstats.num_contexts += 1
+							self.brainstats['num_words'] += 1
+						self.brainstats['num_contexts'] += 1
 			else:
 				self.lines[hashval][1] += num_context
 
 			#is max_words reached, don't learn more
-			if self.brainstats.num_words >= self.settings.max_words:
+			if self.brainstats['num_words'] >= self.settings.max_words:
 				self.settings.learning = 0
 				self.barf('ERR', "Had to turn off learning- max_words limit reached!")
 

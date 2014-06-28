@@ -140,7 +140,7 @@ def unfilter_reply(message):
 		if emotebeg == 0:
 			emoteend = emoteend - 2
 		emote = message[emotebeg:emoteend]
-		self.barf('DBG', "Emote found: %s" % emote)
+		barf.Barf('DBG', "Emote found: %s" % emote)
 		new_message = message[:emotebeg]
 		extra = message[emoteend:]
 		message = new_message
@@ -315,7 +315,8 @@ class scrib:
 					f.close()
 					self.lines = self.unpack(s, v)
 					if self.debug == 1:
-						self.barf('DBG', "Applying filter to adjust to new brain system.\n                This may take several minutes...")
+						self.barf('DBG', "Applying filter to adjust to new brain system.")
+						self.barf('TAB', "This may take a bit, and will shrink the dataset.")
 					self.auto_rebuild()
 					f = open("brain/lines.dat", "wb")
 					s = self.pack(self.lines, self.brain.version, True)
@@ -359,7 +360,9 @@ class scrib:
 			num_contexts += len(self.lines[x][0].split())
 		self.brainstats['num_contexts'] = num_contexts
 		self.barf('ACT', "%s words and %s contexts loaded" % ( self.brainstats['num_words'], self.brainstats['num_contexts'] ))
-
+		self.barf('ACT', "Optimizing brain bits...")
+		self.auto_rebuild()
+		
 		# Is an aliases update required ?
 		count = 0
 		for x in self.settings.aliases.keys():

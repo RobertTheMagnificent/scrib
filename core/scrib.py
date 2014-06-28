@@ -181,6 +181,7 @@ class scrib:
 		Here we'll load settings and set up modules.
 		"""
 		self.version = "1.1.1"
+		self.timers_started = False
 
 		# This is where we do some ownership command voodoo.
 		self.owner_commands = ['alias', 'censor', 'check', 'context', 'learn', 'learning', 'limit', 'rebuild', 'replace', 'replyrate', 'save', 'uncensor', 'unlearn', 'quit']
@@ -205,6 +206,7 @@ class scrib:
 							"censored": [],
 							"num_aliases": 0,
 							"aliases": {},
+							"ignore_list": [],
 							"version": self.version
 							})
 
@@ -226,6 +228,18 @@ class scrib:
 							"sentences": {}
 							})
 		self.unfilterd = {}
+
+		# Starts the timers:
+		if self.timers_started is False:
+			try:
+				self.autosave = threading.Timer(self.to_sec("125m"), self.save_all)
+				self.autosave.start()
+				self.autorebuild = threading.Timer(self.to_sec("71h"), self.auto_rebuild)
+				self.autorebuild.start()
+				timers_started = True
+			except SystemExit, e:
+				self.autosave.cancel()
+				self.autorebuild.cancel()
 
 		if dbread("hello") is None:
 			dbwrite("hello", "hi #nick")
@@ -368,6 +382,9 @@ class scrib:
 			pass
 
 		#self.settings.save()
+	def to_sec(self, s):
+		seconds_per_unit = {"s": 1, "m": 60, "h": 3600, "d": 86400, "w": 604800}
+		return int(s[:-1]) * seconds_per_unit[s[-1]]
 
 	# For unpacking a brain. This is just quick and dirty, should be replaced...
 	def brain_ver(self, version):
@@ -414,10 +431,10 @@ class scrib:
 				del s
 				return stuff
 
-			stuff = json.dumps(file, sort_keys=True, indent=4, separators=(',', ': '), encoding='utf-8')
+			stuff = json.dumps(file, sort_keys=True, indent=4, separators=(',', ': '), encoding='latin-1').decode('latin-1').encode('utf-8') # Gross
 		return stuff
 
-	def save_all(self, interface):
+	def save_all(self, interface, restart_timer=True):
 		self.barf('SAV', "Writing to my brain...")
 
 		f = open("brain/words.dat", "wb")
@@ -489,6 +506,12 @@ class scrib:
 
 		self.barf('SAV', "Brain saved.")
 
+		if restart_timer is True:
+			self.autosave = threading.Timer(self.to_sec("125m"), self.save_all)
+			self.autosave.start()
+			if self.debug == 1:
+				self.barf('DBG', "Restart timer started.")
+
 	def auto_rebuild(self):
 		if self.settings.learning == 1:
 			t = time.time()
@@ -511,9 +534,18 @@ class scrib:
 				   self.brainstats.num_words - old_num_words,
 				   old_num_contexts,
 				   self.brainstats.num_contexts - old_num_contexts)
+
+			# Restarts the timer
+			self.autorebuild = threading.Timer(self.to_sec("71h"), self.auto_rebuild)
+			self.autorebuild.start()
+
 			return msg
 		else:
 			return "Learning mode is off; will not rebuild."
+
+	def kill_timers(self):
+		self.autosave.cancel()
+		self.autorebuild.cancel()
 
 	def process(self, interface, body, replyrate, learn, args, owner=0, muted=0):
 		"""
@@ -599,9 +631,8 @@ class scrib:
 			if message == "":
 				if self.debug == 1:
 					self.barf('DBG', "Message empty.")
+					replying = "Not replying."
 				return
-			if self.debug == 1:
-				replying = "Not replying."
 			else:
 				time.sleep(.075 * len(message))
 				if self.debug == 1:
@@ -975,9 +1006,10 @@ class scrib:
 							pass
 
 				elif cmds[0] == 'quit':
-					self.save_all(interface)
+					self.kill_timers()
+					self.save_all(interface, False)
 					self.barf('MSG', 'Goodbye!')
-					sys.exit(0)
+					sys.exit()
 			
 				elif cmds[0] == 'save':
 					self.barf('SAV', 'User initiated save')
@@ -1201,8 +1233,7 @@ class scrib:
 			return ""
 
 		#remove words on the ignore list
-		#words = [x for x in words if x not in self.settings.ignore_list and not x.isdigit()]
-		words = [x for x in words if not x.isdigit()]
+		words = [x for x in words if x not in self.settings.ignore_list and not x.isdigit()]
 
 		# Find rarest word (excluding those unknown)
 		index = []
@@ -1413,8 +1444,8 @@ class scrib:
 					self.barf('ERR', "Not learning: %s" % words)
 				return
 
-			vowels = "aÃ Ã¢eÃ©Ã¨ÃªiÃ®Ã¯oÃ¶Ã´uÃ¼Ã»y"
-			#vowels = ""
+			#vowels = "aÃ Ã¢eÃ©Ã¨ÃªiÃ®Ã¯oÃ¶Ã´uÃ¼Ã»y"
+			vowels = ""
 			for x in xrange(0, len(words)):
 
 				nb_voy = 0

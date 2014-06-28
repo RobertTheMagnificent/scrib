@@ -350,8 +350,9 @@ if __name__ == "__main__":
 		traceback.print_exc()
 		my_scrib.barf('ERR', "Oh no, I've crashed! Would you like to save my brain?", False)
 		c = raw_input("[Y/n]")
-		if c[:1] == 'n':
-			sys.exit(0)
+		if c[:1] != 'n':
+			my_scrib.save_all(my_scrib, False)
+		sys.exit(0)
 
 	bot.disconnect(bot.settings.quit_message) # exit irc cleanly
 	del my_scrib

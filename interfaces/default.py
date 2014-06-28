@@ -17,9 +17,6 @@ class ModLineIn:
 		Module to interface console input and output with the Scrib learn
 		and reply modules. Allows offline chat with Scrib.
 		"""
-		# Command list for this module
-		commandlist = "LineIn Module Commands:\n!quit"
-		commanddict = { "quit": "Usage: !quit\nQuits Scrib and saves the dictionary" }
 
 		def __init__(self, my_scrib):
 				self.scrib = my_scrib
@@ -72,10 +69,12 @@ if __name__ == "__main__":
 		except SystemExit:
 			pass
 		except:
+			my_scrib.kill_timers()
 			my_scrib.barf('ERR', traceback.format_exc())
 			my_scrib.barf('ERR', "Oh no, I've crashed! Would you like to save my brain?", False)
 			c = raw_input("[Y/n]")
-			if c[:1] != 'n':
-				my_scrib.save_all(my_scrib)
+			if c[:1] != "n":
+				my_scrib.save_all(my_scrib, False)
+
 		del my_scrib
-		sys.exit(0)
+		sys.exit()

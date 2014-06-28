@@ -1,4 +1,4 @@
-#!/bin/bash    
+#!/bin/bash
 # Scrib brain backup script ver. 0.1
 # by KittyTristy "Tristy Hopkins"
 
@@ -20,11 +20,14 @@ function start
 			[Nn]* ) exit ;;
 			* ) echo "Please enter yes or no.";;
 			esac
-		done	
+		done
 }
 
 function brainbak
 {
+	if [ ! -d "backups" ]; then
+		mkdir backups
+	fi
 	echo ""
 	echo -e $BOLD"Whose brain are you backing up?"$CLEAR
 	read -p "# " BRAIN
@@ -32,6 +35,7 @@ function brainbak
 	echo -e $BOLD"Okay, starting backup. Standby."$CLEAR
 	echo ""
 	tar -zcvf $BRAIN-brain$DATE.tar.gz brain/
+	mv $BRAIN-brain$DATE.tar.gz backup/
 	echo ""
 	echo -e $BOLD"We're done!"$CLEAR
 

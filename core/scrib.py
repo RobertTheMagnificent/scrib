@@ -198,7 +198,7 @@ class scrib:
 			'replace': "replace [current] [new]",
 			'replyrate': "Shows/sets the reply rate.",
 			'save': "Saves the brain.",
-			'uncensor': "uncensor [word]",
+			'uncensor': "uncensor [word1] [word2] [word3] ...",
 			'unlearn': "unlearn [word]",
 			'quit': "Shut the bot down."
 		}
@@ -231,6 +231,7 @@ class scrib:
 							"num_aliases": 0,
 							"aliases": {},
 							"ignore_list": [],
+							"optimum": 0,
 							"version": self.version
 							})
 
@@ -290,8 +291,8 @@ class scrib:
 				c = raw_input("[Y/n]")
 				if c[:1].lower() != 'n':
 					timestamp = "%s-%s" % (datetime.date.today(), time.strftime("%H%M%S",time.localtime(time.time())))
-					shutil.copyfile("brain/cortex.zip", "brain/cortex-%s.zip" % timestamp)
-					self.barf('ACT', "Backup saved to brain/cortex-%s.zip" % timestamp)
+					shutil.copyfile("brain/cortex.zip", "backups/cortex-%s.zip" % timestamp)
+					self.barf('ACT', "Backup saved to backups/cortex-%s.zip" % timestamp)
 					self.barf('ACT', "Starting update, may take a few moments.")
 					f = open("brain/words.dat", "rb")
 					if self.debug == 1:
@@ -352,6 +353,9 @@ class scrib:
 			self.lines = {}
 			self.barf('ERR', "New brain generated.")
 
+		if self.settings.optimum == 1:
+			self.barf('ACT', "Optimizing brain bits...")
+			self.auto_rebuild()
 		self.barf('ACT', "Calculating words and contexts...")
 		self.brainstats['num_words'] = len(self.words)
 		num_contexts = 0
@@ -360,8 +364,6 @@ class scrib:
 			num_contexts += len(self.lines[x][0].split())
 		self.brainstats['num_contexts'] = num_contexts
 		self.barf('ACT', "%s words and %s contexts loaded" % ( self.brainstats['num_words'], self.brainstats['num_contexts'] ))
-		self.barf('ACT', "Optimizing brain bits...")
-		self.auto_rebuild()
 		
 		# Is an aliases update required ?
 		count = 0
@@ -477,6 +479,7 @@ class scrib:
 		f.write('brain/words.dat')
 		if self.debug == 1:
 			self.barf('DBG', "Words zipped")
+		os.remove('brain/words.dat')
 		f.write('brain/lines.dat')
 		if self.debug == 1:
 			self.barf('DBG', "Lines zipped")
@@ -485,12 +488,16 @@ class scrib:
 			f.close()
 			if self.debug == 1:
 				self.barf('DBG', "Version zipped")
+			os.remove('brain/version')
 		except:
-			f = open("brain/version", "w")
-			f.write(self.brain.version)
-			f.close()
+			v = open("brain/version", "w")
+			v.write(self.brain.version)
+			v.close()
+			f.write("brain/version")
 			if self.debug == 1:
-				self.barf('DBG', "Version written.")
+				self.barf('DBG', "Version written and zipped.")
+			os.remove('brain/version')
+
 
 		f = open("brain/words.dat", "w")
 		# write each words known
@@ -1030,7 +1037,7 @@ class scrib:
 					self.kill_timers()
 					self.save_all(interface, False)
 					self.barf('MSG', 'Goodbye!')
-					sys.exit()
+					sys.exit(0)
 			
 				elif cmds[0] == 'save':
 					self.barf('SAV', 'User initiated save')

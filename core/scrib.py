@@ -20,9 +20,6 @@ import brain
 import cfg
 from plugins import PluginManager
 
-def get_time_for_file():
-	return "%s-%s" % (datetime.date.today(), time.strftime("%H%M%S",time.localtime(time.time())))
-
 def to_sec(s):
 	seconds_per_unit = {"s": 1, "m": 60, "h": 3600, "d": 86400, "w": 604800}
 	return int(s[:-1]) * seconds_per_unit[s[-1]]
@@ -258,7 +255,7 @@ class scrib:
 				self.barf('ERR', "Brain version incorrect.")
 				c = raw_input(self.barf('ERR', "Would you like to update the brain? (Y/n) "))
 				if c[:1].lower() != 'n':
-					timestamp = get_time_for_file()
+					timestamp = "%s-%s" % (datetime.date.today(), time.strftime("%H%M%S",time.localtime(time.time())))
 					shutil.copyfile("brain/cortex.zip", "brain/cortex-%s.zip" % timestamp)
 					self.barf('ACT', "Backup saved to brain/cortex-%s.zip" % timestamp)
 					self.barf('ACT', "Starting update, may take a few moments.")

@@ -197,7 +197,6 @@ class scrib:
 		self.settings.load("conf/scrib.cfg",{
 							"name": "scrib",
 							"symbol": "!",
-							"reply_length": 140,
 							"reply_rate": 100,
 							"learning": 1,
 							"debug": 0,
@@ -562,13 +561,10 @@ class scrib:
 			# empty. do not output
 			if message == "":
 				if self.debug == 1:
-					self.barf('DBG', "Not replying; message empty.")
+					self.barf('DBG', "Message empty.")
 				return
 			if self.debug == 1:
 				replying = "Not replying."
-			#  else output
-			if len(message) >= self.settings.length:
-				time.sleep(3)
 			else:
 				time.sleep(.075 * len(message))
 				if self.debug == 1:

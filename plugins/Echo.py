@@ -1,18 +1,17 @@
-from plugins import ScribPlugin
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+from plugins import PluginManager
 
-# User Alias and Command
-alias = "!echo"
-command = { "echo": "Usage: !echo message\nMake the bot mimic your message." }
+# User command
+command = "!echo"
 
 # Plugin Action
-class EchoPlugin(ScribPlugin.ScribPlugin):
-	def action(self, command_list, scrib, c):
-		if scrib.scrib.settings.debug == 1:
-			ScribPlugin.barf(ScribPlugin.DBG, "Echo Plugin activated.")
-		if command_list[0] == alias and len(command_list) >= 1:
+class EchoPlugin(PluginManager.Load):
+	def action(self, cmds, scrib, c):
+		if cmds[0] == command and len(cmds) >= 1:
 			phrase=""
-			for x in xrange (1, len (command_list)):
-				phrase = phrase + str(command_list[x]) + " "
+			for x in xrange (1, len (cmds)):
+				phrase = phrase + str(cmds[x]) + " "
 			return phrase
 
-ScribPlugin.addPlugin( command, alias, EchoPlugin() )
+PluginManager.addPlugin( command, command, EchoPlugin() )

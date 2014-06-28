@@ -184,9 +184,9 @@ class scrib:
 		self.version = "1.1.1"
 
 		# This is where we do some ownership command voodoo.
-		self.owner_commands = ['alias', 'censor', 'check', 'context', 'learn', 'learning', 'limit', 'rebuild', 'replace', 'save', 'uncensor', 'unlearn', 'quit']
-		self.general_commands = ['help', 'known', 'owner', 'version', 'words']
-		self.plugin_commands = PluginManager.plugin_aliases
+		self.owner_commands = ['alias', 'censor', 'check', 'context', 'learn', 'learning', 'limit', 'rebuild', 'replace', 'replyrate', 'save', 'uncensor', 'unlearn', 'quit']
+		self.general_commands = ['date', 'help', 'known', 'owner', 'version', 'words']
+		self.plugin_commands = PluginManager.plugin_commands
 		self.commands = self.general_commands + self.owner_commands + self.plugin_commands
 
 		self.barf = barf.Barf # So that we don't have to include it elsewhere.
@@ -198,10 +198,11 @@ class scrib:
 							"name": "scrib",
 							"symbol": "!",
 							"reply_length": 140,
+							"reply_rate": 100,
 							"learning": 1,
 							"debug": 0,
+							"muted": 0,
 							"max_words": 9001,
-							"length": 140,
 							"censored": [],
 							"num_aliases": 0,
 							"aliases": {},
@@ -829,6 +830,14 @@ class scrib:
 					new = cmds[2]
 					msg = self.replace(old, new)
 
+				elif cmds[0] == "replyrate":
+					if len(cmds) == 2:
+						self.settings.reply_rate = int(cmds[1])
+						msg = "Now replying to %d%% of messages." % int(cmds[1])
+					else:
+						msg = "Reply rate is %d%%." % self.settings.reply_rate
+					return msg
+
 				elif cmds[0] == "context":
 					if self.debug == 1:
 						self.barf('DBG', "Checking contexts...")
@@ -994,6 +1003,36 @@ class scrib:
 							self.settings.learning = 0
 							self.settings._defaults['learning'] = 0
 
+				elif cmds[0] == "alias":
+					# List aliases words
+					if len(cmds) == 1:
+						if len(self.settings.aliases) == 0:
+							msg = "No aliases"
+						else:
+							msg = "I will alias the word(s) %s." \
+								  % (", ".join(self.settings.aliases.keys()))
+					# add every word listd to alias list
+					elif len(cmds) == 2:
+						if cmds[1][0] != '~': cmds[1] = '~' + cmds[1]
+						if cmds[1] in self.settings.aliases.keys():
+							msg = "These words : %s are aliases to %s." \
+								  % (" ".join(self.settings.aliases[cmds[1]]), cmds[1] )
+						else:
+							msg = "The alias %s is not known." % cmds[1][1:]
+					elif len(cmds) > 2:
+						#create the aliases
+						if cmds[1][0] != '~': cmds[1] = '~' + cmds[1]
+						if not (cmds[1] in self.settings.aliases.keys()):
+							self.settings.aliases[cmds[1]] = [cmds[1][1:]]
+							self.replace(cmds[1][1:], cmds[1])
+							msg += cmds[1][1:] + " "
+						for x in xrange(2, len(cmds)):
+							msg += "%s " % cmds[x]
+							self.settings.aliases[cmds[1]].append(cmds[x])
+							#replace each words by his alias
+							self.replace(cmds[x], cmds[1])
+						msg += "have been aliased to %s." % cmds[1]
+
 			# Publicly accessible commands
 			if cmds[0] == 'help':
 				if owner == 0 or owner == 1:
@@ -1009,35 +1048,8 @@ class scrib:
 			elif cmds[0] == "version":
 				msg = 'scrib: %s; brain: %s' % ( self.version, self.brain.version )
 
-			elif cmds[0] == "alias":
-				# List aliases words
-				if len(cmds) == 1:
-					if len(self.settings.aliases) == 0:
-						msg = "No aliases"
-					else:
-						msg = "I will alias the word(s) %s." \
-							  % (", ".join(self.settings.aliases.keys()))
-				# add every word listd to alias list
-				elif len(cmds) == 2:
-					if cmds[1][0] != '~': cmds[1] = '~' + cmds[1]
-					if cmds[1] in self.settings.aliases.keys():
-						msg = "These words : %s are aliases to %s." \
-							  % (" ".join(self.settings.aliases[cmds[1]]), cmds[1] )
-					else:
-						msg = "The alias %s is not known." % cmds[1][1:]
-				elif len(cmds) > 2:
-					#create the aliases
-					if cmds[1][0] != '~': cmds[1] = '~' + cmds[1]
-					if not (cmds[1] in self.settings.aliases.keys()):
-						self.settings.aliases[cmds[1]] = [cmds[1][1:]]
-						self.replace(cmds[1][1:], cmds[1])
-						msg += cmds[1][1:] + " "
-					for x in xrange(2, len(cmds)):
-						msg += "%s " % cmds[x]
-						self.settings.aliases[cmds[1]].append(cmds[x])
-						#replace each words by his alias
-						self.replace(cmds[x], cmds[1])
-					msg += "have been aliased to %s." % cmds[1]
+			elif cmds[0] == "!date":
+				msg = "It is ".join(i for i in os.popen('date').readlines())
 
 			elif cmds[0] == "words":
 				num_w = self.brainstats.num_words

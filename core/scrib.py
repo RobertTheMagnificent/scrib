@@ -20,10 +20,6 @@ import brain
 import cfg
 from plugins import PluginManager
 
-def to_sec(s):
-	seconds_per_unit = {"s": 1, "m": 60, "h": 3600, "d": 86400, "w": 604800}
-	return int(s[:-1]) * seconds_per_unit[s[-1]]
-
 # Makes !learn and !teach usable
 def dbread(key):
 	value = None

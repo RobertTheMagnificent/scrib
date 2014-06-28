@@ -1149,7 +1149,7 @@ class scrib:
 						c = len(self.words[word])
 						msg = "%s is known (%d contexts)" % ( word, c)
 					else:
-						msg = "is unknown." % ( word)
+						msg = "%s is unknown." % ( word)
 				elif len(cmds) > 2:
 					# multiple words.
 					words = []

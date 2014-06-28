@@ -36,7 +36,7 @@ class ModIRC(SingleServerIRCBot):
 
 	# We are going to store the owner's host mask :3
 	owner_mask = []
-	commanddict = PluginManager.ScribPlugin.plugin_commands
+	commanddict = PluginManager.plugin_commands
 
 	def __init__(self, my_scrib, args):
 		"""
@@ -275,10 +275,10 @@ class ModIRC(SingleServerIRCBot):
 
 		# Pass on to scrib
 		if source in self.owners and e.source() in self.owner_mask:
-			self.scrib.process_msg(self, body, replyrate, learn, (body, source, target, c, e), 1, not_quiet)
+			self.scrib.process(self, body, replyrate, learn, (body, source, target, c, e), 1, not_quiet)
 		else:
 			#start a new thread
-			thread.start_new_thread(self.scrib.process_msg,
+			thread.start_new_thread(self.scrib.process,
 									(self, body, replyrate, learn, (body, source, target, c, e), 0, not_quiet))
 
 	def irc_commands(self, body, source, target, c, e):

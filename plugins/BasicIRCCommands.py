@@ -1,4 +1,4 @@
-from plugins import ScribPlugin
+from plugins import PluginManager
 import sys
 
 # User Alias and Command
@@ -6,7 +6,7 @@ nick_alias = "!nick"
 nick_command = { "nick": "Owner command. Usage: !nick nickname\nChange nickname." }
 
 # Plugin Action
-class NickPlugin(ScribPlugin.ScribPlugin):
+class NickPlugin(PluginManager.Load):
 	def action(self, command_list, scrib, c):
 		msg = ""
 		if command_list[0] == nick_alias and len(command_list) == 2:
@@ -22,7 +22,7 @@ class NickPlugin(ScribPlugin.ScribPlugin):
 join_alias = "!join"
 join_command = { "join": "Owner command. Usage: !join #chan1 [#chan2 [...]]\nJoin one or more channels." }
 
-class JoinPlugin(ScribPlugin.ScribPlugin):
+class JoinPlugin(PluginManager.Load):
 	def action(self, command_list, scrib, c):
 		msg = ""
 		if command_list[0] == join_alias:
@@ -36,7 +36,7 @@ class JoinPlugin(ScribPlugin.ScribPlugin):
 part_alias = "!part"
 part_command = { "part": "Owner command. Usage: !part #chan1 [#chan2 [...]]\nLeave one or more channels." }
 
-class PartPlugin(ScribPlugin.ScribPlugin):
+class PartPlugin(PluginManager.Load):
 	def action(self, command_list, scrib, c):
 		msg = ""
 		if command_list[0] == part_alias:
@@ -50,7 +50,7 @@ class PartPlugin(ScribPlugin.ScribPlugin):
 chans_alias = "!chans"
 chans_command = { "chans": "Owner command. Usage: !chans\nList channels currently on." }
 
-class ChansPlugin(ScribPlugin.ScribPlugin):
+class ChansPlugin(PluginManager.Load):
 	def action(self, command_list, scrib, c):
 		msg = ""
 		if command_list[0] == chans_alias:
@@ -66,7 +66,7 @@ class ChansPlugin(ScribPlugin.ScribPlugin):
 quit_alias = "!quit"
 quit_command = { "quit": "Owner command. Usage: !quit\nMake the bot quit IRC." }
 
-class QuitPlugin(ScribPlugin.ScribPlugin):
+class QuitPlugin(PluginManager.Load):
 	def action(self, command_list, scrib, c):
 		if command_list[0] == quit_alias:
 			sys.exit()
@@ -74,7 +74,7 @@ class QuitPlugin(ScribPlugin.ScribPlugin):
 quitmsg_alias = "!quitmsg"
 quitmsg_command = { "quitmsg": "Owner command. Usage: !quitmsg [message]\nSet the quit message. Without arguments show the current quit message." }
 
-class QuitmsgPlugin(ScribPlugin.ScribPlugin):
+class QuitmsgPlugin(PluginManager.Load):
 	def action(self, command_list, scrib, c):
 		msg = ""
 		if command_list[0] == quitmsg_alias:
@@ -88,7 +88,7 @@ class QuitmsgPlugin(ScribPlugin.ScribPlugin):
 ignore_alias = "!ignore"
 ignore_command = { "ignore": "Owner command. Usage: !ignore [nick1 [nick2 [...]]]\nIgnore one or more nicknames. Without arguments it lists ignored nicknames." }
 
-class IgnorePlugin(ScribPlugin.ScribPlugin):
+class IgnorePlugin(PluginManager.Load):
 	def action(self, command_list, scrib, c):
 		if command_list[0] == ignore_alias:
 			# if no arguments are given say who we are
@@ -111,7 +111,7 @@ class IgnorePlugin(ScribPlugin.ScribPlugin):
 unignore_alias = "!unignore"
 unignore_command = { "unignore": "Owner command. Usage: !unignore nick1 [nick2 [...]]\nUnignores one or more nicknames." }
 
-class UnIgnorePlugin(ScribPlugin.ScribPlugin):
+class UnIgnorePlugin(PluginManager.Load):
 	def action(self, command_list, scrib, c):
 		msg = ""
 		if command_list[0] == unignore_alias:
@@ -128,7 +128,7 @@ class UnIgnorePlugin(ScribPlugin.ScribPlugin):
 replyignore_alias = "!replyignore"
 replyignore_command = { "replyIgnored": "Owner command. Usage: !replyIgnored [on|off]\nAllow/disallow replying to ignored users. Without arguments shows the current setting." }
 
-class ReplyIgnorePlugin(ScribPlugin.ScribPlugin):
+class ReplyIgnorePlugin(PluginManager.Load):
 	def action(self, command_list, scrib, c):
 		msg = ""
 		if command_list[0] == replyignore_alias:
@@ -148,12 +148,12 @@ class ReplyIgnorePlugin(ScribPlugin.ScribPlugin):
 					scrib.settings.replyIgnored = 0
 		return msg
 
-ScribPlugin.addPlugin( nick_command, nick_alias, NickPlugin() )
-ScribPlugin.addPlugin( join_command, join_alias, JoinPlugin() )
-ScribPlugin.addPlugin( part_command, part_alias, PartPlugin() )
-ScribPlugin.addPlugin( chans_command, chans_alias, ChansPlugin() )
-ScribPlugin.addPlugin( quit_command, quit_alias, QuitPlugin() )
-ScribPlugin.addPlugin( quitmsg_command, quitmsg_alias, QuitmsgPlugin() )
-ScribPlugin.addPlugin( ignore_command, ignore_alias, IgnorePlugin() )
-ScribPlugin.addPlugin( unignore_command, unignore_alias, UnIgnorePlugin() )
-ScribPlugin.addPlugin( replyignore_command, replyignore_alias, ReplyIgnorePlugin() )
+PluginManager.addPlugin( nick_command, nick_alias, NickPlugin() )
+PluginManager.addPlugin( join_command, join_alias, JoinPlugin() )
+PluginManager.addPlugin( part_command, part_alias, PartPlugin() )
+PluginManager.addPlugin( chans_command, chans_alias, ChansPlugin() )
+PluginManager.addPlugin( quit_command, quit_alias, QuitPlugin() )
+PluginManager.addPlugin( quitmsg_command, quitmsg_alias, QuitmsgPlugin() )
+PluginManager.addPlugin( ignore_command, ignore_alias, IgnorePlugin() )
+PluginManager.addPlugin( unignore_command, unignore_alias, UnIgnorePlugin() )
+PluginManager.addPlugin( replyignore_command, replyignore_alias, ReplyIgnorePlugin() )

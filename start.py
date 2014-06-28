@@ -1,42 +1,69 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
+import getopt
 import sys
 import os
 
-if __name__ == "__main__":
+from core import barf
+from core import cfg	
 
-	def help():
-		print "Scrib bot. Usage:"
-		print "\tstart.py [options]"
-		print "\t--irc (connection info stored in conf/scrib-irc.cfg"
-		print "\t--feedme [filename] (text file to process)"
-		print "\n"
-		sys.exit(0)
-
-	def dirCheck():
-		if not os.path.exists("conf"):
-			os.makedirs("conf")
+interface_dir = os.path.abspath(os.path.dirname(__file__ )) + "/interfaces/"
+interface_list = []
+def register_interfaces():
+	for interface in os.listdir(os.path.dirname(interface_dir)):
+		if os.path.isfile(interface_dir + "/" + interface):
+			interface_name, ext = os.path.splitext(interface)
 		
-	if "--help" in sys.argv:
-		help()
+			if ext == '.py' and interface_name != '__init__':
+				try:
+					barf.Barf('PLG', 'Registered interface:                \033[1m%s' % interface_name)
+					interface_list.append(interface_name)
 
-	if "--irc" in sys.argv:
-		dirCheck()
-		if os.path.isfile(os.path.join("interfaces", "scrib_irc.py")):
-			os.system(os.path.join("interfaces", "scrib_irc.py"))
-		else:
-			print "No IRC interface. Exiting."
-		sys.exit(0)
+				except ImportError as e:
+					barf.Barf('ERR', "Failed to register interface ( IE ):   \033[1m%s" % interface_name)
+					barf.Barf('TAB', e)
 
-	if "--feedme" in sys.argv:
-		dirCheck()
-		if sys.argv[2]:
-			if os.path.isfile(os.path.join("interfaces", "feedme.py")):
-				os.system(os.path.join("interfaces", "feedme.py" %s) % sys.argv[2])
-		sys.exit(0)
+				except NameError as e:
+					barf.Barf('ERR', "Failed to register interface ( NE ):   \033[1m%s" % interface_name)
+					barf.Barf('TAB', e)
 
+	return interface_list
+
+core_interfaces = ['help'] # This should populate with all available interfaces.
+registered_interfaces = register_interfaces()
+interfaces = core_interfaces + registered_interfaces
+
+def usage():
+	barf.Barf('DEF', 'scrib bot. Usage:', False)
+	barf.Barf('TAB', 'start.py [interface]', False)
+	sys.exit(0)
+
+def load(interface):
+	barf.Barf("MSG", "Loading scrib...")
+	os.system(os.path.join('interfaces',interface+'.py'))
+	sys.exit()
+
+def main(argv):
+	"""
+	Let's get this party started!
+	"""
+
+	try:
+		opts, args = getopt.getopt(argv, "hg:d", interfaces)
+	except getopt.GetoptError:
+		barf.Barf('DEF', "That is not a valid argument. Try --help", False)
+		sys.exit(2)
+
+
+if __name__ == "__main__":
+	def dirCheck(thisdir):
+		if not os.path.exists(thisdir):
+			os.makedirs(thisdir)
+		
+	dirCheck('conf')
+	if len(sys.argv) > 1:
+		if sys.argv[1] in interfaces:
+			load(sys.argv[1])
 	else:
-		dirCheck()
-		os.system(os.path.join("interfaces","default.py"))
-		print os.name
-		sys.exit(0)
+		load('default')
+

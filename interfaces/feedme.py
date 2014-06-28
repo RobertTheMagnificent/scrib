@@ -7,7 +7,6 @@ import os
 
 sys.path.append(os.path.abspath(os.path.dirname(__file__) + '/../'))
 
-from core import barf
 from core import scrib
 
 class ModFileIn:
@@ -19,28 +18,28 @@ class ModFileIn:
 	commandlist = "FileIn Module Commands:\nNone"
 	commanddict = {}
 	
-	def __init__(self, Scrib, args):
+	def __init__(self, scrib, args):
 
 		f = open(args[1], "r")
 		buffer = f.read()
 		f.close()
 
-		if Scrib.debug == 1:
-			barf.barf(barf.DBG, "Scrib: %s" % Scrib.settings)
-		before = "I knew "+`Scrib.brainstats.num_words`+" words ("+`len(Scrib.lines)`+" lines) before reading "+sys.argv[1]
-		buffer = Scrib.filter_message(buffer)
+		if scrib.debug == 1:
+			scrib.barf('DBG', "scrib: %s" % scrib.settings)
+		before = "I knew "+`scrib.brainstats.num_words`+" words ("+`len(scrib.lines)`+" lines) before reading "+sys.argv[1]
+		buffer = scrib.filter_message(buffer)
 		# Learn from input
 		try:
-			barf.barf(barf.MSG, buffer)
-			Scrib.learn(buffer)
+			scrib.barf(barf.MSG, buffer)
+			scrib.learn(buffer)
 		except KeyboardInterrupt, e:
 			# Close database cleanly
-			barf.barf(barf.ERR, "Early termination.")
-		after = "I know "+`Scrib.brainstats.num_words`+" words ("+`len(Scrib.lines)`+" lines) now."
-		del Scrib
+			scrib.barf('ERR', "Early termination.")
+		after = "I know "+`scrib.brainstats.num_words`+" words ("+`len(scrib.lines)`+" lines) now."
+		del scrib
 		
-		barf.barf(barf.ACT, before)
-		barf.barf(barf.ACT, after)
+		scrib.barf('ACT', before)
+		scrib.barf('ACT', after)
 
 	def shutdown(self):
 		pass
@@ -53,7 +52,7 @@ class ModFileIn:
 
 if __name__ == "__main__":
 	if len(sys.argv) < 2:
-		barf.barf(barf.ERR, "Please specify a filename.")
+		scrib.barf('ERR', "Please specify a filename.")
 		sys.exit()
 	# start the scrib
 	my_scrib = scrib.scrib()

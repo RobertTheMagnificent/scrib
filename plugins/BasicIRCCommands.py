@@ -109,35 +109,11 @@ class UnIgnorePlugin(PluginManager.Load):
 					pass
 		return msg
 
-replyignore_cmd = "!replyignore"
-replyignore_cmd = { "replyIgnored": "Owner command. Usage: !replyIgnored [on|off]\nAllow/disallow replying to ignored users. Without arguments shows the current setting." }
-
-class ReplyIgnorePlugin(PluginManager.Load):
-	def action(self, cmds, scrib, c):
-		msg = ""
-		if cmds[0] == replyignore_cmd:
-			msg = "Replying to ignored users "
-			if len(cmds) == 1:
-				if scrib.settings.replyIgnored == 0:
-					msg = msg + "off"
-				else:
-					msg = msg + "on"
-			else:
-				toggle = cmds[1]
-				if toggle == "on":
-					msg = msg + "on"
-					scrib.settings.replyIgnored = 1
-				else:
-					msg = msg + "off"
-					scrib.settings.replyIgnored = 0
-		return msg
-
-PluginManager.addPlugin( nick_cmd, nick_cmd, NickPlugin() )
-PluginManager.addPlugin( join_cmd, join_cmd, JoinPlugin() )
-PluginManager.addPlugin( part_cmd, part_cmd, PartPlugin() )
-PluginManager.addPlugin( chans_cmd, chans_cmd, ChansPlugin() )
-PluginManager.addPlugin( quit_cmd, quit_cmd, QuitPlugin() )
-PluginManager.addPlugin( quitmsg_cmd, quitmsg_cmd, QuitmsgPlugin() )
-PluginManager.addPlugin( ignore_cmd, ignore_cmd, IgnorePlugin() )
-PluginManager.addPlugin( unignore_cmd, unignore_cmd, UnIgnorePlugin() )
-PluginManager.addPlugin( replyignore_cmd, replyignore_cmd, ReplyIgnorePlugin() )
+PluginManager.addPlugin( nick_cmd, NickPlugin() )
+PluginManager.addPlugin( join_cmd, JoinPlugin() )
+PluginManager.addPlugin( part_cmd, PartPlugin() )
+PluginManager.addPlugin( chans_cmd, ChansPlugin() )
+PluginManager.addPlugin( quit_cmd, QuitPlugin() )
+PluginManager.addPlugin( quitmsg_cmd, QuitmsgPlugin() )
+PluginManager.addPlugin( ignore_cmd, IgnorePlugin() )
+PluginManager.addPlugin( unignore_cmd, UnIgnorePlugin() )

@@ -15,4 +15,4 @@ class EchoPlugin(PluginManager.Load):
 			msg = "".join([i for i in os.popen('fortune').readlines()]).replace('\n\n','\n').replace('\n', ' ')
 			msg = self.filter(msg)
 
-PluginManager.addPlugin( command, alias, EchoPlugin() )
+PluginManager.addPlugin( command, EchoPlugin() )

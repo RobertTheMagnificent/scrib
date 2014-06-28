@@ -14,4 +14,4 @@ class EchoPlugin(PluginManager.Load):
 				phrase = phrase + str(cmds[x]) + " "
 			return phrase
 
-PluginManager.addPlugin( command, command, EchoPlugin() )
+PluginManager.addPlugin( command, EchoPlugin() )

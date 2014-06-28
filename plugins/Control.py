@@ -17,4 +17,4 @@ class ControlPlugin(PluginManager.Load):
 				msg = "Try again."
 			return msg
 
-PluginManager.addPlugin( command, command, ControlPlugin() )
+PluginManager.addPlugin( command, ControlPlugin() )

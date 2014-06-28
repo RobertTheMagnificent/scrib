@@ -2,14 +2,12 @@
 # -*- coding: utf-8 -*-
 
 process_table = {}
-plugin_commands = {}
-plugin_aliases = []
+plugin_commands = []
 
-def addPlugin( command, alias, action ):
+def addPlugin( command, action ):
 	global plugin_commands, plugin_aliases
-	process_table[alias[1:]] = action
-	plugin_commands = dict( plugin_commands.items() + command.items() )
-	plugin_aliases.append(alias)
+	process_table[command] = action
+	plugin_commands.append(command)
 
 class Load:
 	def action(self, stuff, scrib, c):

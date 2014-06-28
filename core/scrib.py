@@ -325,7 +325,7 @@ class scrib:
 				num_contexts += len(self.lines[x][0].split())
 			self.brainstats.num_contexts = num_contexts
 			# Save new values
-		#	self.brainstats.save()
+			self.brainstats.save()
 
 		# Is an aliases update required ?
 		count = 0
@@ -394,7 +394,7 @@ class scrib:
 			stuff = pickle.loads(file)
 		elif self.brain_ver(version) == 3:
 			import json
-			stuff = json.loads(file)
+			stuff = json.loads(file, encoding="utf-8")
 		return stuff
 
 	def pack(self, file, version, upgrade=False):
@@ -409,13 +409,12 @@ class scrib:
 			if upgrade == True:
 				s = {}
 				for k,v in file.items():
-#					v[0] = v[0].decode('utf8', 'ignore')
 					s.update({k:v})
-				stuff = json.dumps(s, sort_keys=True, indent=4, separators=(',', ': '), encoding='latin-1')
+				stuff = json.dumps(s, sort_keys=True, indent=4, separators=(',', ': '), encoding='latin-1').decode('latin1').encode('utf8') # Compat
 				del s
 				return stuff
 
-			stuff = json.dumps(file, sort_keys=True, indent=4, separators=(',', ': '), encoding='latin-1')
+			stuff = json.dumps(file, sort_keys=True, indent=4, separators=(',', ': '), encoding='utf-8')
 		return stuff
 
 	def save_all(self, interface):
@@ -484,7 +483,7 @@ class scrib:
 		# Save settings
 		self.settings.save()
 		self.brainstats.save()
-		#self.version.save()
+
 		if interface != False:
 			interface.settings.save()
 
@@ -506,6 +505,15 @@ class scrib:
 			for k in old_lines.keys():
 				filtered_line = self.filter(old_lines[k][0])
 				self.learn(filtered_line, old_lines[k][1])
+			msg = "Rebuilt brain in %0.2fs. Words %d (%+d), contexts %d (%+d)." % \
+				  (time.time() - t,
+				   old_num_words,
+				   self.brainstats.num_words - old_num_words,
+				   old_num_contexts,
+				   self.brainstats.num_contexts - old_num_contexts)
+			return msg
+		else:
+			return "Learning mode is off; will not rebuild."
 
 	def process(self, interface, body, replyrate, learn, args, owner=0, muted=0):
 		"""
@@ -829,28 +837,7 @@ class scrib:
 						   num_bad)
 
 				elif cmds[0] == "rebuild":
-					if self.settings.learning == 1:
-						t = time.time()
-
-						old_lines = self.lines
-						old_num_words = self.brainstats.num_words
-						old_num_contexts = self.brainstats.num_contexts
-
-						self.words = {}
-						self.lines = {}
-						self.brainstats.num_words = 0
-						self.brainstats.num_contexts = 0
-
-						for k in old_lines.keys():
-							self.learn(old_lines[k][0], old_lines[k][1])
-
-						msg = "Rebuilt brain in %0.2fs. Words %d (%+d), contexts %d (%+d)." % \
-							  (
-							   time.time() - t,
-							   old_num_words,
-							   self.brainstats.num_words - old_num_words,
-							   old_num_contexts,
-							   self.brainstats.num_contexts - old_num_contexts)
+					msg = self.auto_rebuild()
 
 				elif cmds[0] == "replace":
 					if len(cmds) < 3:
@@ -1427,7 +1414,7 @@ class scrib:
 				return
 
 			vowels = "aÃ Ã¢eÃ©Ã¨ÃªiÃ®Ã¯oÃ¶Ã´uÃ¼Ã»y"
-			vowels = ""
+			#vowels = ""
 			for x in xrange(0, len(words)):
 
 				nb_voy = 0

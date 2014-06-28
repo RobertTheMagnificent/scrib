@@ -315,10 +315,11 @@ class scrib:
 					s = f.read()
 					f.close()
 					self.lines = self.unpack(s, v)
-					if self.debug == 1:
-						self.barf('DBG', "Applying filter to adjust to new brain system.")
-						self.barf('TAB', "This may take a bit, and will shrink the dataset.")
-					self.auto_rebuild()
+					if self.settings.optimum == 1:
+						if self.debug == 1:
+							self.barf('DBG', "Applying filter to adjust to new brain system.")
+							self.barf('TAB', "This may take a bit, and will shrink the dataset.")
+						self.auto_rebuild()
 					f = open("brain/lines.dat", "wb")
 					s = self.pack(self.lines, self.brain.version, True)
 					f.write(s)

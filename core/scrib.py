@@ -291,7 +291,7 @@ class scrib:
 				c = raw_input("[Y/n]")
 				if c[:1].lower() != 'n':
 					timestamp = "%s-%s" % (datetime.date.today(), time.strftime("%H%M%S",time.localtime(time.time())))
-					shutil.copyfile("brain/cortex.zip", "backups/cortex-%s.zip" % timestamp)
+					shutil.copyfile("brain/cortex.zip", "backups/%s-cortex-%s.zip" % ( self.settings.name, timestamp ))
 					self.barf('ACT', "Backup saved to backups/cortex-%s.zip" % timestamp)
 					self.barf('ACT', "Starting update, may take a few moments.")
 					f = open("brain/words.dat", "rb")
@@ -1015,11 +1015,11 @@ class scrib:
 					else:
 						for x in xrange(1, len(cmds)):
 							if cmds[x] in self.settings.censored:
-								msg += "is already censored." % ( cmds[x])
+								msg += "%s is already censored." % ( cmds[x])
 							else:
 								self.settings.censored.append(cmds[x])
 								self.unlearn(cmds[x])
-								msg += "is now censored." % ( cmds[x])
+								msg += "%s is now censored." % ( cmds[x])
 							msg += "\n"
 
 				elif cmds[0] == "uncensor":
@@ -1030,7 +1030,7 @@ class scrib:
 					for x in xrange(1, len(cmds)):
 						try:
 							self.settings.censored.remove(cmds[x])
-							msg = "is uncensored." % ( cmds[x])
+							msg = "%s is uncensored." % ( cmds[x])
 						except ValueError, e:
 							pass
 

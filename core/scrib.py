@@ -7,7 +7,6 @@ import sys
 import os
 import shutil
 import fileinput
-import cPickle as pickle
 import struct
 import datetime
 import time
@@ -198,6 +197,7 @@ class scrib:
 							"name": "scrib",
 							"symbol": "!",
 							"reply_rate": 100,
+							"nick_reply_rate": 100,
 							"learning": 1,
 							"debug": 0,
 							"muted": 0,
@@ -244,11 +244,11 @@ class scrib:
 			self.barf('ERR', "No brain found.")
 		try:
 			f = open("brain/version", "rb")
-			v = f.read()
+			v = f.read().strip()
 			self.barf('MSG', "Current brain version is %s " % v)
 			f.close()
 			if v != self.brain.version:
-				self.barf('ERR', "Brain version incorrect.")
+				self.barf('ERR', "Brain is version "+v+", but I use "+self.brain.version+".")
 				c = raw_input(self.barf('ERR', "Would you like to update the brain? (Y/n) "))
 				if c[:1].lower() != 'n':
 					timestamp = "%s-%s" % (datetime.date.today(), time.strftime("%H%M%S",time.localtime(time.time())))
@@ -265,7 +265,7 @@ class scrib:
 					if self.debug == 1:
 						self.barf('DBG', "Saving words...")
 					f = open("brain/words.dat", "wb")
-					s = pickle.dumps(self.words)
+					s = self.pack(self.words, self.brain.version, True)
 					f.write(s)
 					f.close()
 					del s
@@ -277,10 +277,10 @@ class scrib:
 					f.close()
 					self.lines = self.unpack(s, v)
 					if self.debug == 1:
-						self.barf('DBG', "Applying filter to adjust to new brain system.\n               This may take several minutes...")
+						self.barf('DBG', "Applying filter to adjust to new brain system.\n                This may take several minutes...")
 					self.auto_rebuild()
 					f = open("brain/lines.dat", "wb")
-					s = pickle.dumps(self.lines)
+					s = self.pack(self.lines, self.brain.version, True)
 					f.write(s)
 					f.close()
 					del s
@@ -291,6 +291,7 @@ class scrib:
 					f.close()
 					if self.debug == 1:
 						self.barf('DBG', "Version updated.")
+					v = self.brain.version
 					self.barf('ACT', "Brain converted successfully! Continuing.")
 
 					if self.debug == 1:
@@ -299,25 +300,13 @@ class scrib:
 			f = open("brain/words.dat", "rb")
 			s = f.read()
 			f.close()
-			self.words = pickle.loads(s)
+			self.words = self.unpack(s, v)
 			del s
 			f = open("brain/lines.dat", "rb")
 			s = f.read()
 			f.close()
-			self.lines = pickle.loads(s)
+			self.lines = self.unpack(s, v)
 			del s
-
-#			import json
-#			self.barf('SAV', "Saving lines.json")
-#			f = open("lines.json", "wb")
-#			s = {}
-#			for k,v in self.lines.items():
-#				self.barf('DBG', "Saving lines to lines.json")
-#				v[0] = v[0].decode('utf-8', 'ignore')
-#				s.update({k:v})
-#			f.write(json.dumps(s, sort_keys=True, indent=4, separators=(',', ': ')))
-#			f.close()
-#			del f, s
 
 		except (EOFError, IOError), e:
 			# Create new brain
@@ -380,26 +369,65 @@ class scrib:
 		self.settings.save()
 
 	# For unpacking a brain. This is just quick and dirty, should be replaced...
+	def brain_ver(self, version):
+		marshal = ['0.0.1', '0.1.0', '0.1.1']
+		pickle = ['0.1.2', '0.1.3', '0.1.4']
+		json = ['0.1.5']
+		
+		if version in marshal:
+			return 1
+		elif version in pickle:
+			return 2
+		elif version in json:
+			return 3
+		else:
+			self.barf('ERR', "Invalid brain type")
+			return 0
+
 	def unpack(self, file, version):
-		oldversions = ['0.0.1', '0.1.0', '0.1.1']
-		if version in oldversions:
+		if self.brain_ver(version) == 1:
 			import marshal
 			stuff = marshal.loads(file)
-		else:
+		elif self.brain_ver(version) == 2:
+			import cPickle as pickle
 			stuff = pickle.loads(file)
+		elif self.brain_ver(version) == 3:
+			import json
+			stuff = json.loads(file)
+		return stuff
+
+	def pack(self, file, version, upgrade=False):
+		if self.brain_ver(version) == 1:
+			import marshal
+			stuff = marshal.dumps(file)
+		elif self.brain_ver(version) == 2:
+			import cPickle as pickle
+			stuff = pickle.dumps(file)
+		elif self.brain_ver(version) == 3:
+			import json
+			if upgrade == True:
+				s = {}
+				for k,v in file.items():
+					v[0] = v[0].decode('utf-8', 'ignore')
+					s.update({k:v})
+				stuff = json.dumps(s, sort_keys=True, indent=4, separators=(',', ': '))
+				del s
+				return stuff
+								
+			stuff = json.dumps(file, sort_keys=True, indent=4, separators=(',', ': '))
 		return stuff
 
 	def save_all(self, interface):
 		self.barf('SAV', "Writing to my brain...")
 
 		f = open("brain/words.dat", "wb")
-		s = pickle.dumps(self.words)
+		s = self.pack(self.words, self.brain.version)
 		f.write(s)
 		f.close()
 		if self.debug == 1:
 			self.barf('DBG', "Words saved.")
 		f = open("brain/lines.dat", "wb")
-		s = pickle.dumps(self.lines)
+		s = self.pack(self.lines, self.brain.version)
 		f.write(s)
 		f.close()
 		if self.debug == 1:
@@ -420,7 +448,7 @@ class scrib:
 				self.barf('DBG', "Version zipped")
 		except:
 			f = open("brain/version", "w")
-			f.write(self.version.brain)
+			f.write(self.brain.version)
 			f.close()
 			if self.debug == 1:
 				self.barf('DBG', "Version written.")
@@ -650,7 +678,7 @@ class scrib:
 		Respond to user commands.
 		"""
 		cmds = body.split()
-		sym = self.settings.symbol
+		sym = self.settings.symbol # For ease of typing
 		msg = ""
 
 		if owner == 0 and cmds[0] in self.commands:
@@ -795,7 +823,7 @@ class scrib:
 						   num_broken,
 						   num_bad)
 
-				elif cmds[0] == "!rebuild":
+				elif cmds[0] == "rebuild":
 					if self.settings.learning == 1:
 						t = time.time()
 
@@ -1079,7 +1107,6 @@ class scrib:
 							msg += x + "(" + str(c) + ") "
 						else:
 							msg += x + "(0) "
-
 
 		if cmds[0] not in self.commands:
 			msg = cmds[0] + " is not a registered command."
@@ -1384,17 +1411,18 @@ class scrib:
 			"""
 
 			words = body.split()
-			# Ignore sentences of < 1 words XXX was <3
+			# Ignore sentences of < 1
 			if len(words) < 1:
 				return
 
-			# Ignore if the sentence starts with an exclamation
-			if body[0:1] == "!":
+			# Ignore if the sentence starts with the symbol
+			if body[0:1] == self.settings.symbol:
 				if self.debug == 1:
 					self.barf('ERR', "Not learning: %s" % words)
 				return
 
 			vowels = "aÃ Ã¢eÃ©Ã¨ÃªiÃ®Ã¯oÃ¶Ã´uÃ¼Ã»y"
+			vowels = ""
 			for x in xrange(0, len(words)):
 
 				nb_voy = 0

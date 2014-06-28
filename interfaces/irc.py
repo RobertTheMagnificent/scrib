@@ -2,14 +2,16 @@
 # -*- coding: utf-8 -*-
 import sys
 import os
-
+import traceback
+import thread
 sys.path.append(os.path.abspath(os.path.dirname(__file__) + '/../'))
+from core import scrib
 
 try:
 	from ircbot import *
 	from irclib import *
 except:
-	print "Dearest User,\nircbot.py and irclib.py are not found. Please install them forthwith from\nhttp://python-irclib.sourceforge.net\n\nThank you,\nscrib"
+	self.scrib.barf('ERR', "ircbot.py and irclib.py are not found. Please install them to continue.")
 	sys.exit(1)
 
 # Let's override some irclib function
@@ -17,26 +19,18 @@ def my_remove_connection(self, connection):
 	if self.fn_to_remove_socket:
 		self.fn_to_remove_socket(connection._get_socket())
 
-
 IRC._remove_connection = my_remove_connection
 
-from core import scrib
-from core import barf
-from core import cfgfile
-from plugins import PluginManager
-import traceback
-import thread
 
-class ModIRC(SingleServerIRCBot):
+class ScribIRC(SingleServerIRCBot):
 	"""
 	Interfacing some IRC I/O with scrib learn/reply modules!
 	"""
 	join_msg = "%s"# is here"
 	part_msg = "%s"# has left"
 
-	# We are going to store the owner's host mask :3
+	# We are going to store the owner(s) host mask.
 	owner_mask = []
-	commanddict = PluginManager.plugin_commands
 
 	def __init__(self, my_scrib, args):
 		"""
@@ -45,27 +39,18 @@ class ModIRC(SingleServerIRCBot):
 		self.scrib = my_scrib
 		# load settings
 
-		self.settings = cfgfile.cfgset()
-		self.settings.load("conf/scrib-irc.cfg",
-						   {"myname": ("The bot's nickname", "Scrib"),
-							"realname": ("Reported 'real name'", "Scrib"),
-							"filter": ("Do we filter our replies or just blindly speak?", 1),
-							"owners": ("Owner(s) nickname", ["OwnerNick"]),
-							"servers": ("IRC Server to connect to (server, port [,password])", [("irc.freenode.net", 6667)]),
-							"chans": ("Channels to auto-join", ["#scoundrels"]),
-							"speaking": ("Allow the bot to talk on channels", 1),
-							"private": ("Hide the fact we are a bot", 0),
-							"ignorelist": ("Ignore these nicknames:", []),
-							"replyIgnored": ("Reply but don't learn from ignored people", 0),
-							"reply_chance": ("Chance of reply (%) per message", 33),
-							"nick_reply_chance": ("Chance of reply (%) per message when mentioned", 100),
-							"quitmsg": ("IRC quit message", "Bye :-("),
-							"debug": ("IRC debug messages in terminal", 0),
-							"password": ("password for control the bot (Edit manually !)", "")
+		self.settings = self.scrib.cfg.set()
+		self.settings.load("conf/irc.cfg", {
+								"realname": "Scrib Bot",
+								"servers": [("irc.freenode.net", 6667)],
+								"channels": ["#scoundrels"],
+								"owners": ["OwnerOne"],
+								"owner_passwords": ["Ducks"],
+								"quit_message": "Goodbye.",
 						   })
-
+		self.scrib.settings.name = my_scrib.settings.name
 		self.owners = self.settings.owners[:]
-		self.chans = self.settings.chans[:]
+		self.chans = self.settings.channels[:]
 
 		# Parse command prompt parameters
 
@@ -93,22 +78,20 @@ class ModIRC(SingleServerIRCBot):
 			# Nickname
 			if args[x] == "-n":
 				try:
-					self.settings.myname = args[x + 1]
+					self.scrib.settings.name = args[x + 1]
 				except IndexError:
 					pass
 
 	def our_start(self):
-		barf.Barf('ACT', "Connecting to \033[1m%s" % self.settings.servers)
-		SingleServerIRCBot.__init__(self, self.settings.servers, self.settings.myname, self.settings.realname, 2)
-
+		#for server in self.settings.servers:
+		self.scrib.barf('ACT', "Connecting to %s" % self.settings.servers[0][0])
+		SingleServerIRCBot.__init__(self, self.settings.servers, self.scrib.settings.name, self.settings.realname, 2)
 		self.start()
 
 	def on_welcome(self, c, e):
-		barf.Barf('ACT', "Joining \033[1m%s" % self.chans)
 		for i in self.chans:
+			self.scrib.barf('ACT', "Joining %s" % i)
 			c.join(i)
-
-
 
 	def shutdown(self):
 		try:
@@ -116,13 +99,6 @@ class ModIRC(SingleServerIRCBot):
 		except AttributeError, e:
 			# already disconnected probably (pingout or whatever)
 			pass
-
-	def get_version(self):
-		if self.settings.private:
-			# private mode. we shall be a windows luser today
-			return "Omnomnomicon"
-		else:
-			return self.scrib.ver_string
 
 	def on_kick(self, c, e):
 		"""
@@ -137,8 +113,8 @@ class ModIRC(SingleServerIRCBot):
 		else:
 			reason = ""
 
-		if kicked == self.settings.myname:
-			barf.Barf('ACT', "%s was kicked off %s by %s (%s)" % (kicked, target, kicker, reason))
+		if kicked == self.scrib.settings.name:
+			self.scrib.barf('ACT', "%s was kicked off %s by %s (%s)" % (kicked, target, kicker, reason))
 
 	def on_privmsg(self, c, e):
 		self.on_msg(c, e)
@@ -155,7 +131,7 @@ class ModIRC(SingleServerIRCBot):
 
 	def _on_disconnect(self, c, e):
 		# self.channels = IRCDict()
-		barf.Barf('ACT', "Disconnected..")
+		self.scrib.barf('ACT', "Disconnected..")
 		self.connection.execute_delayed(self.reconnection_interval, self._connected_checker)
 
 
@@ -172,7 +148,7 @@ class ModIRC(SingleServerIRCBot):
 		# First message from owner 'locks' the owner host mask
 		if not e.source() in self.owner_mask and source in self.owners:
 			self.owner_mask.append(e.source())
-			barf.Barf('ACT', "My owner is \033[0m%s" % e.source())
+			self.scrib.barf('ACT', "My owner is \033[0m%s" % e.source())
 
 		# Message text
 		if len(e.arguments()) == 1:
@@ -200,24 +176,16 @@ class ModIRC(SingleServerIRCBot):
 		body = body[body.rfind("\xa0") + 1:]
 
 		# WHOOHOOO!!
-		if target == self.settings.myname or source == self.settings.myname:
-			barf.Barf('MSG', "%s <%s> \033[0m%s" % (target, source, body))
+		if target == self.scrib.settings.name or source == self.scrib.settings.name:
+			self.scrib.barf('MSG', "%s <%s> \033[0m%s" % (target, source, body))
 
 		# Ignore self.
-		if source == self.settings.myname: return
+		if source == self.scrib.settings.name: return
 
-		# Ignore selected nicks
-		if self.settings.ignorelist.count(source) > 0 and self.settings.replyIgnored == 1:
-			barf.Barf('ACT', "Not learning from %s" % source)
-			learn = 0
-		elif self.settings.ignorelist.count(source) > 0:
-			barf.Barf('ACT', "Ignoring %s" % source)
-			return
-
-		# private mode. disable commands for non owners
-		if (not source in self.owners) and self.settings.private:
-			while body[:1] == "!":
-				barf.Barf('ACT', "Private mode is on, ignoring command: %s" % body)
+		# Disable commands for non owners
+		if (not source in self.owners):
+			while body[:1] == self.scrib.settings.symbol:
+				self.scrib.barf('ACT', "Ignoring non-owner command: %s" % body)
 				return
 
 		if body == "":
@@ -225,27 +193,27 @@ class ModIRC(SingleServerIRCBot):
 
 		# Ignore quoted messages
 		if body[0] == "<" or body[0:1] == "\"" or body[0:1] == " <" or body[0] == "[":
-			if self.settings.debug == 1:
-				barf.Barf('DBG', "Ignoring quoted text.")
+			if self.scrib.debug == 1:
+				self.scrib.barf('DBG', "Ignoring quoted text.")
 			return
 
-		# We want replies reply_chance%, if speaking is on
-		not_quiet = self.settings.speaking
-		replyrate = not_quiet * self.settings.reply_chance
-		nickreplyrate = not_quiet * self.settings.nick_reply_chance
+		# We want replies reply_rate%, if speaking is on
+		muted = self.scrib.settings.muted
+		replyrate = muted * self.scrib.settings.reply_rate
+		nickreplyrate = muted * self.scrib.settings.nick_reply_rate
 
 		if self.nick_check(body) == 1:
 			replyrate = nickreplyrate
-			if self.settings.debug == 1:
-				barf.Barf('DBG', "Responding to Highlight")
+			if self.scrib.debug == 1:
+				self.scrib.barf('DBG', "Responding to Highlight")
 
 		# Always reply to private messages
 		if e.eventtype() == "privmsg":
 			replyrate = 100
-			not_quiet = 1
+			muted = 0
 
 			try:
-				if body[0] == "!": # was [1:0]
+				if body[0] == self.scrib.settings.symbol:
 					if self.irc_commands(body, source, target, c, e) == 1: return
 					return
 			except: pass
@@ -253,13 +221,13 @@ class ModIRC(SingleServerIRCBot):
 		#replace nicknames, including own, with "#nick"
 		if e.eventtype() == "pubmsg":
 			try:
-				if body[0] == "!":
+				if body[0] == self.scrib.settings.symbol:
 					if self.irc_commands(body, source, target, c, e) == 1: return
 			except: pass
 
-			barf.Barf('MSG', "%s <%s> \033[0m%s" % (target, source, body))
-			body = body.replace(self.settings.myname, "#nick")
-			body = body.replace(self.settings.myname.lower(), "#nick")
+			self.scrib.barf('MSG', "%s <%s> \033[0m%s" % (target, source, body))
+			body = body.replace(self.scrib.settings.name, "#nick")
+			body = body.replace(self.scrib.settings.name.lower(), "#nick")
 			for x in self.channels[target].users():
 				x = re.sub("[\&\%\+\@\~]","", x)
 				if x:
@@ -269,41 +237,42 @@ class ModIRC(SingleServerIRCBot):
 
 		if body == "": return
 
-		if self.settings.debug == 1:
-			barf.Barf('DBG', "Body empty, no reply.")
+		if self.scrib.debug == 1:
+			self.scrib.barf('DBG', "Body empty, no reply.")
 
 
 		# Pass on to scrib
 		if source in self.owners and e.source() in self.owner_mask:
-			self.scrib.process(self, body, replyrate, learn, (body, source, target, c, e), 1, not_quiet)
+			if self.scrib.debug == 1:
+				self.scrib.barf('DBG', "Passing command to scrib as owner")
+			self.scrib.process(self, body, replyrate, (body, source, target, c, e), 1, muted)
 		else:
+			if self.scrib.debug == 1:
+				self.scrib.barf('DBG', "Starting a new thread")
 			#start a new thread
 			thread.start_new_thread(self.scrib.process,
-									(self, body, replyrate, learn, (body, source, target, c, e), 0, not_quiet))
+									(self, body, replyrate, (body, source, target, c, e), 0, muted))
 
 	def irc_commands(self, body, source, target, c, e):
 		"""
 		Route IRC Commands to the PluginManager.
 		"""
-
 		msg = ""
-		command_list = body.split()
-		command_list[0] = command_list[0]
+		cmds = body.split()
 
 		### Owner commands (Which is all of them for now)
 		if source in self.owners and e.source() in self.owner_mask:
 			# Only accept commands that are in the Command List
 			if self.scrib.debug == 1:
-				barf.Barf('DBG', "Command: %s" % command_list[0])
-				barf.Barf('DBG', "Command list: %s" % str(command_list))
-			if command_list[0][1:] in self.commanddict:
-				msg = "%s %s" % (self.self.settings.pubsym, PluginManager.sendMessage(command_list[0][1:], command_list, self, c))
+				self.scrib.barf('DBG', "Command: %s" % cmds[0])
+				self.scrib.barf('DBG', "Command list: %s" % str(cmds))
+			if cmds[0][1:] in self.commands:
+				msg = "%s" % PluginManager.sendMessage(cmds[0][1:], cmds, self, c)
 
 
-			if command_list[0] == "!reload" and len(command_list) == 2:
-				msg = PluginManager.reloadPlugin(command_list[1])
+			if cmds[0] == "!reload" and len(cmds) == 2:
+				msg = PluginManager.reloadPlugin(cmds[1])
 
-			self.self.settings.save()
 			self.settings.save()
 
 		if msg == "":
@@ -315,7 +284,7 @@ class ModIRC(SingleServerIRCBot):
 	def nick_check(self, message):
 		# Check to see if I'm highlighted
 		highlighted = 0
-		if message.find(self.settings.myname) != -1:
+		if message.find(self.scrib.settings.name) != -1:
 			highlighted = 1
 		return highlighted
 
@@ -324,16 +293,16 @@ class ModIRC(SingleServerIRCBot):
 		Output a line of text. args = (body, source, target, c, e)
 		"""
 		if not self.connection.is_connected():
-			barf.Barf('ERR', "Can't send reply : not connected to server")
+			self.scrib.barf('ERR', "Can't send reply : not connected to server")
 			return
 
 		# Unwrap arguments
 		body, source, target, c, e = args
 
 		# Decide. should we do a ctcp action?
-		if message.find(self.settings.myname + " ") == 0:
+		if message.find(self.scrib.settings.name + " ") == 0:
 			action = 1
-			message = message[len(self.settings.myname) + 1:]
+			message = message[len(self.scrib.settings.name) + 1:]
 		else:
 			action = 0
 
@@ -343,16 +312,16 @@ class ModIRC(SingleServerIRCBot):
 		# Joins replies and public messages
 		if e.eventtype() == "join" or e.eventtype() == "quit" or e.eventtype() == "part" or e.eventtype() == "pubmsg":
 			if action == 0:
-				barf.Barf('MSG', "%s <%s> \033[0m%s" % ( target, self.settings.myname, message))
+				self.scrib.barf('MSG', "%s <%s> \033[0m%s" % ( target, self.scrib.settings.name, message))
 				c.privmsg(target, message)
 			else:
-				barf.Barf('MSG', "%s <%s> /me \033[0m%s" % ( target, self.settings.myname, message))
+				self.scrib.barf('MSG', "%s <%s> /me \033[0m%s" % ( target, self.scrib.settings.name, message))
 				c.action(target, message)
 		# Private messages
 		elif e.eventtype() == "privmsg":
 			# normal private msg
 			if action == 0:
-				barf.Barf('MSG', "%s <%s> \033[0m%s" % ( source, self.settings.myname, message))
+				self.scrib.barf('MSG', "%s <%s> \033[0m%s" % ( source, self.scrib.settings.name, message))
 				c.privmsg(source, message)
 				# send copy to owner
 				if not source in self.owners:
@@ -360,7 +329,7 @@ class ModIRC(SingleServerIRCBot):
 					c.privmsg(','.join(self.owners), "(To   " + source + ") " + message)
 			# ctcp action priv msg
 			else:
-				barf.Barf('MSG', "%s <%s> /me \033[0m%s" % ( target, self.settings.myname, message))
+				self.scrib.barf('MSG', "%s <%s> /me \033[0m%s" % ( target, self.scrib.settings.name, message))
 				c.action(source, message)
 				# send copy to owner
 				if not source in self.owners:
@@ -370,7 +339,7 @@ class ModIRC(SingleServerIRCBot):
 
 if __name__ == "__main__":
 	my_scrib = scrib.scrib()
-	bot = ModIRC(my_scrib, sys.argv)
+	bot = ScribIRC(my_scrib, sys.argv)
 	try:
 		bot.our_start()
 	except KeyboardInterrupt, e:
@@ -379,9 +348,12 @@ if __name__ == "__main__":
 		pass
 	except:
 		traceback.print_exc()
-		c = raw_input(barf.Barf('ERR', "Oh no, I've crashed! Would you like to save my brain? (Y/n) "))
+		my_scrib.barf('ERR', "Oh no, I've crashed! Would you like to save my brain?", False)
+		c = raw_input("[Y/n]")
 		if c[:1] == 'n':
 			sys.exit(0)
-	bot.disconnect(bot.settings.quitmsg)
-	my_scrib.save_all(False)
+
+	bot.disconnect(bot.settings.quit_message) # exit irc cleanly
 	del my_scrib
+
+

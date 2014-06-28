@@ -62,7 +62,8 @@ if __name__ == "__main__":
 		try:
 			my_scrib = scrib.scrib()
 		except ValueError, e:
-			self.scrib.barf('ERR', traceback.format_exc())
+			from core import barf
+			barf.Barf('ERR', traceback.format_exc())
 			sys.exit(0)
 
 		try:

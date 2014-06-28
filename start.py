@@ -16,7 +16,7 @@ def register_interfaces():
 		
 			if ext == '.py' and interface_name != '__init__':
 				try:
-					barf.Barf('PLG', 'Registered interface:                \033[1m%s' % interface_name)
+					barf.Barf('PLG', 'Registered interface:           \033[1m%s' % interface_name)
 					interface_list.append(interface_name)
 
 				except ImportError as e:

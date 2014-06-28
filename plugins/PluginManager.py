@@ -1,14 +1,14 @@
-from plugins import ScribPlugin
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
 
-def sendMessage( event, text, scrib, c ):
-	if ScribPlugin.process_table[event] != '':
-		return ScribPlugin.process_table[event].action(text, scrib, c)
-	else:
-		return ''
+process_table = {}
+plugin_commands = []
 
-def reloadPlugin( event ):
-	if ScribPlugin.process_table[event] != '':
-		reload(event)
-		return "Reloaded %s" % event
-	else:
-		return 'Reloading error'
+def addPlugin( command, action ):
+	global plugin_commands, plugin_aliases
+	process_table[command] = action
+	plugin_commands.append(command)
+
+class Load:
+	def action(self, stuff, scrib, c):
+		return "Default Action"

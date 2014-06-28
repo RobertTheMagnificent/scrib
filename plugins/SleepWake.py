@@ -1,30 +1,29 @@
-from plugins import ScribPlugin
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+from plugins import PluginManager
 
 # User Alias and Command
-sleep_alias = "!sleep"
-sleep_command = { "sleep": "Usage: !sleep \nMake the bot stop talking." }
+sleep_cmd = "!sleep"
 
 # Plugin Action
-class SleepPlugin(ScribPlugin.ScribPlugin):
-	def action(self, command_list, scrib, c):
-		if command_list[0] == sleep_alias and len(command_list)==1:
+class SleepPlugin(PluginManager.Load):
+	def action(self, cmds, scrib, c):
+		if cmds[0] == sleep_cmd and len(cmds)==1:
 			msg = "Going to sleep. Goodnight!"
-			scrib.settings.speaking = 0
+			scrib.settings.muted = 1
 		else:
 			msg = "Zzz..."
 		return msg
 
-wake_alias = "!wake"
-wake_command = { "wake": "Owner command. Usage: !wake\nAllow the bot to talk." }
-
-class WakePlugin(ScribPlugin.ScribPlugin):
-	def action(self, command_list, scrib, c):
-		if command_list[0] == wake_alias and scrib.settings.speaking == 0:
-			scrib.settings.speaking = 1 
+wake_cmd = "!wake"
+class WakePlugin(PluginManager.Load):
+	def action(self, cmds, scrib, c):
+		if cmds[0] == wake_cmd and scrib.settings.muted == 1:
+			scrib.settings.muted = 0
 			msg = "Whoohoo!"
 		else:
 			msg = "But I'm already awake..."
 		return msg
 
-ScribPlugin.addPlugin( sleep_command, sleep_alias, SleepPlugin() )
-ScribPlugin.addPlugin( wake_command, wake_alias, WakePlugin() )
+PluginManager.addPlugin( sleep_cmd, SleepPlugin() )
+PluginManager.addPlugin( wake_cmd, WakePlugin() )

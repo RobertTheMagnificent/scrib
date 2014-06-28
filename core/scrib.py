@@ -2,26 +2,22 @@
 # -*- coding: utf-8 -*-
 
 from random import *
-import barf
-from plugins import PluginManager
 import ctypes
 import sys
 import os
 import shutil
 import fileinput
-import cPickle as pickle
 import struct
+import datetime
 import time
 import zipfile
 import re
 import threading
 
-timers_started = 0
-
-
-def to_sec(s):
-	seconds_per_unit = {"s": 1, "m": 60, "h": 3600, "d": 86400, "w": 604800}
-	return int(s[:-1]) * seconds_per_unit[s[-1]]
+import barf
+import brain
+import cfg
+from plugins import PluginManager
 
 # Makes !learn and !teach usable
 def dbread(key):
@@ -83,7 +79,7 @@ def unfilter_reply(message):
 	so the bot sounds more human :P
 	"""
 	
-	barf.Barf('DBG', "Orig Message: %s" % message)
+	#barf.Barf('DBG', "Orig Message: %s" % message)
 
 	# Had to write my own initial capitalizing code *sigh*
 	message = "%s%s" % (message[:1].upper(), message[1:])
@@ -144,7 +140,7 @@ def unfilter_reply(message):
 		if emotebeg == 0:
 			emoteend = emoteend - 2
 		emote = message[emotebeg:emoteend]
-		barf.Barf('DBG', "Emote found: %s" % emote)
+		self.barf('DBG', "Emote found: %s" % emote)
 		new_message = message[:emotebeg]
 		extra = message[emoteend:]
 		message = new_message
@@ -176,103 +172,80 @@ def unfilter_reply(message):
 
 
 class scrib:
-	import cfgfile
-
-	# Main command list
-	commandlist = "Owner commands:\n!alias, !censor, !check, !context, !learning, !limit, !rebuild, !replace, !save, !uncensor, !unlearn\nPublic commands:\n!date, !fortune, !help, !known, !owner, !version, !words"
-	core_commanddict = {
-		"alias": "Usage: !alias : Show the difference aliases\n!alias <alias> : show the words attached to this alias\n!alias <alias> <word> : link the word to the alias.",
-		"censor": "Usage: !censor [word1 [...]]\nPrevent the bot using one or more words. Without arguments lists the currently censored words.",
-		"check": "Usage: !check\nChecks the brain for broken links. Shouldn't happen, but worth trying if you get KeyError crashes.",
-		"context": "Usage: !context <phrase>\nPrint contexts containing <phrase>.",
-		"learning": "Usage: !learning [on|off]\nToggle bot learning. Without arguments shows the current setting.",
-		"learn": "Owner command. Usage: !learn trigger | response\nTeaches the bot to respond the any words similar to the trigger word or phrase with a certain response",
-		"teach": "Owner command. Usage: !teach trigger | response\nTeaches the bot to respond the any words similar to the trigger word or phrase with a certain response",
-		"forget": "Owner command. Usage: !forget trigger\nForces the bot to forget all previously learned responses to a certain trigger word or phrase",
-		"find": "Owner command. Usage: !find trigger\nFinds all matches to the trigger word or phrase and displays the amount of matches",
-		"responses": "Owner command. Usage: !responses\nDisplays the total number of trigger/response pairs the bot has learned",
-		"limit": "Usage: !limit [number]\nSet the number of words that Scrib can learn.",
-		"rebuild": "Usage: !rebuild\nRebuilds brain links from the lines of known text. Takes a while. You probably don't need to do it unless the brain is very screwed.",
-		"replace": "Usage: !replace <old> <new>\nReplace all occurrences of word <old> in the brain with <new>.",
-		"save": "Usage: !save\nSave Scrib's brain.",
-		"uncensor": "Usage: !uncensor word1 [word2 [...]]\nRemove censorship on one or more words.",
-		"unlearn": "Usage: !unlearn <expression>\nRemove all occurrences of a word or expression from the brain. For example '!unlearn of of' would remove all contexts containing double 'of's.",
-		"date": "Usage: !date\nTells you the date.",
-		"fortune": "Usage: !fortune\nTells you something interesting.",
-		"help": "Usage: !help [command]\nPrints information about using a command, or a list of commands if no command is given.",
-		"known": "Usage: !known word1 [word2 [...]]\nDisplays if one or more words are known, and how many contexts are known.",
-		"owner": "Usage: !owner password\nAdd the user in the owner list.",
-		"version": "Usage: !version\nDisplay what version of Scrib we are running.",
-		"words": "Usage: !words\nDisplay how many words are known."
-	}
-
-	commanddict = dict(core_commanddict.items() + PluginManager.ScribPlugin.plugin_commands.items())
+	"""
+	The meat of scrib
+	"""
 
 	def __init__(self):
 		"""
-		Open the brain. Resize as required.
+		Here we'll load settings and set up modules.
 		"""
+		self.version = "1.1.1"
+		self.timers_started = False
+
+		# This is where we do some ownership command voodoo.
+		self.owner_commands = ['alias', 'censor', 'check', 'context', 'learn', 'learning', 'limit', 'rebuild', 'replace', 'replyrate', 'save', 'uncensor', 'unlearn', 'quit']
+		self.general_commands = ['date', 'help', 'known', 'owner', 'version', 'words']
+		self.plugin_commands = PluginManager.plugin_commands
+		self.commands = self.general_commands + self.owner_commands + self.plugin_commands
+
+		self.barf = barf.Barf # So that we don't have to include it elsewhere.
+		self.cfg = cfg
+
 		# Attempt to load settings
-		self.settings = self.cfgfile.cfgset()
-		self.settings.load("conf/scrib.cfg",
-						   {"max_words": ("max limits in the number of words known", 6000),
-							"learning": ("Allow the bot to learn", 1),
-							"length": ("Max length bot reply can be, otherwise filtered", 25),
-							"ignore_list": ("Words that can be ignored for the answer", ['!.', '?.', "'", ',', ';']),
-							"censored": ("Don't learn the sentence if one of those words is found", []),
-							"num_aliases": ("Total of aliases known", 0),
-							"debug": ("Debug mode adds verbose output to terminal", 0),
-							"aliases": ("A list of similar words", {}),
-							"pubsym": ("Symbol to append to cmd msgs in public", "!"),
-							"debug": ("Whether or not we show IRC debug commands in the terminal", 0),
-							"no_save": ("If True, Scrib doesn't save his brain and configuration to disk", "False")
-						   })
+		self.settings = self.cfg.set()
+		self.settings.load("conf/scrib.cfg",{
+							"name": "scrib",
+							"symbol": "!",
+							"reply_rate": 100,
+							"nick_reply_rate": 100,
+							"learning": 1,
+							"debug": 0,
+							"muted": 0,
+							"max_words": 9001,
+							"censored": [],
+							"num_aliases": 0,
+							"aliases": {},
+							"ignore_list": [],
+							"version": self.version
+							})
 
 		self.debug = self.settings.debug
 
 		if self.debug == 1:
-			barf.Barf('DBG', "Class scrib initialized.")
+			self.barf('DBG', "Class scrib initialized.")
 
 		# Brain stats
-		self.brainstats = self.cfgfile.cfgset()
-		self.brainstats.load("brain/knowledge",
-							 {"num_contexts": ("Total word contexts", 0),
-							  "num_words": ("Total unique words known", 0)
-							 })
+		self.brain = brain.brain()	
+		self.brainstats = self.cfg.set()
+		self.brainstats.load("brain/knowledge", {
+							"num_contexts": 0,
+							"num_words": 0
+							})
 
-		self.answers = self.cfgfile.cfgset()
-		self.answers.load("brain/answers.dat",
-						  {"sentences": ("A list of prepared answers", {})
-						  })
+		self.answers = self.cfg.set()
+		self.answers.load("brain/answers.dat", {
+							"sentences": {}
+							})
 		self.unfilterd = {}
 
-		self.version = self.cfgfile.cfgset()
-		self.version.load("VERSION",
-						  {"core": ("Core version of Scrib", '0.8.1'),
-						   "brain": ("Brain version of Scrib", '0.1.3'),
-						  })
-
 		# Starts the timers:
-		global timers_started
-		if timers_started is False:
+		if self.timers_started is False:
 			try:
-				self.autosave = threading.Timer(to_sec("125m"), self.save_all)
+				self.autosave = threading.Timer(self.to_sec("125m"), self.save_all)
 				self.autosave.start()
-				self.autopurge = threading.Timer(to_sec("5h"), self.auto_optimise)
-				self.autopurge.start()
-				self.autorebuild = threading.Timer(to_sec("71h"), self.auto_rebuild)
+				self.autorebuild = threading.Timer(self.to_sec("71h"), self.auto_rebuild)
 				self.autorebuild.start()
 				timers_started = True
 			except SystemExit, e:
 				self.autosave.cancel()
-				self.autopurge.cancel()
 				self.autorebuild.cancel()
 
 		if dbread("hello") is None:
 			dbwrite("hello", "hi #nick")
 
 		# Read the brain
-		barf.Barf('SAV', "Reading my brain...")
+		self.barf('SAV', "Reading my brain...")
 		try:
 			if os.path.exists('brain/cortex.zip'):
 				zfile = zipfile.ZipFile('brain/cortex.zip', 'r')
@@ -282,93 +255,83 @@ class scrib:
 					file.write(data)
 					file.close()
 		except (EOFError, IOError), e:
-			barf.Barf('ERR', "No brain found.")
+			self.barf('ERR', "No brain found.")
 		try:
 			f = open("brain/version", "rb")
-			v = f.read()
-			barf.Barf('MSG', "Current brain version is %s " % v)
+			v = f.read().strip()
+			self.barf('MSG', "Current brain version is %s " % v)
 			f.close()
-			if v != self.version.brain:
-				barf.Barf('ERR', "Brain version incorrect.")
-				c = raw_input(barf.Barf('ERR', "Would you like to update the brain? (Y/n) "))
+			if v != self.brain.version:
+				self.barf('ERR', "Brain is version "+v+", but I use "+self.brain.version+".")
+				self.barf('ERR', "Would you like to update the brain?")
+				c = raw_input("[Y/n]")
 				if c[:1].lower() != 'n':
-					timestamp = get_time_for_file()
+					timestamp = "%s-%s" % (datetime.date.today(), time.strftime("%H%M%S",time.localtime(time.time())))
 					shutil.copyfile("brain/cortex.zip", "brain/cortex-%s.zip" % timestamp)
-					barf.Barf('ACT', "Backup saved to brain/cortex-%s.zip" % timestamp)
-					barf.Barf('ACT', "Starting update, may take a few moments.")
+					self.barf('ACT', "Backup saved to brain/cortex-%s.zip" % timestamp)
+					self.barf('ACT', "Starting update, may take a few moments.")
 					f = open("brain/words.dat", "rb")
 					if self.debug == 1:
-						barf.Barf('DBG', "Reading words...")
+						self.barf('DBG', "Reading words...")
 					s = f.read()
 					f.close()
 					self.words = self.unpack(s, v)
 					del s
 					if self.debug == 1:
-						barf.Barf('DBG', "Saving words...")
+						self.barf('DBG', "Saving words...")
 					f = open("brain/words.dat", "wb")
-					s = pickle.dumps(self.words)
+					s = self.pack(self.words, self.brain.version, True)
 					f.write(s)
 					f.close()
 					del s
 					if self.debug == 1:
-						barf.Barf('DBG', "Words converted.")
-						barf.Barf('DBG', "Reading lines...")
+						self.barf('DBG', "Words converted.")
+						self.barf('DBG', "Reading lines...")
 					f = open("brain/lines.dat", "rb")
 					s = f.read()
 					f.close()
 					self.lines = self.unpack(s, v)
-					if self.debug == 1:
-						barf.Barf('DBG', "Applying filter to adjust to new brain system.\n               This may take several minutes...")
-					self.auto_rebuild()
+					# This block was destroying the hash, like how !prune did...
+					#if self.debug == 1:
+					#	self.barf('DBG', "Applying filter to adjust to new brain system.\n                This may take several minutes...")
+					#self.auto_rebuild()
 					f = open("brain/lines.dat", "wb")
-					s = pickle.dumps(self.lines)
+					s = self.pack(self.lines, self.brain.version, True)
 					f.write(s)
 					f.close()
 					del s
 					if self.debug == 1:
-						barf.Barf('DBG', "Lines converted.")
+						self.barf('DBG', "Lines converted.")
 					f = open("brain/version", "wb")
-					f.write(self.version.brain)
+					f.write(self.brain.version)
 					f.close()
 					if self.debug == 1:
-						barf.Barf('DBG', "Version updated.")
-					barf.Barf('ACT', "Brain converted successfully! Continuing.")
-
-					if self.debug == 1:
-						barf.Barf('DBG', "Brain saved.")
+						self.barf('DBG', "Version updated.")
+					v = self.brain.version
+					self.barf('ACT', "Brain converted successfully! Continuing.")
+				else:
+					self.brain.version = v # Saves old brain as old brain format.
 
 			f = open("brain/words.dat", "rb")
 			s = f.read()
 			f.close()
-			self.words = pickle.loads(s)
+			self.words = self.unpack(s, v)
 			del s
 			f = open("brain/lines.dat", "rb")
 			s = f.read()
 			f.close()
-			self.lines = pickle.loads(s)
+			self.lines = self.unpack(s, v)
 			del s
-
-#			import json
-#			barf.Barf('SAV', "Saving lines.json")
-#			f = open("lines.json", "wb")
-#			s = {}
-#			for k,v in self.lines.items():
-#				barf.Barf('DBG', "Saving lines to lines.json")
-#				v[0] = v[0].decode('utf-8', 'ignore')
-#				s.update({k:v})
-#			f.write(json.dumps(s, sort_keys=True, indent=4, separators=(',', ': ')))
-#			f.close()
-#			del f, s
 
 		except (EOFError, IOError), e:
 			# Create new brain
 			self.words = {}
 			self.lines = {}
-			barf.Barf('ERR', "New brain generated.")
+			self.barf('ERR', "New brain generated.")
 
 		# Is a resizing required?
 		if len(self.words) != self.brainstats.num_words:
-			barf.Barf('ACT', "Updating my brain's information...")
+			self.barf('ACT', "Recalculating brain stats...")
 			self.brainstats.num_words = len(self.words)
 			num_contexts = 0
 			# Get number of contexts
@@ -383,7 +346,7 @@ class scrib:
 		for x in self.settings.aliases.keys():
 			count += len(self.settings.aliases[x])
 		if count != self.settings.num_aliases:
-			barf.Barf('ACT', "Check brain for new aliases.")
+			self.barf('ACT', "Check brain for new aliases.")
 			self.settings.num_aliases = count
 
 			for x in self.words.keys():
@@ -418,94 +381,136 @@ class scrib:
 			# No words to unlearn
 			pass
 
-		self.settings.save()
+		#self.settings.save()
+	def to_sec(self, s):
+		seconds_per_unit = {"s": 1, "m": 60, "h": 3600, "d": 86400, "w": 604800}
+		return int(s[:-1]) * seconds_per_unit[s[-1]]
 
 	# For unpacking a brain. This is just quick and dirty, should be replaced...
+	def brain_ver(self, version):
+		marshal = ['0.0.1', '0.1.0', '0.1.1']
+		pickle = ['0.1.2', '0.1.3', '0.1.4']
+		json = ['0.1.5']
+		
+		if version in marshal:
+			return 1
+		elif version in pickle:
+			return 2
+		elif version in json:
+			return 3
+		else:
+			self.barf('ERR', "Invalid brain type")
+			return 0
+
 	def unpack(self, file, version):
-		oldversions = ['0.0.1', '0.1.0', '0.1.1']
-		if version in oldversions:
+		if self.brain_ver(version) == 1:
 			import marshal
 			stuff = marshal.loads(file)
-		else:
+		elif self.brain_ver(version) == 2:
+			import cPickle as pickle
 			stuff = pickle.loads(file)
+		elif self.brain_ver(version) == 3:
+			import json
+			stuff = json.loads(file, encoding="utf-8")
 		return stuff
 
-	def save_all(self, restart_timer=True):
-		if self.settings.no_save != "True":
-			barf.Barf('SAV', "Writing to my brain...")
+	def pack(self, file, version, upgrade=False):
+		if self.brain_ver(version) == 1:
+			import marshal
+			stuff = marshal.dumps(file)
+		elif self.brain_ver(version) == 2:
+			import cPickle as pickle
+			stuff = pickle.dumps(file)
+		elif self.brain_ver(version) == 3:
+			import json
+			if upgrade == True:
+				s = {}
+				for k,v in file.items():
+					s.update({k:v})
+				stuff = json.dumps(s, sort_keys=True, indent=4, separators=(',', ': '), encoding='latin-1').decode('latin1').encode('utf8') # Compat
+				del s
+				return stuff
 
-			f = open("brain/words.dat", "wb")
-			s = pickle.dumps(self.words)
-			f.write(s)
+			stuff = json.dumps(file, sort_keys=True, indent=4, separators=(',', ': '), encoding='latin-1').decode('latin-1').encode('utf-8') # Gross
+		return stuff
+
+	def save_all(self, interface, restart_timer=True):
+		self.barf('SAV', "Writing to my brain...")
+
+		f = open("brain/words.dat", "wb")
+		s = self.pack(self.words, self.brain.version)
+		f.write(s)
+		f.close()
+		if self.debug == 1:
+			self.barf('DBG', "Words saved.")
+		f = open("brain/lines.dat", "wb")
+		s = self.pack(self.lines, self.brain.version)
+		f.write(s)
+		f.close()
+		if self.debug == 1:
+			self.barf('DBG', "Lines saved.")
+
+		#zip the files
+		f = zipfile.ZipFile('brain/cortex.zip', 'w', zipfile.ZIP_DEFLATED)
+		f.write('brain/words.dat')
+		if self.debug == 1:
+			self.barf('DBG', "Words zipped")
+		f.write('brain/lines.dat')
+		if self.debug == 1:
+			self.barf('DBG', "Lines zipped")
+		try:
+			f.write('brain/version')
 			f.close()
 			if self.debug == 1:
-				barf.Barf('DBG', "Words saved.")
-			f = open("brain/lines.dat", "wb")
-			s = pickle.dumps(self.lines)
-			f.write(s)
+				self.barf('DBG', "Version zipped")
+		except:
+			f = open("brain/version", "w")
+			f.write(self.brain.version)
 			f.close()
 			if self.debug == 1:
-				barf.Barf('DBG', "Lines saved.")
+				self.barf('DBG', "Version written.")
 
-			#zip the files
-			f = zipfile.ZipFile('brain/cortex.zip', 'w', zipfile.ZIP_DEFLATED)
-			f.write('brain/words.dat')
-			if self.debug == 1:
-				barf.Barf('DBG', "Words zipped")
-			f.write('brain/lines.dat')
-			if self.debug == 1:
-				barf.Barf('DBG', "Lines zipped")
+		f = open("brain/words.dat", "w")
+		# write each words known
+		wordlist = []
+		#Sort the list before to export
+		for key in self.words.keys():
 			try:
-				f.write('brain/version')
-				f.close()
-				if self.debug == 1:
-					barf.Barf('DBG', "Version zipped")
+				wordlist.append([key, len(self.words[key].encode('utf8'))])
 			except:
-				f = open("brain/version", "w")
-				f.write(self.version.brain)
-				f.close()
-				if self.debug == 1:
-					barf.Barf('DBG', "Version written.")
+				pass
+		wordlist.sort(lambda x, y: cmp(x[1], y[1]))
+		map((lambda x: f.write(str(x[0]) + "\n\r") ), wordlist)
+		f.close()
+		if self.debug == 1:
+			self.barf('DBG', "Words written.")
 
-			f = open("brain/words.dat", "w")
-			# write each words known
-			wordlist = []
-			#Sort the list before to export
-			for key in self.words.keys():
-				try:
-					wordlist.append([key, len(self.words[key])])
-				except:
-					pass
-			wordlist.sort(lambda x, y: cmp(x[1], y[1]))
-			map((lambda x: f.write(str(x[0]) + "\n\r") ), wordlist)
-			f.close()
+		f = open("brain/sentences.dat", "w")
+		# write each words known
+		wordlist = []
+		#Sort the list before to export
+		for key in self.unfilterd.keys():
+			wordlist.append([key, self.unfilterd[key]])
+		wordlist.sort(lambda x, y: cmp(y[1], x[1]))
+		map((lambda x: f.write(str(x[0]) + "\n") ), wordlist)
+		f.close()
+		if self.debug == 1:
+			self.barf('DBG', "Sentences written.")
+
+		# Save settings
+		self.settings.save()
+		self.brainstats.save()
+
+		if interface != False:
+			interface.settings.save()
+
+		self.barf('SAV', "Brain saved.")
+
+		if restart_timer is True:
+			self.autosave = threading.Timer(self.to_sec("125m"), self.save_all)
+			self.autosave.start()
 			if self.debug == 1:
-				barf.Barf('DBG', "Words written.")
-
-			f = open("brain/sentences.dat", "w")
-			# write each words known
-			wordlist = []
-			#Sort the list before to export
-			for key in self.unfilterd.keys():
-				wordlist.append([key, self.unfilterd[key]])
-			wordlist.sort(lambda x, y: cmp(y[1], x[1]))
-			map((lambda x: f.write(str(x[0]) + "\n") ), wordlist)
-			f.close()
-			if self.debug == 1:
-				barf.Barf('DBG', "Sentences written.")
-
-			if restart_timer is True:
-				self.autosave = threading.Timer(to_sec("125m"), self.save_all)
-				self.autosave.start()
-				if self.debug == 1:
-					barf.Barf('DBG', "Restart timer started.")
-
-			# Save settings
-			self.settings.save()
-			self.brainstats.save()
-			self.version.save()
-
-			barf.Barf('SAV', "Brain saved.")
+				self.barf('DBG', "Restart timer started.")
 
 	def auto_rebuild(self):
 		if self.settings.learning == 1:
@@ -521,69 +526,86 @@ class scrib:
 			self.brainstats.num_contexts = 0
 
 			for k in old_lines.keys():
-				filtered_line = self.filter_message(old_lines[k][0])
+				filtered_line = self.filter(old_lines[k][0])
 				self.learn(filtered_line, old_lines[k][1])
+			msg = "Rebuilt brain in %0.2fs. Words %d (%+d), contexts %d (%+d)." % \
+				  (time.time() - t,
+				   old_num_words,
+				   self.brainstats.num_words - old_num_words,
+				   old_num_contexts,
+				   self.brainstats.num_contexts - old_num_contexts)
 
 			# Restarts the timer
-			self.autorebuild = threading.Timer(to_sec("71h"), self.auto_rebuild)
+			self.autorebuild = threading.Timer(self.to_sec("71h"), self.auto_rebuild)
 			self.autorebuild.start()
+
+			return msg
+		else:
+			return "Learning mode is off; will not rebuild."
 
 	def kill_timers(self):
 		self.autosave.cancel()
-		self.autopurge.cancel()
 		self.autorebuild.cancel()
 
-	def process_msg(self, io_module, body, replyrate, learn, args, owner=0, not_quiet=1):
+	def process(self, interface, body, replyrate, learn, args, owner=0, muted=0):
 		"""
 		Process message 'body' and pass back to IO module with args.
-		If owner==1 allow owner commands.
-		If not_quiet==0 only respond with taught responses.
+		If muted == 1 only respond with taught responses.
 		"""
 
 		if self.debug == 1:
-			barf.Barf('DBG', "Processing message...")
+			self.barf('DBG', "Processing message...")
 
 		# add trailing space so sentences are broken up correctly
 		body = body + " "
 
 		# Parse commands
-		if body[0] == "!":
-			barf.Barf('DBG', "Parsing commands...")
-			#if body[0] not in commandlist:
-				# do something
-			self.do_commands(io_module, body, args, owner)
+		if body[0] == self.settings.symbol:
+			if self.debug == 1:
+				self.barf('DBG', "Parsing commands...")
+				if owner == 1:
+					self.barf('DBG', 'User is owner.')
+				else:
+					self.barf('DBG', 'User is not owner.')	
+
+			self.do(interface, body[1:], args, owner)
 			return
+
 
 		# Filter out garbage and do some formatting
 		if self.debug == 1:
-			barf.Barf('DBG', "Filtering message...")
-		body = self.filter_message(body)
+			self.barf('DBG', "Filtering message...")
+		body = self.filter(body)
 
 		# Learn from input
-		if learn == 1:
+
+		if self.settings.learning == 1:
 			if self.debug == 1:
-				barf.Barf('DBG', "Learning from: " + body)
+				self.barf('DBG', "Learning from: %s" % body)
 			self.learn(body)
+
 
 		# Make a reply if desired
 		if randint(0, 99) < replyrate:
 			if self.debug == 1:
-				barf.Barf('DBG', "Decided to answer...")
+				self.barf('DBG', "Decided to answer...")
 			message = ""
 
-			#Look if we can find a prepared answer
-			if dbread(body):
-				if self.debug == 1:
-					barf.Barf('DBG', "Using prepared answer.")
-				message = unfilter_reply(dbread(body))
-				if self.debug == 1:
-					barf.Barf('DBG', "Replying with: " + message)
-			if not_quiet == 1:
+			if muted == 0:
+				#Look if we can find a prepared answer
+				if dbread(body):
+					if self.debug == 1:
+						self.barf('DBG', "Using prepared answer.")
+					message = unfilter_reply(dbread(body))
+					if self.debug == 1:
+						self.barf('DBG', "Replying with: " + message)
+					return
+
 				for sentence in self.answers.sentences.keys():
 					pattern = "^%s$" % sentence
 					if re.search(pattern, body):
 						if self.debug == 1:
-							barf.Barf('DBG', "Searching for reply...")
+							self.barf('DBG', "Searching for reply...")
 						message = self.answers.sentences[sentence][
 							randint(0, len(self.answers.sentences[sentence]) - 1)]
 						break
@@ -595,35 +617,31 @@ class scrib:
 
 				if message == "":
 					if self.debug == 1:
-						barf.Barf('DBG', "No prepared answer; thinking...")
+						self.barf('DBG', "No prepared answer; thinking...")
 					message = self.reply(body)
 					if self.debug == 1:
-						barf.Barf('DBG', "Reply formed; unfiltering...")
+						self.barf('DBG', "Reply formed; unfiltering...")
 					message = unfilter_reply(message)
 					if self.debug == 1:
-						barf.Barf('DBG', "Unfiltered message: " + message)
+						self.barf('DBG', "Unfiltered message: " + message)
 			else:
 				return
 
 			# empty. do not output
 			if message == "":
 				if self.debug == 1:
-					barf.Barf('DBG', "Not replying; message empty.")
+					self.barf('DBG', "Message empty.")
+					replying = "Not replying."
 				return
-			if self.debug == 1:
-				replying = "Not replying."
-			#  else output
-			if len(message) >= self.settings.length:
-				time.sleep(3)
 			else:
 				time.sleep(.075 * len(message))
 				if self.debug == 1:
 					replying = "Reply sent."
-				io_module.output(message, args)
+				interface.output(message, args)
 			if self.debug == 1:
-				barf.Barf('DBG', replying)
+				self.barf('DBG', replying)
 
-	def filter_message(bot, message):
+	def filter(bot, message):
 		"""
 		Make easier to learn and reply to.
 		"""
@@ -695,449 +713,431 @@ class scrib:
 
 		return message
 
-	def do_commands(self, io_module, body, args, owner):
+	def do(self, interface, body, args, owner):
 		"""
 		Respond to user commands.
 		"""
+		cmds = body.split()
+		sym = self.settings.symbol # For ease of typing
 		msg = ""
 
-		command_list = body.split()
-		command_list[0] = command_list[0]
-
-		# Guest commands. These should be executable by anyone
-		# Unless private = 1
-
-		# Version string
-		if command_list[0] == "!version":
-			brain = self.version.brain
-			core = self.version.core
-			msg = "%s I am a scrib version %s. My brain version is %s." % (self.settings.pubsym, core, brain)
-
-
-		# These, however, should never be public.
-
-		# Learn/Teach commands
-		if command_list[0] == "!teach" or command_list[0] == "!learn":
-			try:
-				key = ' '.join(command_list[1:]).split("|")[0].strip()
-				key = re.sub("[\.\,\?\*\"\'!]", "", key)
-				rnum = int(len(' '.join(command_list[1:]).split("|")) - 1)
-				if "#nick" in key:
-					msg = "%s Stop trying to teach me something that will break me!" % self.settings.pubsym
-				else:
-					value = teach_filter(' '.join(command_list[1:]).split("|")[1].strip())
-					dbwrite(key[0:], value[0:])
-					if rnum > 1:
-						array = ' '.join(command_list[1:]).split("|")
-						rcount = 1
-						for value in array:
-							if rcount == 1:
-								rcount = rcount + 1
-							else:
-								dbwrite(key[0:], teach_filter(value[0:].strip()))
-					else:
-						value = ' '.join(command_list[1:]).split("|")[1].strip()
-						dbwrite(key[0:], teach_filter(value[0:]))
-					msg = "%s New response learned for %s" % (self.settings.pubsym, key)
-			except:
-				msg = "%s I couldn't learn that!" % self.settings.pubsym
-
-		# Forget command
-		if command_list[0] == "!forget":
-			if os.path.isfile("brain/prepared.dat"):
-				try:
-					key = ' '.join(command_list[1:]).strip()
-					for line in fileinput.input("brain/prepared.dat", inplace=1):
-						data = line.split(":=:")[0]
-						dlen = r'\b.{2,}\b'
-						if re.search(dlen, key, re.IGNORECASE):
-							if key.lower() in data.lower() or data.lower() in key.lower():
-								pass
-						else:
-							print line.strip()
-						msg = "%s I've discarded '%s' from my brain." % (self.settings.pubsym, key)
-				except:
-					msg = "%s Sorry, I couldn't forget that!" % (self.settings.pubsym)
-			else:
-				msg = "%s You have to teach me before you can make me forget it!" % self.settings.pubsym
-
-		# Find response command
-		if command_list[0] == "!find":
-			if os.path.isfile("brain/prepared.dat"):
-				rcount = 0
-				matches = ""
-				key = ' '.join(command_list[1:]).strip()
-				file = open("brain/prepared.dat")
-				for line in file.readlines():
-					data = line.split(":=:")[0]
-					dlen = r'\b.{2,}\b'
-					if re.search(dlen, key, re.IGNORECASE):
-						if key.lower() in data.lower() or data.lower() in key.lower():
-							if key.lower() is "":
-								pass
-							else:
-								rcount = rcount + 1
-								if matches == "":
-									matches = data
-								else:
-									matches = matches + ", " + data
-				file.close()
-				if rcount < 1:
-					msg = "%s I have no match for %s" % (self.settings.pubsym, key)
-				elif rcount == 1:
-					msg = "%s I found 1 match: %s" % (self.settings.pubsym, matches)
-				else:
-					msg = "%s I found %d matches: %s" % (self.settings.pubsym, rcount, matches)
-			else:
-				msg = "%s You need to teach me something first!" % self.settings.pubsym
-
-		if command_list[0] == "!responses":
-			if os.path.isfile("brain/prepared.dat"):
-				rcount = 0
-				file = open("brain/prepared.dat")
-				for line in file.readlines():
-					if line is "":
-						pass
-					else:
-						rcount = rcount + 1
-				file.close()
-				if rcount < 1:
-					msg = "%s I've learned no responses" % self.settings.pubsym
-				elif rcount == 1:
-					msg = "%s I've learned only 1 response" % self.settings.pubsym
-				else:
-					msg = "%s I've learned %d responses" % (self.settings.pubsym, rcount)
-			else:
-				msg = "%s You need to teach me something first!" % self.settings.pubsym
-
-		# How many words do we know?
-		elif command_list[0] == "!words":
-			num_w = self.brainstats.num_words
-			num_c = self.brainstats.num_contexts
-			num_l = len(self.lines)
-			if num_w != 0:
-				num_cpw = num_c / float(num_w) # contexts per word
-			else:
-				num_cpw = 0.0
-			msg = "%s I know %d words (%d contexts, %.2f per word), 1%d lines." % (
-				self.settings.pubsym, num_w, num_c, num_cpw, num_l)
-
-		# Do I know this word
-		elif command_list[0] == "!known":
-			if len(command_list) == 2:
-				# single word specified
-				word = command_list[1]
-				if self.words.has_key(word):
-					c = len(self.words[word])
-					msg = "%s %s is known (%d contexts)" % (self.settings.pubsym, word, c)
-				else:
-					msg = "%s %s is unknown." % (self.settings.pubsym, word)
-			elif len(command_list) > 2:
-				# multiple words.
-				words = []
-				for x in command_list[1:]:
-					words.append(x)
-				msg = "%s Number of contexts: " % self.settings.pubsym
-				for x in words:
-					if self.words.has_key(x):
-						c = len(self.words[x])
-						msg += x + "/" + str(c) + " "
-					else:
-						msg += x + "/0 "
-
-		# Owner commands
-		if owner == 1:
-			# Save the brain
-			if command_list[0] == "!save":
-				msg = "%s Saving brain..." % self.settings.pubsym
-				self.save_all(False)
-				msg = "%s Brain has been saved!" % self.settings.pubsym
-
-			# Command list
-			# TODO: Help should broken into Guest and Owner modules
-			elif command_list[0] == "!help":
-				if len(command_list) > 1:
-					# Help for a specific command
-					cmd = command_list[1]
-					dic = None
-					if cmd in self.commanddict.keys():
-						dic = self.commanddict
-					elif cmd in io_module.commanddict.keys():
-						dic = io_module.commanddict
-					if dic:
-						for i in dic[cmd].split("\n"):
-							io_module.output(self.settings.pubsym + i, args)
-					else:
-						msg = "%s No help on command '%s'" % (self.settings.pubsym, cmd)
-				else:
-					dic = self.commandlist
-					for i in dic.split("\n"):
-						io_module.output(self.settings.pubsym + " " + i, args)
-
-			# Change the max_words setting
-			elif command_list[0] == "!limit":
-				msg = "%s The max limit is " % self.settings.pubsym
-				if len(command_list) == 1:
-					msg += str(self.settings.max_words)
-				else:
-					limit = int(command_list[1])
-					self.settings.max_words = limit
-					msg += "now " + command_list[1]
-
-			# Check for broken links in the brain
-			elif command_list[0] == "!check":
-				t = time.time()
-				num_broken = 0
-				num_bad = 0
-				for w in self.words.keys():
-					wlist = self.words[w]
-
-					for i in xrange(len(wlist) - 1, -1, -1):
-						line_idx, word_num = struct.unpack("iH", wlist[i])
-
-						# Nasty critical error we should fix
-						if not self.lines.has_key(line_idx):
-							barf.Barf('ACT', "Removing broken link '%s' -> %d." % (w, line_idx))
-							num_broken = num_broken + 1
-							del wlist[i]
-						else:
-							# Check pointed to word is correct
-							split_line = self.lines[line_idx][0].split()
-							if split_line[word_num] != w:
-								barf.Barf('ACT', "Line '%s' word %d is not '%s' as expected." % \
-										  (self.lines[line_idx][0],
-										   word_num, w))
-								num_bad = num_bad + 1
-								del wlist[i]
-					if len(wlist) == 0:
-						del self.words[w]
-						self.brainstats.num_words = self.brainstats.num_words - 1
-						barf.Barf('ACT', "\"%s\" vaporized from brain." % w)
-
-				msg = "%s Checked my brain in %0.2fs. Fixed links: %d broken, %d bad." % \
-					  (self.settings.pubsym,
-					   time.time() - t,
-					   num_broken,
-					   num_bad)
-
-			# Rebuild the brain by discarding the word links and
-			# Re-parsing each line
-			elif command_list[0] == "!rebuild":
-				if self.settings.learning == 1:
-					t = time.time()
-
-					old_lines = self.lines
-					old_num_words = self.brainstats.num_words
-					old_num_contexts = self.brainstats.num_contexts
-
-					self.words = {}
-					self.lines = {}
-					self.brainstats.num_words = 0
-					self.brainstats.num_contexts = 0
-
-					for k in old_lines.keys():
-						self.learn(old_lines[k][0], old_lines[k][1])
-
-					msg = "%s Rebuilt brain in %0.2fs. Words %d (%+d), contexts %d (%+d)." % \
-						  (self.settings.pubsym,
-						   time.time() - t,
-						   old_num_words,
-						   self.brainstats.num_words - old_num_words,
-						   old_num_contexts,
-						   self.brainstats.num_contexts - old_num_contexts)
-
-			# Remove rare words
-			elif command_list[0] == "!prune":
-				if self.debug == 1:
-					barf.Barf('DBG', "Pruning...")
-
-				io_module.output("Pruning has been removed. You can use !unlearn to remove words individually.", args)
-				return
-
-			# Change a typo in the brain
-			elif command_list[0] == "!replace":
-				if len(command_list) < 3:
-					return
-				old = command_list[1]
-				new = command_list[2]
-				msg = self.replace(old, new)
-
-			# Barf the contents to avoid chat spamming.
-			elif command_list[0] == "!context":
-				if self.debug == 1:
-					barf.Barf('DBG', "Checking contexts...")
-
-				# build context we are looking for
-				context = " ".join(command_list[1:])
-				if context == "":
-					return
-
-				find_context = " ".join(command_list[1:])
-				num_contexts = ""
-
-
-				# Build context list
-				# Pad it
-				context = " " + context + " "
-				c = []
-				# Search through contexts
-				for x in self.lines.keys():
-					# get context
-					ctxt = self.lines[x][0]
-					# add leading whitespace for easy sloppy search code
-					# TODO Find a better, less sloppy way to do this crap
-					ctxt = " " + ctxt + " "
-					if ctxt.find(context) != -1:
-						# Avoid duplicates (2 of a word
-						# in a single context)
-						num_contexts = len(c) + 1
-						if len(c) == 0:
-							c.append(self.lines[x][0])
-						elif c[len(c) - 1] != self.lines[x][0]:
-							c.append(self.lines[x][0])
-				x = 0
-
-				if num_contexts != "":
-					barf.Barf('ACT', "=========================================")
-					barf.Barf('ACT', "Printing %s contexts containing \033[1m'%s'" % (num_contexts, find_context))
-					barf.Barf('ACT', "=========================================")
-				else:
-					barf.Barf('ACT', "=========================================")
-					barf.Barf('ACT', "No contexts to print containing \033[1m'%s'" % find_context)
-
-				while x < 5:
-					if x < len(c):
-						lines = c
-						barf.Barf('ACT', "%s" % lines[x])
-					x += 1
-				if len(c) == 5:
-					return
-				if x < 5:
-					x = 5
-				while x < len(c):
-					lines = c
-					barf.Barf('ACT', "%s" % lines[x])
-					x += 1
-
-				barf.Barf('ACT', "=========================================")
-
-			# Remove a word from the vocabulary [use with care]
-			elif command_list[0] == "!unlearn":
-				if self.debug == 1:
-					barf.Barf('DBG', "Unlearning...")
-				# build context we are looking for
-				context = " ".join(command_list[1:])
-				if context == "":
-					return
-				barf.Barf('ACT', "Looking for: %s" % context)
-				# Unlearn contexts containing 'context'
-				t = time.time()
-				self.unlearn(context)
-				# we don't actually check if anything was
-				# done..
-				msg = "%s Unlearn done in %0.2fs" % (self.settings.pubsym, time.time() - t)
-
-			# Query/toggle bot learning
-			elif command_list[0] == "!learning":
-				msg = "%s Learning mode " % self.settings.pubsym
-				if len(command_list) == 1:
-					if self.settings.learning == 0:
-						msg += "off"
-					else:
-						msg += "on"
-				else:
-					toggle = command_list[1]
-					if toggle == "on":
-						msg += "on"
-						self.settings.learning = 1
-					else:
-						msg += "off"
-						self.settings.learning = 0
-
-			# add a word to the 'censored' list
-			elif command_list[0] == "!censor":
-				# no arguments. list censored words
-				if len(command_list) == 1:
-					if len(self.settings.censored) == 0:
-						msg = "%s No words censored." % self.settings.pubsym
-					else:
-						msg = "%s I will not use the word(s) %s" % (
-							self.settings.pubsym, ", ".join(self.settings.censored))
-				# add every word listd to censored list
-				else:
-					for x in xrange(1, len(command_list)):
-						if command_list[x] in self.settings.censored:
-							msg += "%s %s is already censored." % (self.settings.pubsym, command_list[x])
-						else:
-							self.settings.censored.append(command_list[x])
-							self.unlearn(command_list[x])
-							msg += "%s %s is now censored." % (self.settings.pubsym, command_list[x])
-						msg += "\n"
-
-			# remove a word from the censored list
-			elif command_list[0] == "!uncensor":
-				if self.debug == 1:
-					barf.Barf('DBG', "Uncensoring...")
-				# Remove words listed from the censor list
-				# eg !uncensor tom dick harry
-				for x in xrange(1, len(command_list)):
+		if owner == 0 and cmds[0] in self.commands:
+			msg = "Sorry, but you're not an owner."
+		
+		if cmds[0] in self.commands:
+			# Owner commands
+			if owner == 1:
+				if cmds[0] == "learn":
 					try:
-						self.settings.censored.remove(command_list[x])
-						msg = "%s %s is uncensored." % (self.settings.pubsym, command_list[x])
-					except ValueError, e:
-						pass
+						key = ' '.join(cmds[1:]).split("|")[0].strip()
+						key = re.sub("[\.\,\?\*\"\'!]", "", key)
+						rnum = int(len(' '.join(cmds[1:]).split("|")) - 1)
+						if "#nick" in key:
+							msg = "Yeah, that won't work."
+						else:
+							value = teach_filter(' '.join(cmds[1:]).split("|")[1].strip())
+							dbwrite(key[0:], value[0:])
+							if rnum > 1:
+								array = ' '.join(cmds[1:]).split("|")
+								rcount = 1
+								for value in array:
+									if rcount == 1:
+										rcount = rcount + 1
+									else:
+										dbwrite(key[0:], teach_filter(value[0:].strip()))
+							else:
+								value = ' '.join(cmds[1:]).split("|")[1].strip()
+								dbwrite(key[0:], teach_filter(value[0:]))
+							msg = "New response learned for %s" % key
+					except Exception, e:
+						msg = "I couldn't learn that: %s" % e
 
-			elif command_list[0] == "!alias":
-				# List aliases words
-				if len(command_list) == 1:
-					if len(self.settings.aliases) == 0:
-						msg = "%s No aliases" % self.settings.pubsym
+				elif cmds[0] == "forget":
+					if os.path.isfile("brain/prepared.dat"):
+						try:
+							key = ' '.join(cmds[1:]).strip()
+							for line in fileinput.input("brain/prepared.dat", inplace=1):
+								data = line.split(":=:")[0]
+								dlen = r'\b.{2,}\b'
+								if re.search(dlen, key, re.IGNORECASE):
+									if key.lower() in data.lower() or data.lower() in key.lower():
+										pass
+								else:
+									print line.strip()
+								msg = "Poof! '%s' is gone." % key
+						except Exception, e:
+							msg = "Sorry, I couldn't forget that: %s" % e
 					else:
-						msg = "%s I will alias the word(s) %s." \
-							  % (self.settings.pubsym, ", ".join(self.settings.aliases.keys()))
-				# add every word listd to alias list
-				elif len(command_list) == 2:
-					if command_list[1][0] != '~': command_list[1] = '~' + command_list[1]
-					if command_list[1] in self.settings.aliases.keys():
-						msg = "%s These words : %s are aliases to %s." \
-							  % (
-							self.settings.pubsym, " ".join(self.settings.aliases[command_list[1]]), command_list[1] )
+						msg = "I cannot forget what I do not know."
+
+				elif cmds[0] == "find":
+					if os.path.isfile("brain/prepared.dat"):
+						rcount = 0
+						matches = ""
+						key = ' '.join(cmds[1:]).strip()
+						file = open("brain/prepared.dat")
+						for line in file.readlines():
+							data = line.split(":=:")[0]
+							dlen = r'\b.{2,}\b'
+							if re.search(dlen, key, re.IGNORECASE):
+								if key.lower() in data.lower() or data.lower() in key.lower():
+									if key.lower() is "":
+										pass
+									else:
+										rcount = rcount + 1
+										if matches == "":
+											matches = data
+										else:
+											matches = matches + ", " + data
+						file.close()
+						if rcount < 1:
+							msg = "I have no match for %s" % (key)
+						elif rcount == 1:
+							msg = "I found 1 match: %s" % (matches)
+						else:
+							msg = "I found %d matches: %s" % (rcount, matches)
 					else:
-						msg = "%s The alias %s is not known." % (self.settings.pubsym, command_list[1][1:])
-				elif len(command_list) > 2:
-					#create the aliases
-					msg = "%s The words : " % self.settings.pubsym
-					if command_list[1][0] != '~': command_list[1] = '~' + command_list[1]
-					if not (command_list[1] in self.settings.aliases.keys()):
-						self.settings.aliases[command_list[1]] = [command_list[1][1:]]
-						self.replace(command_list[1][1:], command_list[1])
-						msg += command_list[1][1:] + " "
-					for x in xrange(2, len(command_list)):
-						msg += "%s " % command_list[x]
-						self.settings.aliases[command_list[1]].append(command_list[x])
-						#replace each words by his alias
-						self.replace(command_list[x], command_list[1])
-					msg += "have been aliased to %s." % command_list[1]
+						msg = "Sorry, but I don't know know what you're on about."
 
-			# Fortune command
-			elif command_list[0] == "!fortune":
-				msg = self.settings.pubsym + "" \
-					.join([i for i in os.popen('fortune').readlines()]).replace('\n\n','\n').replace('\n', ' ')
-				msg = self.filter_message(msg)
-			# Date command
-			elif command_list[0] == "!date":
-				msg = self.settings.pubsym + " It is ".join(i for i in os.popen('date').readlines())
-			# Quit
-			elif command_list[0] == "!quit":
-				# Close the brain
-				barf.Barf('ACT', "Goodbye!")
-				sys.exit(0)
+				elif cmds[0] == "responses":
+					if os.path.isfile("brain/prepared.dat"):
+						rcount = 0
+						file = open("brain/prepared.dat")
+						for line in file.readlines():
+							if line is "":
+								pass
+							else:
+								rcount = rcount + 1
+						file.close()
+						if rcount < 1:
+							msg = "I've learned no responses"
+						elif rcount == 1:
+							msg = "I've learned only 1 response"
+						else:
+							msg = "I've learned %d responses" % rcount
+					else:
+						msg = "You need to teach me something first!"
 
-			# Save changes
-			self.settings.save()
+				elif cmds[0] == "limit":
+					msg = "The max limit is "
+					if len(cmds) == 1:
+						msg += str(self.settings.max_words)
+					else:
+						limit = int(cmds[1])
+						self.settings.max_words = limit
+						msg += "now " + cmds[1]
+
+				# Check for broken links in the brain
+				elif cmds[0] == "check":
+					t = time.time()
+					num_broken = 0
+					num_bad = 0
+					for w in self.words.keys():
+						wlist = self.words[w]
+
+						for i in xrange(len(wlist) - 1, -1, -1):
+							try:
+								line_idx, word_num = struct.unpack("iH", wlist[i])
+							except:
+								self.barf('ERR', 'The hash table is damaged. Please use !rebuild, then !save.')
+								return
+
+							# Nasty critical error we should fix
+							if not self.lines.has_key(line_idx):
+								self.barf('ACT', "Removing broken link '%s' -> %d." % (w, line_idx))
+								num_broken = num_broken + 1
+								del wlist[i]
+							else:
+								# Check pointed to word is correct
+								split_line = self.lines[line_idx][0].split()
+								if split_line[word_num] != w:
+									self.barf('ACT', "Line '%s' word %d is not '%s' as expected." % \
+											  (self.lines[line_idx][0],
+											   word_num, w.decode('utf8')))
+									num_bad = num_bad + 1
+									del wlist[i]
+						if len(wlist) == 0:
+							del self.words[w]
+							self.brainstats.num_words = self.brainstats.num_words - 1
+							self.barf('ACT', "\"%s\" vaporized from brain." % w)
+
+					msg = "Checked my brain in %0.2fs. Fixed links: %d broken, %d bad." % \
+						  (
+						   time.time() - t,
+						   num_broken,
+						   num_bad)
+
+				elif cmds[0] == "rebuild":
+					msg = self.auto_rebuild()
+
+				elif cmds[0] == "replace":
+					if len(cmds) < 3:
+						return
+					old = cmds[1]
+					new = cmds[2]
+					msg = self.replace(old, new)
+
+				elif cmds[0] == "replyrate":
+					if len(cmds) == 2:
+						self.settings.reply_rate = int(cmds[1])
+						msg = "Now replying to %d%% of messages." % int(cmds[1])
+					else:
+						msg = "Reply rate is %d%%." % self.settings.reply_rate
+					return msg
+
+				elif cmds[0] == "context":
+					if self.debug == 1:
+						self.barf('DBG', "Checking contexts...")
+
+					# build context we are looking for
+					context = " ".join(cmds[1:])
+					if context == "":
+						return
+
+					find_context = " ".join(cmds[1:])
+					num_contexts = ""
+
+					# Build context list
+					context = " " + context + " "
+					c = []
+					# Search through contexts
+					for x in self.lines.keys():
+						# get context
+						ctxt = self.lines[x][0]
+						# add leading whitespace for easy sloppy search code
+						# TODO Find a better, less sloppy way to do this crap
+						ctxt = " " + ctxt + " "
+						if ctxt.find(context) != -1:
+							# Avoid duplicates (2 of a word
+							# in a single context)
+							num_contexts = len(c) + 1
+							if len(c) == 0:
+								c.append(self.lines[x][0])
+							elif c[len(c) - 1] != self.lines[x][0]:
+								c.append(self.lines[x][0])
+					x = 0
+
+					if num_contexts != "":
+						self.barf('ACT', "=========================================")
+						self.barf('ACT', "Printing contexts containing \033[1m'%s'" % (num_contexts, find_context))
+						self.barf('ACT', "=========================================")
+					else:
+						self.barf('ACT', "=========================================")
+						self.barf('ACT', "No contexts to print containing \033[1m'%s'" % find_context)
+
+					while x < 5:
+						if x < len(c):
+							lines = c
+							self.barf('ACT', "%s" % lines[x])
+						x += 1
+					if len(c) == 5:
+						return
+					if x < 5:
+						x = 5
+					while x < len(c):
+						lines = c
+						self.barf('ACT', "%s" % lines[x])
+						x += 1
+
+					self.barf('ACT', "=========================================")
+
+				# Remove a word from the vocabulary [use with care]
+				elif cmds[0] == "unlearn":
+					if self.debug == 1:
+						self.barf('DBG', "Unlearning...")
+					# build context we are looking for
+					context = " ".join(cmds[1:])
+					if context == "":
+						return
+					self.barf('ACT', "Looking for: %s" % context)
+					# Unlearn contexts containing 'context'
+					t = time.time()
+					self.unlearn(context)
+					# we don't actually check if anything was
+					# done..
+					msg = "Unlearn done in %0.2fs" % ( time.time() - t)
+					msg += " You may want to !check the brain, to be safe."
+
+				elif cmds[0] == "learning":
+					msg = "Learning mode "
+					if len(cmds) == 1:
+						if self.settings.learning == 0:
+							msg += "off"
+						else:
+							msg += "on"
+					else:
+						toggle = cmds[1]
+						if toggle == "on":
+							msg += "on"
+							self.settings.learning = 1
+						else:
+							msg += "off"
+							self.settings.learning = 0
+
+				elif cmds[0] == "censor":
+					# no arguments. list censored words
+					if len(cmds) == 1:
+						if len(self.settings.censored) == 0:
+							msg = "No words censored."
+						else:
+							msg = "I will not use the word(s) %s" % (
+								 ", ".join(self.settings.censored))
+					# add every word listd to censored list
+					else:
+						for x in xrange(1, len(cmds)):
+							if cmds[x] in self.settings.censored:
+								msg += "is already censored." % ( cmds[x])
+							else:
+								self.settings.censored.append(cmds[x])
+								self.unlearn(cmds[x])
+								msg += "is now censored." % ( cmds[x])
+							msg += "\n"
+
+				elif cmds[0] == "uncensor":
+					if self.debug == 1:
+						self.barf('DBG', "Uncensoring...")
+					# Remove words listed from the censor list
+					# eg !uncensor tom dick harry
+					for x in xrange(1, len(cmds)):
+						try:
+							self.settings.censored.remove(cmds[x])
+							msg = "is uncensored." % ( cmds[x])
+						except ValueError, e:
+							pass
+
+				elif cmds[0] == 'quit':
+					self.kill_timers()
+					self.save_all(interface, False)
+					self.barf('MSG', 'Goodbye!')
+					sys.exit()
+			
+				elif cmds[0] == 'save':
+					self.barf('SAV', 'User initiated save')
+					self.save_all(interface)
+
+				elif cmds[0] == 'debug':
+					msg = "debug mode "
+					if len(cmds) == 1:
+						if self.settings.debug == 0:
+							msg = msg + 'off'
+						else:
+							msg = msg + 'on'
+					else:
+						toggle = cmds[1]
+						if toggle == 'on':
+							msg = msg + 'on'
+							self.settings.debug = 1 # Set current session
+							self.settings._defaults['debug'] = 1 # Set default to save to file.
+						else:
+							msg = msg + 'off'
+							self.settings.debug = 0
+							self.settings._defaults['debug'] = 0
+
+				elif cmds[0] == 'learning':
+					msg = "Learning mode "
+					if len(cmds) == 1:
+						if self.settings.learning == 0:
+							msg = msg + 'off'
+						else:
+							msg = msg + 'on'
+					else:
+						toggle = cmds[1]
+						if toggle == 'on':
+							msg = msg + 'on'
+							self.settings.learning = 1 # Set current session
+							self.settings._defaults['learning'] = 1 # Set default to save to file.
+						else:
+							msg = msg + 'off'
+							self.settings.learning = 0
+							self.settings._defaults['learning'] = 0
+
+				elif cmds[0] == "alias":
+					# List aliases words
+					if len(cmds) == 1:
+						if len(self.settings.aliases) == 0:
+							msg = "No aliases"
+						else:
+							msg = "I will alias the word(s) %s." \
+								  % (", ".join(self.settings.aliases.keys()))
+					# add every word listd to alias list
+					elif len(cmds) == 2:
+						if cmds[1][0] != '~': cmds[1] = '~' + cmds[1]
+						if cmds[1] in self.settings.aliases.keys():
+							msg = "These words : %s are aliases to %s." \
+								  % (" ".join(self.settings.aliases[cmds[1]]), cmds[1] )
+						else:
+							msg = "The alias %s is not known." % cmds[1][1:]
+					elif len(cmds) > 2:
+						#create the aliases
+						if cmds[1][0] != '~': cmds[1] = '~' + cmds[1]
+						if not (cmds[1] in self.settings.aliases.keys()):
+							self.settings.aliases[cmds[1]] = [cmds[1][1:]]
+							self.replace(cmds[1][1:], cmds[1])
+							msg += cmds[1][1:] + " "
+						for x in xrange(2, len(cmds)):
+							msg += "%s " % cmds[x]
+							self.settings.aliases[cmds[1]].append(cmds[x])
+							#replace each words by his alias
+							self.replace(cmds[x], cmds[1])
+						msg += "have been aliased to %s." % cmds[1]
+
+			# Publicly accessible commands
+			if cmds[0] == 'help':
+				if owner == 0 or owner == 1:
+					msg = "General commands: "
+					msg = msg + ', '.join(str(cmd) for cmd in self.general_commands)
+				if owner == 1:
+					msg = msg + "\n%s :: Owner commands: " % sym
+					msg = msg + ', '.join(str(cmd) for cmd in self.owner_commands)
+				if self.plugin_commands:
+					msg = msg + "\n%s :: Plugin commands: " % sym
+					msg = msg + ', '.join(str(cmd) for cmd in self.plugin_commands)
+
+			elif cmds[0] == "version":
+				msg = 'scrib: %s; brain: %s' % ( self.version, self.brain.version )
+
+			elif cmds[0] == "!date":
+				msg = "It is ".join(i for i in os.popen('date').readlines())
+
+			elif cmds[0] == "words":
+				num_w = self.brainstats.num_words
+				num_c = self.brainstats.num_contexts
+				num_l = len(self.lines)
+				if num_w != 0:
+					num_cpw = num_c / float(num_w) # contexts per word
+				else:
+					num_cpw = 0.0
+				msg = "I know %d words (%d contexts, %.2f per word), 1%d lines." % (
+					 num_w, num_c, num_cpw, num_l)
+
+			elif cmds[0] == "known":
+				if len(cmds) == 2:
+					# single word specified
+					word = cmds[1]
+					if self.words.has_key(word):
+						c = len(self.words[word])
+						msg = "is known (%d contexts)" % ( word, c)
+					else:
+						msg = "is unknown." % ( word)
+				elif len(cmds) > 2:
+					# multiple words.
+					words = []
+					for x in cmds[1:]:
+						words.append(x)
+					msg = "Number of contexts: "
+					for x in words:
+						if self.words.has_key(x):
+							c = len(self.words[x])
+							msg += x + "(" + str(c) + ") "
+						else:
+							msg += x + "(0) "
+
+		if cmds[0] not in self.commands:
+			msg = cmds[0] + " is not a registered command."
 
 		if msg != "":
-			io_module.output(msg, args)
+			interface.output(sym+msg, args)
+
 
 	def replace(self, old, new):
 		"""
@@ -1147,7 +1147,7 @@ class scrib:
 		try:
 			pointers = self.words[old]
 		except KeyError, e:
-			return "%s %s not known." % (self.settings.pubsym, old)
+			return "%s is not known." % old
 		changed = 0
 
 		for x in pointers:
@@ -1157,7 +1157,7 @@ class scrib:
 			number = self.lines[l][1]
 			if line[w] != old:
 				# fucked brain
-				barf.Barf('ERR', "Broken link: %s %s" % (x, self.lines[l][0] ))
+				self.barf('ERR', "Broken link: %s %s" % (x, self.lines[l][0] ))
 				continue
 			else:
 				line[w] = new
@@ -1171,7 +1171,7 @@ class scrib:
 		else:
 			self.words[new] = self.words[old]
 		del self.words[old]
-		return "%s %d instances of %s replaced with %s" % ( self.settings.pubsym, changed, old, new )
+		return "%d instances of %s replaced with %s" % ( changed, old, new )
 
 	def unlearn(self, context):
 		"""
@@ -1213,14 +1213,14 @@ class scrib:
 			if len(words[x]) == 0:
 				del words[x]
 				self.brainstats.num_words = self.brainstats.num_words - 1
-				barf.Barf('ACT', "\"%s\" vaporized from brain." % x)
+				self.barf('ACT', "\"%s\" vaporized from brain." % x)
 
 	def reply(self, body):
 		"""
 		Reply to a line of text.
 		"""
 		if self.debug == 1:
-			barf.Barf('DBG', "Forming a reply...")
+			self.barf('DBG', "Forming a reply...")
 
 		# split sentences into list of words
 		_words = body.split(" ")
@@ -1258,7 +1258,7 @@ class scrib:
 			return ""
 		word = index[randint(0, len(index) - 1)]
 		if self.debug == 1:
-			barf.Barf('DBG', "Chosen root word: %s" % word)
+			self.barf('DBG', "Chosen root word: %s" % word)
 
 		# Build sentence backwards from "chosen" word
 		sentence = [word]
@@ -1424,7 +1424,7 @@ class scrib:
 
 	def learn(self, body, num_context=1):
 		"""
-		Lines should be cleaned (filter_message()) before passing
+		Lines should be cleaned (filter()) before passing
 		to this.
 		"""
 
@@ -1434,17 +1434,18 @@ class scrib:
 			"""
 
 			words = body.split()
-			# Ignore sentences of < 1 words XXX was <3
+			# Ignore sentences of < 1
 			if len(words) < 1:
 				return
 
-			# Ignore if the sentence starts with an exclamation
-			if body[0:1] == "!":
+			# Ignore if the sentence starts with the symbol
+			if body[0:1] == self.settings.symbol:
 				if self.debug == 1:
-					barf.Barf('ERR', "Not learning: %s" % words)
+					self.barf('ERR', "Not learning: %s" % words)
 				return
 
-			vowels = "aÃ Ã¢eÃ©Ã¨ÃªiÃ®Ã¯oÃ¶Ã´uÃ¼Ã»y"
+			#vowels = "aÃ Ã¢eÃ©Ã¨ÃªiÃ®Ã¯oÃ¶Ã´uÃ¼Ã»y"
+			vowels = ""
 			for x in xrange(0, len(words)):
 
 				nb_voy = 0
@@ -1461,7 +1462,7 @@ class scrib:
 				for censored in self.settings.censored:
 					pattern = "^%s$" % censored
 					if re.search(pattern, words[x]):
-						barf.Barf('ACT', "Censored word %s" % words[x])
+						self.barf('ACT', "Censored word %s" % words[x])
 						return
 
 				if len(words[x]) > 13 \
@@ -1503,7 +1504,7 @@ class scrib:
 			#is max_words reached, don't learn more
 			if self.brainstats.num_words >= self.settings.max_words:
 				self.settings.learning = 0
-				barf.Barf('ERR', "Had to turn off learning- max_words limit reached!")
+				self.barf('ERR', "Had to turn off learning- max_words limit reached!")
 
 		# Split body text into sentences and parse them
 		# one by one.

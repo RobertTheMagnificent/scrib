@@ -3,8 +3,6 @@
 import os, sys
 from core import barf
 
-version = '1.0.1'
-barf.Barf('MSG', 'PluginManager version %s' % version)
 plugin_dir = os.path.abspath(os.path.dirname(__file__ )) + "/"
 sys.path.append(plugin_dir)
 

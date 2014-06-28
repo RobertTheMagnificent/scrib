@@ -754,14 +754,14 @@ class scrib:
 					msg = "General commands: "
 					msg = msg + ', '.join(str(cmd) for cmd in self.general_commands)
 				if owner == 1:
-					msg = msg + " :: Owner commands: "
+					msg = msg + "\n%s :: Owner commands: " % sym
 					msg = msg + ', '.join(str(cmd) for cmd in self.owner_commands)
 				if self.plugin_commands:
-					msg = msg + " :: Plugin commands: "
+					msg = msg + "\n%s :: Plugin commands: " % sym
 					msg = msg + ', '.join(str(cmd) for cmd in self.plugin_commands)
 
 			if cmds[0] == "version":
-				interface.output('This is a scrib version '+self.version, args)
+				msg = 'scrib: %s; brain: %s' % ( self.version, self.brain.version )
 
 			elif cmds[0] == "alias":
 				# List aliases words

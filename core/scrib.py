@@ -327,16 +327,14 @@ class scrib:
 			self.lines = {}
 			self.barf('ERR', "New brain generated.")
 
-		# Is a resizing required?
-		if len(self.words) != self.brainstats.num_words:
-			self.barf('ACT', "Calculating words and contexts...")
-			self.brainstats.num_words = len(self.words)
-			num_contexts = 0
-			# Get number of contexts
-			for x in self.lines.keys():
-				num_contexts += len(self.lines[x][0].split())
-			self.brainstats.num_contexts = num_contexts
-			self.barf('ACT', "%s words and %s contexts loaded" % ( self.brainstats.num_words, self.brainstats.num_contexts ))
+		self.barf('ACT', "Calculating words and contexts...")
+		self.brainstats.num_words = len(self.words)
+		num_contexts = 0
+		# Get number of contexts
+		for x in self.lines.keys():
+			num_contexts += len(self.lines[x][0].split())
+		self.brainstats.num_contexts = num_contexts
+		self.barf('ACT', "%s words and %s contexts loaded" % ( self.brainstats.num_words, self.brainstats.num_contexts ))
 
 		# Is an aliases update required ?
 		count = 0

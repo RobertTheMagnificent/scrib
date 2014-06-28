@@ -291,10 +291,9 @@ class scrib:
 					s = f.read()
 					f.close()
 					self.lines = self.unpack(s, v)
-					# This block was destroying the hash, like how !prune did...
-					#if self.debug == 1:
-					#	self.barf('DBG', "Applying filter to adjust to new brain system.\n                This may take several minutes...")
-					#self.auto_rebuild()
+					if self.debug == 1:
+						self.barf('DBG', "Applying filter to adjust to new brain system.\n                This may take several minutes...")
+					self.auto_rebuild()
 					f = open("brain/lines.dat", "wb")
 					s = self.pack(self.lines, self.brain.version, True)
 					f.write(s)

@@ -77,4 +77,4 @@ if __name__ == "__main__":
 				my_scrib.save_all(my_scrib, False)
 
 		del my_scrib
-		sys.exit()
+		sys.exit(0)

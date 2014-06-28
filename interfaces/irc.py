@@ -235,11 +235,10 @@ class ScribIRC(SingleServerIRCBot):
 					#body = body.replace(x+":", "#nick:")
 					body = body.replace("@ "+x, "@ #nick")
 
-		if body == "": return
-
-		if self.scrib.debug == 1:
-			self.scrib.barf('DBG', "Body empty, no reply.")
-
+		if body == "":
+			if self.scrib.debug == 1:
+				self.scrib.barf('DBG', "Body empty, no reply.")
+			return
 
 		# Pass on to scrib
 		if source in self.owners and e.source() in self.owner_mask:
@@ -357,5 +356,4 @@ if __name__ == "__main__":
 
 	bot.disconnect(bot.settings.quit_message) # exit irc cleanly
 	del my_scrib
-
-
+	sys.exit(0)

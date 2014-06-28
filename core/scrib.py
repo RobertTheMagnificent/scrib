@@ -867,7 +867,8 @@ class scrib:
 							try:
 								line_idx, word_num = struct.unpack("iH", wlist[i])
 							except:
-								self.barf('ERR', 'The hash table is damaged. Please use !rebuild, then !save.')
+								msg = 'The hash table is damaged. Please use !rebuild, then !save.'
+								self.barf('ERR', msg)
 								return
 
 							# Nasty critical error we should fix

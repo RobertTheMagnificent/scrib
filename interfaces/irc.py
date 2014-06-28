@@ -347,7 +347,8 @@ if __name__ == "__main__":
 	except SystemExit, e:
 		pass
 	except:
-		traceback.print_exc()
+		my_scrib.kill_timers()
+		my_scrib.barf('ERR', traceback.format_exc())
 		my_scrib.barf('ERR', "Oh no, I've crashed! Would you like to save my brain?", False)
 		c = raw_input("[Y/n]")
 		if c[:1] != 'n':

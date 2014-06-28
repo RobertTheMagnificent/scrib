@@ -249,7 +249,8 @@ class scrib:
 			f.close()
 			if v != self.brain.version:
 				self.barf('ERR', "Brain is version "+v+", but I use "+self.brain.version+".")
-				c = raw_input(self.barf('ERR', "Would you like to update the brain? (Y/n) "))
+				self.barf('ERR', "Would you like to update the brain?")
+				c = raw_input("[Y/n]")
 				if c[:1].lower() != 'n':
 					timestamp = "%s-%s" % (datetime.date.today(), time.strftime("%H%M%S",time.localtime(time.time())))
 					shutil.copyfile("brain/cortex.zip", "brain/cortex-%s.zip" % timestamp)
@@ -276,9 +277,10 @@ class scrib:
 					s = f.read()
 					f.close()
 					self.lines = self.unpack(s, v)
-					if self.debug == 1:
-						self.barf('DBG', "Applying filter to adjust to new brain system.\n                This may take several minutes...")
-					self.auto_rebuild()
+					# This block was destroying the hash, like how !prune did...
+					#if self.debug == 1:
+					#	self.barf('DBG', "Applying filter to adjust to new brain system.\n                This may take several minutes...")
+					#self.auto_rebuild()
 					f = open("brain/lines.dat", "wb")
 					s = self.pack(self.lines, self.brain.version, True)
 					f.write(s)
@@ -293,9 +295,8 @@ class scrib:
 						self.barf('DBG', "Version updated.")
 					v = self.brain.version
 					self.barf('ACT', "Brain converted successfully! Continuing.")
-
-					if self.debug == 1:
-						self.barf('DBG', "Brain saved.")
+				else:
+					self.brain.version = v # Saves old brain as old brain format.
 
 			f = open("brain/words.dat", "rb")
 			s = f.read()
@@ -316,7 +317,7 @@ class scrib:
 
 		# Is a resizing required?
 		if len(self.words) != self.brainstats.num_words:
-			self.barf('ACT', "Updating my brain's information...")
+			self.barf('ACT', "Recalculating brain stats...")
 			self.brainstats.num_words = len(self.words)
 			num_contexts = 0
 			# Get number of contexts
@@ -324,7 +325,7 @@ class scrib:
 				num_contexts += len(self.lines[x][0].split())
 			self.brainstats.num_contexts = num_contexts
 			# Save new values
-			self.brainstats.save()
+		#	self.brainstats.save()
 
 		# Is an aliases update required ?
 		count = 0
@@ -366,7 +367,7 @@ class scrib:
 			# No words to unlearn
 			pass
 
-		self.settings.save()
+		#self.settings.save()
 
 	# For unpacking a brain. This is just quick and dirty, should be replaced...
 	def brain_ver(self, version):
@@ -408,13 +409,13 @@ class scrib:
 			if upgrade == True:
 				s = {}
 				for k,v in file.items():
-					v[0] = v[0].decode('utf-8', 'ignore')
+#					v[0] = v[0].decode('utf8', 'ignore')
 					s.update({k:v})
-				stuff = json.dumps(s, sort_keys=True, indent=4, separators=(',', ': '))
+				stuff = json.dumps(s, sort_keys=True, indent=4, separators=(',', ': '), encoding='latin-1')
 				del s
 				return stuff
-								
-			stuff = json.dumps(file, sort_keys=True, indent=4, separators=(',', ': '))
+
+			stuff = json.dumps(file, sort_keys=True, indent=4, separators=(',', ': '), encoding='latin-1')
 		return stuff
 
 	def save_all(self, interface):
@@ -459,7 +460,7 @@ class scrib:
 		#Sort the list before to export
 		for key in self.words.keys():
 			try:
-				wordlist.append([key, len(self.words[key])])
+				wordlist.append([key, len(self.words[key].encode('utf8'))])
 			except:
 				pass
 		wordlist.sort(lambda x, y: cmp(x[1], y[1]))
@@ -796,7 +797,11 @@ class scrib:
 						wlist = self.words[w]
 
 						for i in xrange(len(wlist) - 1, -1, -1):
-							line_idx, word_num = struct.unpack("iH", wlist[i])
+							try:
+								line_idx, word_num = struct.unpack("iH", wlist[i])
+							except:
+								self.barf('ERR', 'The hash table is damaged. Please use !rebuild, then !save.')
+								return
 
 							# Nasty critical error we should fix
 							if not self.lines.has_key(line_idx):
@@ -809,7 +814,7 @@ class scrib:
 								if split_line[word_num] != w:
 									self.barf('ACT', "Line '%s' word %d is not '%s' as expected." % \
 											  (self.lines[line_idx][0],
-											   word_num, w))
+											   word_num, w.decode('utf8')))
 									num_bad = num_bad + 1
 									del wlist[i]
 						if len(wlist) == 0:

@@ -245,13 +245,13 @@ class ScribIRC(SingleServerIRCBot):
 		if source in self.owners and e.source() in self.owner_mask:
 			if self.scrib.debug == 1:
 				self.scrib.barf('DBG', "Passing command to scrib as owner")
-			self.scrib.process(self, body, replyrate, (body, source, target, c, e), 1, muted)
+			self.scrib.process(self, body, replyrate, learn, (body, source, target, c, e), 1, muted)
 		else:
 			if self.scrib.debug == 1:
 				self.scrib.barf('DBG', "Starting a new thread")
 			#start a new thread
 			thread.start_new_thread(self.scrib.process,
-									(self, body, replyrate, (body, source, target, c, e), 0, muted))
+									(self, body, replyrate, learn, (body, source, target, c, e), 0, muted))
 
 	def irc_commands(self, body, source, target, c, e):
 		"""

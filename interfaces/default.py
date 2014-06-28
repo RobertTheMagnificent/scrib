@@ -44,7 +44,8 @@ class ModLineIn:
 						if body[0] == "!":
 								if self.linein_commands(body):
 										continue
-						# Pass message to borg
+
+						# Pass message to scrib
 						self.scrib.process(self, body, 100, 1, ( name ), owner = 1)
 
 		def linein_commands(self, body):
@@ -74,7 +75,7 @@ if __name__ == "__main__":
 			my_scrib.barf('ERR', traceback.format_exc())
 			my_scrib.barf('ERR', "Oh no, I've crashed! Would you like to save my brain?", False)
 			c = raw_input("[Y/n]")
-			if c[:1] == 'n':
-				sys.exit(0)
+			if c[:1] != 'n':
+				my_scrib.save_all(my_scrib)
 		del my_scrib
 		sys.exit(0)

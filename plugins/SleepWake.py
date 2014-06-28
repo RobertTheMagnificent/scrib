@@ -3,7 +3,8 @@
 from plugins import PluginManager
 
 # User Alias and Command
-sleep_cmd = "!sleep"
+sleep_alias = "sleep"
+sleep_command = { sleep_alias: "Usage: !sleep \nMake the bot stop talking." }
 
 # Plugin Action
 class SleepPlugin(PluginManager.Load):
@@ -15,7 +16,9 @@ class SleepPlugin(PluginManager.Load):
 			msg = "Zzz..."
 		return msg
 
-wake_cmd = "!wake"
+wake_alias = "wake"
+wake_command = { wake_alias: "Owner command. Usage: !wake\nAllow the bot to talk." }
+
 class WakePlugin(PluginManager.Load):
 	def action(self, cmds, scrib, c):
 		if cmds[0] == wake_cmd and scrib.settings.muted == 1:
@@ -25,5 +28,5 @@ class WakePlugin(PluginManager.Load):
 			msg = "But I'm already awake..."
 		return msg
 
-PluginManager.addPlugin( sleep_cmd, SleepPlugin() )
-PluginManager.addPlugin( wake_cmd, WakePlugin() )
+PluginManager.addPlugin( sleep_command, sleep_alias, SleepPlugin() )
+PluginManager.addPlugin( wake_command, wake_alias, WakePlugin() )

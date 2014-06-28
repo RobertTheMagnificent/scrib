@@ -3,7 +3,8 @@
 from plugins import PluginManager
 
 # User command
-command = "!control"
+alias = "control"
+command = { alias: "Usage: !control password\nAllow user to have access to bot commands." }
 
 # Plugin Action
 class ControlPlugin(PluginManager.Load):
@@ -17,4 +18,4 @@ class ControlPlugin(PluginManager.Load):
 				msg = "Try again."
 			return msg
 
-PluginManager.addPlugin( command, ControlPlugin() )
+PluginManager.addPlugin( command, alias, ControlPlugin() )

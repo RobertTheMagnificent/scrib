@@ -3,7 +3,8 @@
 from plugins import PluginManager
 
 # User command
-command = "!echo"
+alias = "echo"
+command = { alias: "Usage: !echo message\nMake the bot mimic your message." }
 
 # Plugin Action
 class EchoPlugin(PluginManager.Load):
@@ -14,4 +15,4 @@ class EchoPlugin(PluginManager.Load):
 				phrase = phrase + str(cmds[x]) + " "
 			return phrase
 
-PluginManager.addPlugin( command, EchoPlugin() )
+PluginManager.addPlugin( command, alias, EchoPlugin() )

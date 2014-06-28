@@ -184,10 +184,34 @@ class scrib:
 		self.timers_started = False
 
 		# This is where we do some ownership command voodoo.
-		self.owner_commands = ['alias', 'forget', 'censor', 'check', 'context', 'learn', 'learning', 'limit', 'rebuild', 'replace', 'replyrate', 'save', 'uncensor', 'unlearn', 'quit']
-		self.general_commands = ['date', 'help', 'known', 'owner', 'version', 'words']
+		self.owner_commands = {
+			'alias': "alias [this] [that]",
+			'find': "find [word]",
+			'forget': "forget [word]",
+			'censor': "censor [word]",
+			'check': "Checks hash table for consistency.",
+			'context': "context [word] (outputs to console)",
+			'learn': "learn [word]",
+			'learning': "Toggles bot learning.",
+			'limit': "Max number of words allowed.",
+			'rebuild': "Performs a brain rebuild. Is desructive.",
+			'replace': "replace [current] [new]",
+			'replyrate': "Shows/sets the reply rate.",
+			'save': "Saves the brain.",
+			'uncensor': "uncensor [word]",
+			'unlearn': "unlearn [word]",
+			'quit': "Shut the bot down."
+		}
+		self.general_commands = {
+			'date': "Shows the date.",
+			'help': "Shows commands.",
+			'known': "known [word]",
+			'owner': "Shows owner.",
+			'version': "Displays bot version.",
+			'words': "Shows number of words and contexts."
+		}
 		self.plugin_commands = PluginManager.plugin_commands
-		self.commands = self.general_commands + self.owner_commands + self.plugin_commands
+		self.commands = self.general_commands.keys() + self.owner_commands.keys() + self.plugin_commands.keys()
 
 		self.barf = barf.Barf # So that we don't have to include it elsewhere.
 		self.cfg = cfg
@@ -913,7 +937,7 @@ class scrib:
 
 					if num_contexts != "":
 						self.barf('ACT', "=========================================")
-						self.barf('ACT', "Printing contexts containing \033[1m'%s'" % (num_contexts, find_context))
+						self.barf('ACT', "Printing %d contexts containing \033[1m'%s'" % (num_contexts, find_context))
 						self.barf('ACT', "=========================================")
 					else:
 						self.barf('ACT', "=========================================")
@@ -1111,7 +1135,7 @@ class scrib:
 					word = cmds[1]
 					if self.words.has_key(word):
 						c = len(self.words[word])
-						msg = "is known (%d contexts)" % ( word, c)
+						msg = "%s is known (%d contexts)" % ( word, c)
 					else:
 						msg = "is unknown." % ( word)
 				elif len(cmds) > 2:
@@ -1128,6 +1152,7 @@ class scrib:
 							msg += x + "(0) "
 
 		if cmds[0] not in self.commands:
+			print self.commands
 			msg = cmds[0] + " is not a registered command."
 
 		if msg != "":

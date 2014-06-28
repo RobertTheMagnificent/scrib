@@ -199,8 +199,8 @@ class ScribIRC(SingleServerIRCBot):
 
 		# We want replies reply_rate%, if speaking is on
 		muted = self.scrib.settings.muted
-		replyrate = muted * self.scrib.settings.reply_rate
-		nickreplyrate = muted * self.scrib.settings.nick_reply_rate
+		replyrate = self.scrib.settings.reply_rate
+		nickreplyrate = self.scrib.settings.nick_reply_rate
 
 		if self.nick_check(body) == 1:
 			replyrate = nickreplyrate

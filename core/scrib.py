@@ -217,11 +217,10 @@ class scrib:
 
 		# Brain stats
 		self.brain = brain.brain()	
-		self.brainstats = self.cfg.set()
-		self.brainstats.load("brain/knowledge", {
-							"num_contexts": 0,
-							"num_words": 0
-							})
+		self.brainstats = {
+						"num_contexts": 0,
+						"num_words": 0
+						}
 
 		self.answers = self.cfg.set()
 		self.answers.load("brain/answers.dat", {
@@ -330,16 +329,13 @@ class scrib:
 
 		# Is a resizing required?
 		if len(self.words) != self.brainstats.num_words:
-			self.barf('ACT', "Recalculating brain stats...")
+			self.barf('ACT', "Calculating words and contexts...")
 			self.brainstats.num_words = len(self.words)
 			num_contexts = 0
 			# Get number of contexts
 			for x in self.lines.keys():
 				num_contexts += len(self.lines[x][0].split())
 			self.brainstats.num_contexts = num_contexts
-			self.barf('ACT', "%s words and %s contexts found" % ( self.brainstats.num_words, self.brainstats.num_contexts ))
-			# Save new values
-			self.brainstats.save()
 			self.barf('ACT', "%s words and %s contexts loaded" % ( self.brainstats.num_words, self.brainstats.num_contexts ))
 
 		# Is an aliases update required ?
@@ -500,7 +496,6 @@ class scrib:
 
 		# Save settings
 		self.settings.save()
-		self.brainstats.save()
 
 		if interface != False:
 			interface.settings.save()

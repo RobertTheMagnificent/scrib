@@ -231,7 +231,7 @@ class scrib:
 							"num_aliases": 0,
 							"aliases": {},
 							"ignore_list": [],
-							"optimum": 0,
+							"optimum": 1,
 							"version": self.version
 							})
 
@@ -1164,7 +1164,8 @@ class scrib:
 							msg += x + "(0) "
 
 		if cmds[0] not in self.commands:
-			msg = cmds[0] + " is not a registered command."
+			#msg = cmds[0] + " is not a registered command."
+			self.barf('MSG', 'Ignoring a secret.')
 
 		if msg != "":
 			interface.output(sym+msg, args)

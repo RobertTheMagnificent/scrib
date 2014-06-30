@@ -746,6 +746,8 @@ class scrib:
 			l = x[0]
 			w = x[1]
 			line = self.brain.lines[l][0].split()
+			if self.settings.debug == 1:
+				self.barf('DBG', line)
 			number = self.brain.lines[l][1]
 			if line[w] != old:
 				# fucked brain

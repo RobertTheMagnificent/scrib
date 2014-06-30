@@ -356,6 +356,7 @@ class brain:
 			if body == 0:
 				return
 			
+			words = words.decode('utf8', 'replace').encode('utf8')
 			words = body.split()
 			#words = str(body).split()
 			# Ignore sentences of < 1

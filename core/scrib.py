@@ -4,7 +4,6 @@
 from random import *
 import sys
 import os
-import shutil
 import struct
 import fileinput
 import re

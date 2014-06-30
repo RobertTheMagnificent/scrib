@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import ctypes
 import datetime
 import hashlib
 import os
@@ -93,7 +92,7 @@ class brain:
 			stuff = pickle.loads(file)
 		elif self.brain_type(version) == 3 or self.brain_type(version) == 4:
 			import json
-			stuff = json.loads(file, encoding="utf-8")
+			stuff = json.loads(file)
 		return stuff
 
 	def pack(self, file, version, upgrade=False):
@@ -105,14 +104,7 @@ class brain:
 			stuff = pickle.dumps(file)
 		elif self.brain_type(version) == 3 or self.brain_type(version) == 4:
 			import json
-			if upgrade == True:
-				s = {}
-				for k,v in file.items():
-					s.update({k:v[0]})
-				stuff = json.dumps(s, sort_keys=True, indent=4, separators=(',', ': '), encoding='latin-1').decode('unicode_escape').encode('utf8') # Fixing
-				del s
-				return stuff
-			stuff = json.dumps(file, sort_keys=True, indent=4, separators=(',', ': '), encoding='utf-8')
+			stuff = json.dumps(file, sort_keys=True, indent=4, separators=(',', ': '))
 		return stuff
 
 	def _load(self):
@@ -391,15 +383,7 @@ class brain:
 
 			cleanbody = " ".join(words)
 
-			# This allows for use on 64-bit systems
-			oldhashval = ctypes.c_int32(hash(cleanbody)).value # Deprecated.
-			if self.lines.has_key(oldhashval):
-				barf.barf('ACT', 'Converting an old hash value')
-				if self.settings.debug == 1:
-					self.barf('DBG', 'Deleting hash %s' % oldhashval)
-				del self.lines[oldhashval]
 			hashval = hashlib.sha1(cleanbody).hexdigest()[:10]
-			
 			if not (num_cpw > 100 and self.settings.learning == 0)and not self.lines.has_key(hashval) :
 				self.lines[hashval] = [cleanbody, num_context]
 				# Add link for each word

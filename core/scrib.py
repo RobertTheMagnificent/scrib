@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
 from random import *
 import sys
 import os
@@ -637,7 +636,7 @@ class scrib:
 					msg += ', '.join(str(cmd) for cmd in self.plugin_commands)
 
 			elif cmds[0] == "version":
-				msg = 'scrib: %s; brain: %s' % ( self.version, self.brain.version )
+				msg = 'scrib: %s; brain: %s' % ( self.version, self.brain.settings.version )
 
 			elif cmds[0] == "!date":
 				msg = "It is ".join(i for i in os.popen('date').readlines())

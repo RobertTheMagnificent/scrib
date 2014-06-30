@@ -18,10 +18,8 @@ class clean:
 			"""
 			if message == '':
 				return '';
-
-			if self.settings.debug == True:
-				self.barf('DBG', "Message is type: %s" % type(message))
-			# Firstly, make sure it isn't doesn't have a uri.
+				
+			# Make sure it isn't doesn't have a uri-like thing.
 			urls = ['://']
 			for url in urls:
 				if url in message:
@@ -93,7 +91,5 @@ class clean:
 								self.barf('DBG', 'Checking if %s is in %s' % ( z, words[x] ))
 							words[x] = z
 
-			message = " ".join(words).encode('utf8')
-			if self.settings.debug == 1:
-				self.barf('DBG', 'Cleaned messages is of type: %s' % type(message))
+			message = " ".join(words)
 			return message

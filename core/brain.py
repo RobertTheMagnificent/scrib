@@ -377,7 +377,7 @@ class brain:
 						self.barf('ACT', "Censored word %s" % words[x])
 						return
 
-				if len(words[x]) > 13 and len(words[x]) > 5 ) or ( char and digit ) \
+				if len(words[x]) > 13 and len(words[x]) > 5 or ( char and digit ) \
 					or ( self.words.has_key(words[x]) == 0 and self.settings.learning == 0 ):
 					return
 				elif ( "-" in words[x] or "_" in words[x] ):

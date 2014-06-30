@@ -235,7 +235,7 @@ class brain:
 							pattern = "^%s$" % alias
 							if re.search(pattern, x):
 								self.barf('ACT', "Replacing %s with %s" % (x, z))
-								self.replace(x, z)
+								#self.replace(x, z)
 
 			for x in self.words.keys():
 				if not (x in self.settings.aliases.keys()) and x[0] == '~':

@@ -18,6 +18,7 @@ class clean:
 			"""
 			if message == '':
 				return '';
+
 			if self.settings.debug == True:
 				self.barf('DBG', "Message is type: %s" % type(message))
 			# Firstly, make sure it isn't doesn't have a uri.
@@ -84,7 +85,7 @@ class clean:
 				#is there aliases ?
 				for z in self.settings.aliases.keys():
 					if self.settings.debug == 1:
-						self.barf('DBG', 'Is %s in keys?')
+						self.barf('DBG', 'Is %s in keys?' % z)
 					for alias in self.settings.aliases[z]:
 						pattern = "^%s$" % alias
 						if re.search(pattern, words[x]):
@@ -92,7 +93,7 @@ class clean:
 								self.barf('DBG', 'Checking if %s is in %s' % ( z, words[x] ))
 							words[x] = z
 
-			message = " ".join(words)
+			message = " ".join(words).encode('utf8')
 			if self.settings.debug == 1:
 				self.barf('DBG', 'Cleaned messages is of type: %s' % type(message))
 			return message

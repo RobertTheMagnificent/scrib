@@ -264,7 +264,7 @@ class ScribIRC(SingleServerIRCBot):
 	def nick_check(self, message):
 		# Check to see if I'm highlighted
 		highlighted = 0
-		if message.find(self.scrib.settings.name) != -1:
+		if self.crig.settings.name in message:
 			highlighted = 1
 		return highlighted
 

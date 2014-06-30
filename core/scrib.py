@@ -862,34 +862,24 @@ class scrib:
 			#this is to prevent a case where we have an ignore_listd word
 			word = str(sentence[0].split(" ")[0])
 			for x in xrange(0, len(self.brain.words[word]) - 1):
-				l = self.brain.words[word][0]#.encode('utf8') # for compat
-				w = self.brain.words[word][1]#.encode('utf8') # for compat
-				if self.settings.debug == 1:
-					self.barf('DBG', 'l: %s, w: %s' % (l, w))
+				l = self.brain.words[word][0]
+				w = self.brain.words[word][1]
 				try:
 					context = self.brain.lines[l][0]
-					if self.settings.debug == 1:
-						self.barf('DBG', 'Context: %s' % context)
 				except KeyError:
 					break
 				num_context = self.brain.lines[l][1]
 				cwords = context.split()
 				#if the word is not the first of the context, look to the previous one
-				if self.settings.debug == 1:
-					self.barf('DBG', 'cwords[w]: %s, word: %s' % ( cwords[w], word ))
-				if cwords[w] != word:
-					print context
 				if w:
 					#look if we can find a pair with the choosen word, and the previous one
 					if len(sentence) > 1 and len(cwords) > w + 1:
 						if sentence[1] != cwords[w + 1]:
 							continue
-
 					#if the word is in ignore_list, look to the previous word
 					look_for = cwords[w - 1]
 					if look_for in self.settings.ignore_list and w > 1:
 						look_for = cwords[w - 2] + " " + look_for
-
 					#saves how many times we can find each word
 					if not (pre_words.has_key(look_for)):
 						pre_words[look_for] = num_context
@@ -897,6 +887,10 @@ class scrib:
 						pre_words[look_for] += num_context
 				else:
 					pre_words[""] += num_context
+			if self.settings.debug == 1:
+				self.barf('DBG', 'Context: %s' % context)
+				self.barf('DBG', 'l: %s, w: %s' % (l, w))
+				self.barf('DBG', 'cwords[w]: %s, word: %s' % ( cwords[w], word ))
 
 			#Sort the words
 			list = pre_words.items()

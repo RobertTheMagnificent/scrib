@@ -112,7 +112,7 @@ class brain:
 				stuff = json.dumps(s, sort_keys=True, indent=4, separators=(',', ': '), encoding='latin-1').decode('unicode_escape').encode('utf8') # Fixing
 				del s
 				return stuff
-			stuff = json.dumps(file, sort_keys=True, indent=4, separators=(',', ': '))#, encoding='utf-8')
+			stuff = json.dumps(file, sort_keys=True, indent=4, separators=(',', ': '), encoding='utf-8')
 		return stuff
 
 	def _load(self):

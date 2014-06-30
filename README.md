@@ -5,6 +5,8 @@ License:	GNU GPLv2
 Authors:	See AUTHORS
 </pre>
 
+[ ![Codeship Status for scoundrels/scrib](https://codeship.io/projects/cf8473b0-129d-0131-7f02-02093dca7a42/status?branch=master)](https://codeship.io/projects/7883)
+
 Scrib is a learning chat bot that self-optimizes. It can also be taught through various commands.
 
 Scrib's origins lie within the sources of Pyborg, which was written by Tom Morton and Sébastian Dailly. It was a simple Markov chain-driven bot, similar to MegaHAL, but with the unique ability to learn patterns of speech by figuring out what words go together well. This gives the bot the ability to come up with its own replies, as well as repeating previously learned phrases. There have been pieces absorbed from the Alia fork of Pyborg, as well.

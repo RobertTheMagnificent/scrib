@@ -132,8 +132,7 @@ class ScribIRC(SingleServerIRCBot):
 	def _on_disconnect(self, c, e):
 		# self.channels = IRCDict()
 		self.scrib.barf('ACT', "Disconnected, shutting down.")
-		self.scrib.shutdown(self)
-		#self.connection.execute_delayed(self.reconnection_interval, self._connected_checker)
+		self.connection.execute_delayed(self.reconnection_interval, self._connected_checker)
 
 
 	def on_msg(self, c, e):
@@ -181,13 +180,7 @@ class ScribIRC(SingleServerIRCBot):
 			self.scrib.barf('MSG', "%s <%s> \033[0m%s" % (target, source, body))
 
 		# Ignore self.
-		if source == self.scrib.settings.name: return
-
-		# Disable commands for non owners
-		if (not source in self.owners):
-			while body[:1] == self.scrib.settings.symbol:
-				self.scrib.barf('ACT', "Ignoring non-owner command: %s" % body)
-				return
+		#if source == self.scrib.settings.name: return
 
 		if body == "":
 			return
@@ -354,6 +347,3 @@ if __name__ == "__main__":
 		if c[:1] != 'n':
 			my_scrib.shutdown(my_scrib)
 		sys.exit(0)
-
-	bot.disconnect(bot.settings.quit_message) # exit irc cleanly
-

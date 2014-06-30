@@ -329,7 +329,7 @@ class scrib:
 		cmds = body.split()
 		msg = ""
 
-		if owner == 0 and cmds[0] in self.general.commands.keys():
+		if owner == 0 and cmds[0] in self.general_commands.keys():
 			msg = "Sorry, but you're not an owner."
 		
 		if cmds[0] in self.commands:
@@ -703,7 +703,9 @@ class scrib:
 			number = self.brain.lines[l][1]
 			if line[w] != old:
 				# fucked brain
-				self.barf('ERR', "Broken link: %s %s" % (x, self.brain.lines[l][0] ))
+				# Sending false positives, so I disabled
+				#self.barf('ERR', "Broken link: %s %s" % (x, self.brain.lines[l][0] ))
+				continue
 			else:
 				line[w] = new
 				self.brain.lines[l][0] = " ".join(line)

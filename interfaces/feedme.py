@@ -25,8 +25,8 @@ class ModFileIn:
 		f.close()
 
 		if scrib.debug == 1:
-			scrib.barf('DBG', "scrib: %s" % scrib.settings)
-		before = "I knew "+`scrib.brainstats.num_words`+" words ("+`len(scrib.lines)`+" lines) before reading "+sys.argv[1]
+			scrib.barf('DBG', "scrib: %s; brain: %s" % ( scrib.settings, scrib.brain.settings ))
+		before = "I knew "+`scrib.brainstats.num_words`+" words ("+`len(scrib.brain.lines)`+" lines) before reading "+sys.argv[1]
 		buffer = scrib.filter_message(buffer)
 		# Learn from input
 		try:
@@ -35,7 +35,7 @@ class ModFileIn:
 		except KeyboardInterrupt, e:
 			# Close database cleanly
 			scrib.barf('ERR', "Early termination.")
-		after = "I know "+`scrib.brainstats.num_words`+" words ("+`len(scrib.lines)`+" lines) now."
+		after = "I know "+`scrib.brain.stats.num_words`+" words ("+`len(scrib.brain.lines)`+" lines) now."
 		del scrib
 		
 		scrib.barf('ACT', before)
@@ -57,5 +57,5 @@ if __name__ == "__main__":
 	# start the scrib
 	my_scrib = scrib.scrib()
 	ModFileIn(my_scrib, sys.argv)
-	my_scrib.save_all(False)
+	my_scrib.brain.save_all(False)
 	del my_scrib

@@ -131,8 +131,9 @@ class ScribIRC(SingleServerIRCBot):
 
 	def _on_disconnect(self, c, e):
 		# self.channels = IRCDict()
-		self.scrib.barf('ACT', "Disconnected..")
-		self.connection.execute_delayed(self.reconnection_interval, self._connected_checker)
+		self.scrib.barf('ACT', "Disconnected, shutting down.")
+		self.scrib.shutdown(self)
+		#self.connection.execute_delayed(self.reconnection_interval, self._connected_checker)
 
 
 	def on_msg(self, c, e):
@@ -346,14 +347,13 @@ if __name__ == "__main__":
 	except SystemExit, e:
 		pass
 	except:
-		my_scrib.kill_timers()
+		my_scrib.brain.kill_timers()
 		my_scrib.barf('ERR', traceback.format_exc())
 		my_scrib.barf('ERR', "Oh no, I've crashed! Would you like to save my brain?", False)
 		c = raw_input("[Y/n]")
 		if c[:1] != 'n':
-			my_scrib.save_all(my_scrib, False)
+			my_scrib.shutdown(my_scrib)
 		sys.exit(0)
 
 	bot.disconnect(bot.settings.quit_message) # exit irc cleanly
-	del my_scrib
-	sys.exit(0)
+

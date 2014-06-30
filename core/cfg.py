@@ -7,7 +7,7 @@ import time
 
 import barf
 
-def _load_config(filename):
+def _load_config(filename, suppress = False):
 	try:
 		f = open(filename, 'r')
 	except IOError, e:
@@ -16,7 +16,8 @@ def _load_config(filename):
 	config = json.load(f)
 	f.close()
 
-	barf.Barf('MSG', filename + ' successfully loaded.')
+	if suppress == False:
+		barf.Barf('MSG', filename + ' successfully loaded.')
 
 	return config
 		
@@ -31,7 +32,7 @@ def _save_config(filename, fields):
 
 class set:
 
-	def load(self, filename, defaults):
+	def load(self, filename, defaults, suppress = False):
 		"""
 		Load scrib settings.
 		"""
@@ -39,7 +40,7 @@ class set:
 		self._filename = filename
 
 		# try to load saved ones
-		vars = _load_config(filename)
+		vars = _load_config(filename, suppress)
 		if vars == None:
 			# none found. this is new
 			vars = self._defaults
@@ -53,7 +54,6 @@ class set:
 	def save(self):
 		"""
 		Save scrib settings
-		"""
-		
+		"""	
 		_save_config(self._filename, self._defaults)
 

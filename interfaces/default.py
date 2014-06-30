@@ -56,24 +56,22 @@ class ModLineIn:
 				self.scrib.barf('MSG', message + "\033[0m")
 
 if __name__ == "__main__":
-		try:
-			my_scrib = scrib.scrib()
-		except ValueError, e:
-			from core import barf
-			barf.Barf('ERR', traceback.format_exc())
-			sys.exit(0)
-
-		try:
-			ModLineIn(my_scrib)
-		except SystemExit:
-			pass
-		except:
-			my_scrib.kill_timers()
-			my_scrib.barf('ERR', traceback.format_exc())
-			my_scrib.barf('ERR', "Oh no, I've crashed! Would you like to save my brain?", False)
-			c = raw_input("[Y/n]")
-			if c[:1] != "n":
-				my_scrib.save_all(my_scrib, False)
-
-		del my_scrib
+	try:
+		my_scrib = scrib.scrib()
+	except ValueError, e:
+		from core import barf
+		barf.Barf('ERR', traceback.format_exc())
 		sys.exit(0)
+
+	try:
+		ModLineIn(my_scrib)
+	except SystemExit:
+		pass
+	except:
+		my_scrib.brain.kill_timers()
+		my_scrib.barf('ERR', traceback.format_exc())
+		my_scrib.barf('ERR', "Oh no, I've crashed! Would you like to save my brain?", False)
+		c = raw_input("[Y/n]")
+		if c[:1] != "n":
+			my_scrib.shutdown(my_scrib)
+

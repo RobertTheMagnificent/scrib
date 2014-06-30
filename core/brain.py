@@ -77,10 +77,7 @@ class brain:
 		else:
 			self.barf('ERR', "Invalid brain type")
 			return 0
-		
-		if btype < 4:
-			self.barf('ROL', 'Warning: brain may be incompatible.')
-			self.barf('ROL', 'Suggestion: use a new brain.')
+
 		return btype
 
 	def unpack(self, file, version, upgrade=False):

@@ -422,7 +422,7 @@ class brain:
 
 		# Split body text into sentences and parse them
 		# one by one.
-		#body += " "
+		body += " "
 		lines = body.split(". ")
 		for line in lines:
 			learn_line(self, line, num_context)

@@ -15,7 +15,7 @@ class ModFileIn:
 	"""
 	def __init__(self, scrib):
 		self.barf = scrib.barf
-		self.barf('MSG', 'Where is the food located? Relative to scrib root.')
+		self.barf('MSG', 'Where is the food located?')
 		self.food = raw_input("location: ")
 
 		correct = False

@@ -310,7 +310,7 @@ class brain:
 		#Sort the list before to export
 		for key in self.words.keys():
 			try:
-				wordlist.append([key, len(self.words[key].encode('utf8'))])
+				wordlist.append([key, len(self.words[key])])
 			except:
 				pass
 		wordlist.sort(lambda x, y: cmp(x[1], y[1]))

@@ -16,7 +16,6 @@ class clean:
 			"""
 			Sanitize incoming data for ease of learning.
 			"""
-
 			# Firstly, make sure it isn't doesn't have a uri.
 			urls = ['://']
 			for url in urls:

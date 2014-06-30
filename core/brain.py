@@ -362,16 +362,10 @@ class brain:
 			if len(words) < 1:
 				return
 
-			vowels = "aÃ Ã¢eÃ©Ã¨ÃªiÃ®Ã¯oÃ¶Ã´uÃ¼Ã»y"
-			#vowels = ""
 			for x in xrange(0, len(words)):
-
-				nb_voy = 0
 				digit = 0
 				char = 0
 				for c in words[x]:
-					if c in vowels:
-						nb_voy += 1
 					if c.isalpha():
 						char += 1
 					if c.isdigit():
@@ -383,9 +377,7 @@ class brain:
 						self.barf('ACT', "Censored word %s" % words[x])
 						return
 
-				if len(words[x]) > 13 \
-					or ( ((nb_voy * 100) / len(words[x]) < 26) and len(words[x]) > 5 ) \
-					or ( char and digit ) \
+				if len(words[x]) > 13 and len(words[x]) > 5 ) or ( char and digit ) \
 					or ( self.words.has_key(words[x]) == 0 and self.settings.learning == 0 ):
 					return
 				elif ( "-" in words[x] or "_" in words[x] ):
@@ -411,11 +403,10 @@ class brain:
 			if not (num_cpw > 100 and self.settings.learning == 0)and not self.lines.has_key(hashval) :
 				self.lines[hashval] = [cleanbody, num_context]
 				# Add link for each word
+				if self.settings.debug == 1:
+					self.barf('DBG', 'hash %s added' % ( hashval ))
 				for x in xrange(0, len(words)):
 					if self.words.has_key(words[x]):
-						# Add entry. (line number, word number)
-						if self.settings.debug == 1:
-							self.barf('DBG', 'hash %s added' % ( hashval ))
 						self.words[words[x]].append([hashval, x])
 					else:
 						self.words[words[x]] = [hashval, x]
@@ -423,6 +414,8 @@ class brain:
 					self.stats['num_contexts'] += 1
 			else:
 				self.lines[hashval][1] += num_context
+				if self.settings.debug == 1:
+					self.barf('DBG', '%s context increased to %d' % ( hashval, self.lines[hashval[1]))
 
 			#is max_words reached, don't learn more
 			if self.stats['num_words'] >= self.stats['max_words']:
@@ -431,7 +424,7 @@ class brain:
 
 		# Split body text into sentences and parse them
 		# one by one.
-		body += " "
+		#body += " "
 		lines = body.split(". ")
 		for line in lines:
 			learn_line(self, line, num_context)

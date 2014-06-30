@@ -16,6 +16,7 @@ class clean:
 			"""
 			Sanitize incoming data for ease of learning.
 			"""
+			message = message.decode('utf8')
 			# Firstly, make sure it isn't doesn't have a uri.
 			urls = ['://']
 			for url in urls:
@@ -90,4 +91,4 @@ class clean:
 
 			message = " ".join(words)
 
-			return message
+			return message.encode('utf8')

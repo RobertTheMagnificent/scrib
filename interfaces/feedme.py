@@ -18,10 +18,13 @@ class ModFileIn:
 		self.barf('MSG', 'Where is the food located? Relative to scrib root.')
 		self.food = raw_input("location: ")
 
-		try:		
-			f = open(self.food, "r")
-		except IOError:
-			self.barf('ERR', 'That file does not exist.')
+		correct = False
+		while correct == False:
+			try:		
+				f = open(self.food, "r")
+			except IOError:
+				self.barf('ERR', 'That file does not exist.')
+			correct = True
 		
 		noms = f.read()
 		f.close()

@@ -414,8 +414,6 @@ class brain:
 					self.stats['num_contexts'] += 1
 			else:
 				self.lines[hashval][1] += num_context
-				if self.settings.debug == 1:
-					self.barf('DBG', '%s context increased to %d' % ( hashval, self.lines[hashval[1]]))
 
 			#is max_words reached, don't learn more
 			if self.stats['num_words'] >= self.stats['max_words']:

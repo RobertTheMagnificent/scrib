@@ -9,6 +9,7 @@ class clean:
 
 	def __init__(self):
 		self.settings = cfg.set()
+		self.barf = brain.barf.Barf
 		self.settings.load('conf/brain.cfg', '', True)
 
 	def line(self, message):
@@ -39,13 +40,12 @@ class clean:
 					message = message[0:i] + message[i + 1:]
 					# And remove the (
 					message = message[0:index] + message[index + 1:]
-			except ValueError, e:
-				#brain.barf('ERR', "Filter: %s" % e)
-				pass
+			except ValueError, e:				
+				pass # will just say 'substring not found' on every line that hasn't the above.
 
 			# Strips out mIRC Control codes
-			#ccstrip = re.compile("\x1f|\x02|\x12|\x0f|\x16|\x03(?:\d{1,2}(?:,\d{1,2})?)?", re.UNICODE)
-			#message = ccstrip.sub("", message)
+			ccstrip = re.compile("\x1f|\x02|\x12|\x0f|\x16|\x03(?:\d{1,2}(?:,\d{1,2})?)?", re.UNICODE)
+			message = ccstrip.sub("", message)
 
 			# Few of my fixes...
 			message = message.replace(": ", " : ")
@@ -80,9 +80,13 @@ class clean:
 			for x in xrange(0, len(words)):
 				#is there aliases ?
 				for z in self.settings.aliases.keys():
+					if self.settings.debug == 1:
+						self.barf('DBG', 'Is %s in keys?')
 					for alias in self.settings.aliases[z]:
 						pattern = "^%s$" % alias
 						if re.search(pattern, words[x]):
+							if self.settings.debug == 1:
+								self.barf('DBG', 'Checking if %s is in %s' % ( z, words[x] ))
 							words[x] = z
 
 			message = " ".join(words)

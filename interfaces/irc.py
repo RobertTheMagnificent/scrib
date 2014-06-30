@@ -162,6 +162,10 @@ class ScribIRC(SingleServerIRCBot):
 				# Ignore all the other CTCPs
 				return
 
+		# Don't bother with empty messages.
+		if body == "":
+			return
+
 		for irc_color_char in [',', "\x03"]:
 			debut = body.rfind(irc_color_char)
 			if 0 <= debut < 5:
@@ -178,12 +182,6 @@ class ScribIRC(SingleServerIRCBot):
 		# WHOOHOOO!!
 		if target == self.scrib.settings.name or source == self.scrib.settings.name:
 			self.scrib.barf('MSG', "%s <%s> \033[0m%s" % (target, source, body))
-
-		# Ignore self.
-		#if source == self.scrib.settings.name: return
-
-		if body == "":
-			return
 
 		# Ignore quoted messages
 		if body[0] == "<" or body[0:1] == "\"" or body[0:1] == " <" or body[0] == "[":
@@ -225,23 +223,12 @@ class ScribIRC(SingleServerIRCBot):
 			for x in self.channels[target].users():
 				x = re.sub("[\&\%\+\@\~]","", x)
 				if x:
-					# Disabled due to bug #76
-					#body = body.replace(x+":", "#nick:")
 					body = body.replace("@ "+x, "@ #nick")
-
-		if body == "":
-			if self.scrib.debug == 1:
-				self.scrib.barf('DBG', "Body empty, no reply.")
-			return
 
 		# Pass on to scrib
 		if source in self.owners and e.source() in self.owner_mask:
-			if self.scrib.debug == 1:
-				self.scrib.barf('DBG', "Passing command to scrib as owner")
 			self.scrib.process(self, body, replyrate, learn, (body, source, target, c, e), 1, muted)
 		else:
-			if self.scrib.debug == 1:
-				self.scrib.barf('DBG', "Starting a new thread")
 			#start a new thread
 			thread.start_new_thread(self.scrib.process,
 									(self, body, replyrate, learn, (body, source, target, c, e), 0, muted))
@@ -340,7 +327,6 @@ if __name__ == "__main__":
 	except SystemExit, e:
 		pass
 	except:
-		my_scrib.brain.kill_timers()
 		my_scrib.barf('ERR', traceback.format_exc())
 		my_scrib.barf('ERR', "Oh no, I've crashed! Would you like to save my brain?", False)
 		c = raw_input("[Y/n]")

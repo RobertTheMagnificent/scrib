@@ -68,7 +68,6 @@ if __name__ == "__main__":
 	except SystemExit:
 		pass
 	except:
-		my_scrib.brain.kill_timers()
 		my_scrib.barf('ERR', traceback.format_exc())
 		my_scrib.barf('ERR', "Oh no, I've crashed! Would you like to save my brain?", False)
 		c = raw_input("[Y/n]")

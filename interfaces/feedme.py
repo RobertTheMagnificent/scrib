@@ -13,49 +13,34 @@ class ModFileIn:
 	"""
 	I learn from ASCII files!
 	"""
-
-	# Command list for this module
-	commandlist = "FileIn Module Commands:\nNone"
-	commanddict = {}
-	
-	def __init__(self, scrib, args):
-
-		f = open(args[1], "r")
-		buffer = f.read()
+	def __init__(self, scrib):
+		self.barf = scrib.barf
+		self.barf('MSG', 'Where is the food located? Relative to scrib root.')
+		self.food = raw_input("location: ")
+		
+		f = open(self.food, "r")
+		noms = f.read()
 		f.close()
 
 		if scrib.debug == 1:
-			scrib.barf('DBG', "scrib: %s; brain: %s" % ( scrib.settings, scrib.brain.settings ))
-		before = "I knew "+`scrib.brainstats.num_words`+" words ("+`len(scrib.brain.lines)`+" lines) before reading "+sys.argv[1]
-		buffer = scrib.filter_message(buffer)
+			self.barf('DBG', "scrib: %s; brain: %s" % ( scrib.settings.version, scrib.brain.settings.version ))
+		before = "I knew "+`scrib.brain.stats['num_words']`+" words ("+`len(scrib.brain.lines)`+" lines) before reading '%s'" % self.food
+		noms = scrib.brain.clean.line(noms)
 		# Learn from input
 		try:
-			scrib.barf(barf.MSG, buffer)
-			scrib.learn(buffer)
+			self.barf('MSG', noms)
+			scrib.brain.learn(noms)
 		except KeyboardInterrupt, e:
 			# Close database cleanly
-			scrib.barf('ERR', "Early termination.")
-		after = "I know "+`scrib.brain.stats.num_words`+" words ("+`len(scrib.brain.lines)`+" lines) now."
+			self.barf('ERR', "Early termination.")
+		after = "I know "+`scrib.brain.stats['num_words']`+" words ("+`len(scrib.brain.lines)`+" lines) now."
 		del scrib
 		
-		scrib.barf('ACT', before)
-		scrib.barf('ACT', after)
-
-	def shutdown(self):
-		pass
-
-	def start(self):
-		sys.exit()
-
-	def output(self, message, args):
-		pass
+		self.barf('ACT', before)
+		self.barf('ACT', after)
 
 if __name__ == "__main__":
-	if len(sys.argv) < 2:
-		scrib.barf('ERR', "Please specify a filename.")
-		sys.exit()
-	# start the scrib
 	my_scrib = scrib.scrib()
-	ModFileIn(my_scrib, sys.argv)
-	my_scrib.brain.save_all(False)
+	ModFileIn(my_scrib)
+	my_scrib.shutdown(my_scrib)
 	del my_scrib

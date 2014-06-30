@@ -4,7 +4,6 @@
 from random import *
 import sys
 import os
-import struct
 import fileinput
 import re
 import time
@@ -191,7 +190,6 @@ class scrib:
 			'context': "context [word] (outputs to console)",
 			'learn': "learn [word]",
 			'learning': "Toggles bot learning.",
-			'limit': "Max number of words allowed.",
 			'rebuild': "Performs a brain rebuild. Is desructive.",
 			'replace': "replace [current] [new]",
 			'replyrate': "Shows/sets the reply rate.",
@@ -215,7 +213,7 @@ class scrib:
 		self.settings = self.cfg.set()
 		self.settings.load("conf/scrib.cfg",{
 							"name": "scrib",
-							"symbol": "!",
+							"self.settings.symbol": "!",
 							"reply_rate": 100,
 							"nick_reply_rate": 100,
 							"debug": 0,
@@ -326,13 +324,12 @@ class scrib:
 
 	def do(self, interface, body, args, owner):
 		"""
-		Respond to user commands.
+		Respond to commands.
 		"""
 		cmds = body.split()
-		sym = self.settings.symbol # For ease of typing
 		msg = ""
 
-		if owner == 0 and cmds[0] in self.commands:
+		if owner == 0 and cmds[0] in self.general.commands.keys():
 			msg = "Sorry, but you're not an owner."
 		
 		if cmds[0] in self.commands:
@@ -429,31 +426,32 @@ class scrib:
 					else:
 						msg = "You need to teach me something first!"
 
-				elif cmds[0] == "limit":
-					msg = "The max limit is "
-					if len(cmds) == 1:
-						msg += str(self.settings.max_words)
-					else:
-						limit = int(cmds[1])
-						self.settings.max_words = limit
-						msg += "now " + cmds[1]
-
 				# Check for broken links in the brain
 				elif cmds[0] == "check":
 					t = time.time()
 					num_broken = 0
 					num_bad = 0
+					if self.settings.debug == 1:
+						self.barf('DBG', 'Check commencing...')
 					for w in self.brain.words.keys():
+						w = w.encode('utf8', 'ignore')
 						wlist = self.brain.words[w]
-
+						if self.settings.debug == 1:
+							self.barf('DBG', 'Checking %s against %s' % (w, wlist))
 						for i in xrange(len(wlist) - 1, -1, -1):
 							try:
-								line_idx, word_num = struct.unpack("iH", wlist[i])
+								if self.settings.debug == 1:
+									self.barf('DBG', "Trying %" % wlist[i])
+									self.barf('DBG', '%s' % wlist[i])
+								line_idx, word_num = wlist[i]
+								if self.settings.debug == 1:
+									self.barf('DBG', "line_idx: %s" % line_idx)
 							except:
-								msg = 'The hash table is damaged. Please use !rebuild, then !save.'
+								msg = 'The hash table is malformed. Please use !rebuild, then !save.'
 								self.barf('ERR', msg)
+								interface.output(self.settings.symbol+msg, args)
 								return
-
+						
 							# Nasty critical error we should fix
 							if not self.brain.lines.has_key(line_idx):
 								self.barf('ACT', "Removing broken link '%s' -> %d." % (w, line_idx))
@@ -465,7 +463,7 @@ class scrib:
 								if split_line[word_num] != w:
 									self.barf('ACT', "Line '%s' word %d is not '%s' as expected." % \
 											  (self.brain.lines[line_idx][0],
-											   word_num, w.decode('utf8')))
+											   word_num, w))
 									num_bad = num_bad + 1
 									del wlist[i]
 						if len(wlist) == 0:
@@ -480,6 +478,7 @@ class scrib:
 						   num_bad)
 
 				elif cmds[0] == "rebuild":
+					interface.output(self.settings.symbol+"Rebuilding...", args)
 					msg = self.brain.auto_rebuild()
 
 				elif cmds[0] == "replace":
@@ -495,7 +494,6 @@ class scrib:
 						msg = "Now replying to %d%% of messages." % int(cmds[1])
 					else:
 						msg = "Reply rate is %d%%." % self.settings.reply_rate
-					return msg
 
 				elif cmds[0] == "context":
 					if self.debug == 1:
@@ -622,7 +620,7 @@ class scrib:
 			
 				elif cmds[0] == 'save':
 					self.barf('SAV', 'User initiated save')
-					self.save_all(interface)
+					self.brain.save_all(interface)
 					msg = "Saved!"
 
 				elif cmds[0] == 'debug':
@@ -729,7 +727,7 @@ class scrib:
 			self.barf('MSG', 'Ignoring a secret.')
 
 		if msg != "":
-			interface.output(sym+msg, args)
+			interface.output(self.settings.symbol+msg, args)
 
 
 	def replace(self, old, new):
@@ -745,7 +743,8 @@ class scrib:
 
 		for x in pointers:
 			# pointers consist of (line, word) to self.brain.lines
-			l, w = struct.unpack("iH", x)
+			l = x[0]
+			w = x[1]
 			line = self.brain.lines[l][0].split()
 			number = self.brain.lines[l][1]
 			if line[w] != old:
@@ -793,14 +792,13 @@ class scrib:
 				dellist.append(x)
 				del self.brain.lines[x]
 		words = self.brain.words
-		unpack = struct.unpack
 		# update links
 		for x in wordlist:
 			word_contexts = words[x]
 			# Check all the word's links (backwards so we can delete)
 			for y in xrange(len(word_contexts) - 1, -1, -1):
 				# Check for any of the deleted contexts
-				if unpack("iH", word_contexts[y])[0] in dellist:
+				if y[0] in dellist:
 					del word_contexts[y]
 					self.brain.stats['num_contexts'] = self.brain.stats['num_contexts'] - 1
 			if len(words[x]) == 0:
@@ -837,6 +835,8 @@ class scrib:
 		for x in xrange(0, len(words)):
 			if self.brain.words.has_key(words[x]):
 				k = len(self.brain.words[words[x]])
+				if self.settings.debug == 1:
+					self.barf('DBG', 'k: %s,' % (words[x]))
 			else:
 				continue
 			if (known == -1 or k < known) and k > known_min:
@@ -862,14 +862,21 @@ class scrib:
 			#this is to prevent a case where we have an ignore_listd word
 			word = str(sentence[0].split(" ")[0])
 			for x in xrange(0, len(self.brain.words[word]) - 1):
-				l, w = struct.unpack("iH", self.brain.words[word][x])
+				l = self.brain.words[word][0]#.encode('utf8') # for compat
+				w = self.brain.words[word][1]#.encode('utf8') # for compat
+				if self.settings.debug == 1:
+					self.barf('DBG', 'l: %s, w: %s' % (l, w))
 				try:
 					context = self.brain.lines[l][0]
+					if self.settings.debug == 1:
+						self.barf('DBG', 'Context: %s' % context)
 				except KeyError:
 					break
 				num_context = self.brain.lines[l][1]
 				cwords = context.split()
 				#if the word is not the first of the context, look to the previous one
+				if self.settings.debug == 1:
+					self.barf('DBG', 'cwords[w]: %s, word: %s' % ( cwords[w], word ))
 				if cwords[w] != word:
 					print context
 				if w:
@@ -888,8 +895,6 @@ class scrib:
 						pre_words[look_for] = num_context
 					else:
 						pre_words[look_for] += num_context
-
-
 				else:
 					pre_words[""] += num_context
 
@@ -941,7 +946,8 @@ class scrib:
 			post_words = {"": 0}
 			word = str(sentence[-1].split(" ")[-1])
 			for x in xrange(0, len(self.brain.words[word])):
-				l, w = struct.unpack("iH", self.brain.words[word][x])
+				l = self.brain.words[word][x][0]
+				w = self.brain.words[word][x][1]
 				try:
 					context = self.brain.lines[l][0]
 				except KeyError:
@@ -1015,7 +1021,7 @@ class scrib:
 		#return as string..
 		return "".join(sentence)
 
-		# Ignore if the sentence starts with the symbol
+		# Ignore if the sentence starts with the self.settings.symbol
 		if body[0:1] == self.settings.symbol:
 			if self.debug == 1:
 				self.barf('ERR', "Not learning: %s" % words)

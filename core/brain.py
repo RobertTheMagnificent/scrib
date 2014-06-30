@@ -2,10 +2,10 @@
 # -*- coding: utf-8 -*-
 import ctypes
 import datetime
+import hashlib
 import os
 import re
 import shutil
-import struct
 import threading
 import time
 import zipfile
@@ -17,7 +17,6 @@ import clean
 class brain:
 
 	def __init__(self):
-		self.version = '0.2.0' # Internal versioning
 		self.barf = barf.Barf
 		self.cfg = cfg
 		self.settings = self.cfg.set()
@@ -31,6 +30,7 @@ class brain:
 							"num_aliases": 0,
 							"aliases": {},
 							"optimum": 1,
+							"version": '0.2.0',
 							})
 
 		self.scribsettings.load("conf/scrib.cfg", '')
@@ -61,51 +61,58 @@ class brain:
 
 		self._load()
 
-	def brain_ver(self, version):
+	def brain_type(self, version):
 		marshal = ['0.0.1', '0.1.0', '0.1.1']
 		pickle = ['0.1.2', '0.1.3', '0.1.4']
-		json = ['0.1.5', '0.1.6', '0.1.7', '0.1.8', '0.1.9', '0.2.0']
+		json = ['0.1.5', '0.1.6', '0.1.7', '0.1.8']
+		verfour = ['0.1.9', '0.2.0']
 		
 		if version in marshal:
-			return 1
+			btype = 1
 		elif version in pickle:
-			return 2
+			btype = 2
 		elif version in json:
-			return 3
+			btype = 3
+		elif version in verfour:
+			btype = 4
 		else:
 			self.barf('ERR', "Invalid brain type")
 			return 0
+		
+		if btype < 4:
+			self.barf('ROL', 'Warning: brain may be incompatible.')
+			self.barf('ROL', 'Suggestion: use a new brain.')
+		return btype
 
-	def unpack(self, file, version):
-		if self.brain_ver(version) == 1:
+	def unpack(self, file, version, upgrade=False):
+		if self.brain_type(version) == 1:
 			import marshal
 			stuff = marshal.loads(file)
-		elif self.brain_ver(version) == 2:
+		elif self.brain_type(version) == 2:
 			import cPickle as pickle
 			stuff = pickle.loads(file)
-		elif self.brain_ver(version) == 3:
+		elif self.brain_type(version) == 3 or self.brain_type(version) == 4:
 			import json
 			stuff = json.loads(file, encoding="utf-8")
 		return stuff
 
 	def pack(self, file, version, upgrade=False):
-		if self.brain_ver(version) == 1:
+		if self.brain_type(version) == 1:
 			import marshal
 			stuff = marshal.dumps(file)
-		elif self.brain_ver(version) == 2:
+		elif self.brain_type(version) == 2:
 			import cPickle as pickle
 			stuff = pickle.dumps(file)
-		elif self.brain_ver(version) == 3:
+		elif self.brain_type(version) == 3 or self.brain_type(version) == 4:
 			import json
 			if upgrade == True:
 				s = {}
 				for k,v in file.items():
-					s.update({k:v})
-				stuff = json.dumps(s, sort_keys=True, indent=4, separators=(',', ': '), encoding='latin-1').decode('latin1').encode('utf8') # Compat
+					s.update({k:v[0]})
+				stuff = json.dumps(s, sort_keys=True, indent=4, separators=(',', ': '), encoding='latin-1').decode('unicode_escape').encode('utf8') # Fixing
 				del s
 				return stuff
-
-			stuff = json.dumps(file, sort_keys=True, indent=4, separators=(',', ': '), encoding='latin-1').decode('latin-1').encode('utf-8') # Gross
+			stuff = json.dumps(file, sort_keys=True, indent=4, separators=(',', ': '))#, encoding='utf-8')
 		return stuff
 
 	def _load(self):
@@ -128,8 +135,8 @@ class brain:
 			v = f.read().strip()
 			self.barf('MSG', "Current brain version is %s " % v)
 			f.close()
-			if v != self.version:
-				self.barf('ERR', "Brain is version "+v+", but I use "+self.version+".")
+			if v != self.settings.version:
+				self.barf('ERR', "Brain is version "+v+", but I use "+self.settings.version+".")
 				self.barf('ERR', "Would you like to update the brain?")
 				c = raw_input("[Y/n]")
 				if c[:1].lower() != 'n':
@@ -142,12 +149,12 @@ class brain:
 						self.barf('DBG', "Reading words...")
 					s = f.read()
 					f.close()
-					self.words = self.unpack(s, v)
+					self.words = self.unpack(s, v, True)
 					del s
 					if self.settings.debug == 1:
 						self.barf('DBG', "Saving words...")
 					f = open("brain/words.dat", "wb")
-					s = self.pack(self.words, self.version, True)
+					s = self.pack(self.words, self.settings.version, True)
 					f.write(s)
 					f.close()
 					del s
@@ -162,23 +169,26 @@ class brain:
 						if self.settings.debug == 1:
 							self.barf('DBG', "Applying filter to adjust to new brain system.")
 							self.barf('TAB', "This may take a bit, and will shrink the dataset.")
-						self.auto_rebuild()
+						try:
+							self.auto_rebuild()
+						except:
+							self.barf('ERR', 'Brain failed to migrate.')
 					f = open("brain/lines.dat", "wb")
-					s = self.pack(self.lines, self.version, True)
+					s = self.pack(self.lines, self.settings.version, True)
 					f.write(s)
 					f.close()
 					del s
 					if self.settings.debug == 1:
 						self.barf('DBG', "Lines converted.")
 					f = open("brain/version", "wb")
-					f.write(self.version)
+					f.write(self.settings.version)
 					f.close()
 					if self.settings.debug == 1:
 						self.barf('DBG', "Version updated.")
-					v = self.version
+					v = self.settings.version
 					self.barf('ACT', "Brain converted successfully! Continuing.")
 				else:
-					self.version = v # Saves old brain as old brain format.
+					self.settings.version = v # Saves old brain as old brain format.
 
 			f = open("brain/words.dat", "rb")
 			s = f.read()
@@ -258,13 +268,13 @@ class brain:
 		self.barf('SAV', "Writing to my brain...")
 
 		f = open("brain/words.dat", "wb")
-		s = self.pack(self.words, self.version)
+		s = self.pack(self.words, self.settings.version)
 		f.write(s)
 		f.close()
 		if self.settings.debug == 1:
 			self.barf('DBG', "Words saved.")
 		f = open("brain/lines.dat", "wb")
-		s = self.pack(self.lines, self.version)
+		s = self.pack(self.lines, self.settings.version)
 		f.write(s)
 		f.close()
 		if self.settings.debug == 1:
@@ -287,7 +297,7 @@ class brain:
 			os.remove('brain/version')
 		except:
 			v = open("brain/version", "w")
-			v.write(self.version)
+			v.write(self.settings.version)
 			v.close()
 			f.write("brain/version")
 			if self.settings.debug == 1:
@@ -337,7 +347,7 @@ class brain:
 
 	def learn(self, body, num_context=1):
 		"""
-		Lines should be cleaned (scrib.filter()) before passing to this.
+		Lines should be cleaned (clean.line()) before passing to this.
 		"""
 		def learn_line(self, body, num_context):
 			"""
@@ -352,8 +362,8 @@ class brain:
 			if len(words) < 1:
 				return
 
-			#vowels = "aÃ Ã¢eÃ©Ã¨ÃªiÃ®Ã¯oÃ¶Ã´uÃ¼Ã»y"
-			vowels = ""
+			vowels = "aÃ Ã¢eÃ©Ã¨ÃªiÃ®Ã¯oÃ¶Ã´uÃ¼Ã»y"
+			#vowels = ""
 			for x in xrange(0, len(words)):
 
 				nb_voy = 0
@@ -390,22 +400,27 @@ class brain:
 			cleanbody = " ".join(words)
 
 			# This allows for use on 64-bit systems
-			hashval = ctypes.c_int32(hash(cleanbody)).value
-
-			# Check that context isn't already known
-			if not self.lines.has_key(hashval):
-				if not (num_cpw > 100 and self.settings.learning == 0):
-
-					self.lines[hashval] = [cleanbody, num_context]
-					# Add link for each word
-					for x in xrange(0, len(words)):
-						if self.words.has_key(words[x]):
-							# Add entry. (line number, word number)
-							self.words[words[x]].append(struct.pack("iH", hashval, x))
-						else:
-							self.words[words[x]] = [struct.pack("iH", hashval, x)]
-							self.stats['num_words'] += 1
-						self.stats['num_contexts'] += 1
+			oldhashval = ctypes.c_int32(hash(cleanbody)).value # Deprecated.
+			if self.lines.has_key(oldhashval):
+				barf.barf('ACT', 'Converting an old hash value')
+				if self.settings.debug == 1:
+					self.barf('DBG', 'Deleting hash %s' % oldhashval)
+				del self.lines[oldhashval]
+			hashval = hashlib.sha1(cleanbody).hexdigest()[:10]
+			
+			if not (num_cpw > 100 and self.settings.learning == 0)and not self.lines.has_key(hashval) :
+				self.lines[hashval] = [cleanbody, num_context]
+				# Add link for each word
+				for x in xrange(0, len(words)):
+					if self.words.has_key(words[x]):
+						# Add entry. (line number, word number)
+						if self.settings.debug == 1:
+							self.barf('DBG', 'hash %s added' % ( hashval ))
+						self.words[words[x]].append([hashval, x])
+					else:
+						self.words[words[x]] = [hashval, x]
+						self.stats['num_words'] += 1
+					self.stats['num_contexts'] += 1
 			else:
 				self.lines[hashval][1] += num_context
 
@@ -417,7 +432,9 @@ class brain:
 		# Split body text into sentences and parse them
 		# one by one.
 		body += " "
-		map((lambda x: learn_line(self, x, num_context)), body.split(". "))
+		lines = body.split(". ")
+		for line in lines:
+			learn_line(self, line, num_context)
 
 	def auto_rebuild(self):
 		if self.settings.learning == 1:

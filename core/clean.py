@@ -16,6 +16,8 @@ class clean:
 			"""
 			Sanitize incoming data for ease of learning.
 			"""
+			if message == '':
+				return '';
 			if self.settings.debug == True:
 				self.barf('DBG', "Message is type: %s" % type(message))
 			# Firstly, make sure it isn't doesn't have a uri.
@@ -93,4 +95,4 @@ class clean:
 			message = " ".join(words)
 			if self.settings.debug == 1:
 				self.barf('DBG', 'Cleaned messages is of type: %s' % type(message))
-			return 
+			return message

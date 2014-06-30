@@ -186,7 +186,7 @@ class scrib:
 			'find': "find [word]",
 			'forget': "forget [word]",
 			'censor': "censor [word]",
-			'check': "Checks hash table for consistency.",
+			'check': "(deprecated) alias for rebuild",
 			'context': "context [word] (outputs to console)",
 			'learn': "learn [word]",
 			'learning': "Toggles bot learning.",
@@ -426,60 +426,13 @@ class scrib:
 					else:
 						msg = "You need to teach me something first!"
 
-				# Check for broken links in the brain
-				elif cmds[0] == "check":
-					t = time.time()
-					num_broken = 0
-					num_bad = 0
-					if self.settings.debug == 1:
-						self.barf('DBG', 'Check commencing...')
-					for w in self.brain.words.keys():
-						w = w.encode('utf8', 'ignore')
-						wlist = self.brain.words[w]
-						if self.settings.debug == 1:
-							self.barf('DBG', 'Checking %s against %s' % (w, wlist))
-						for i in xrange(len(wlist) - 1, -1, -1):
-							try:
-								if self.settings.debug == 1:
-									self.barf('DBG', "Trying %" % wlist[i])
-									self.barf('DBG', '%s' % wlist[i])
-								line_idx, word_num = wlist[i]
-								if self.settings.debug == 1:
-									self.barf('DBG', "line_idx: %s" % line_idx)
-							except:
-								msg = 'The hash table is malformed. Please use !rebuild, then !save.'
-								self.barf('ERR', msg)
-								interface.output(self.settings.symbol+msg, args)
-								return
-						
-							# Nasty critical error we should fix
-							if not self.brain.lines.has_key(line_idx):
-								self.barf('ACT', "Removing broken link '%s' -> %d." % (w, line_idx))
-								num_broken = num_broken + 1
-								del wlist[i]
-							else:
-								# Check pointed to word is correct
-								split_line = self.brain.lines[line_idx][0].split()
-								if split_line[word_num] != w:
-									self.barf('ACT', "Line '%s' word %d is not '%s' as expected." % \
-											  (self.brain.lines[line_idx][0],
-											   word_num, w))
-									num_bad = num_bad + 1
-									del wlist[i]
-						if len(wlist) == 0:
-							del self.brain.words[w]
-							self.brain.stats['num_words'] = self.brain.stats['num_words'] - 1
-							self.barf('ACT', "\"%s\" vaporized from brain." % w)
-
-					msg = "Checked my brain in %0.2fs. Fixed links: %d broken, %d bad." % \
-						  (
-						   time.time() - t,
-						   num_broken,
-						   num_bad)
-
-				elif cmds[0] == "rebuild":
+				elif cmds[0] == "rebuild" or cmds[0] == 'check':
+					msg = ''
+					if cmds[0] == 'check':
+						msg += 'Check has been removed. '
 					interface.output(self.settings.symbol+"Rebuilding...", args)
-					msg = self.brain.auto_rebuild()
+					
+					msg += self.brain.auto_rebuild()
 
 				elif cmds[0] == "replace":
 					if len(cmds) < 3:
@@ -740,19 +693,17 @@ class scrib:
 		except KeyError, e:
 			return "%s is not known." % old
 		changed = 0
-
+		num_pointers = len(pointers)
+		print pointers
 		for x in pointers:
-			# pointers consist of (line, word) to self.brain.lines
-			l = x[0]
-			w = x[1]
+			l = pointers[0]
+			w = pointers[1]
+
 			line = self.brain.lines[l][0].split()
-			if self.settings.debug == 1:
-				self.barf('DBG', line)
 			number = self.brain.lines[l][1]
 			if line[w] != old:
 				# fucked brain
 				self.barf('ERR', "Broken link: %s %s" % (x, self.brain.lines[l][0] ))
-				continue
 			else:
 				line[w] = new
 				self.brain.lines[l][0] = " ".join(line)

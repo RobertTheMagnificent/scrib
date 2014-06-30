@@ -53,117 +53,6 @@ def dbwrite(key, value):
 			else:
 				print line.strip()
 
-# Some more machic to fix some common issues with the teach system
-def teach_filter(message):
-	message = message.replace("||", "$C4")
-	message = message.replace("|-:", "$b7")
-	message = message.replace(":-|", "$b6")
-	message = message.replace(";-|", "$b5")
-	message = message.replace("|:", "$b4")
-	message = message.replace(";|", "$b3")
-	message = message.replace("=|", "$b2")
-	message = message.replace(":|", "$b1")
-	return message
-
-
-def unfilter_reply(message):
-	"""
-	This undoes the phrase mangling the central code does
-	so the bot sounds more human :P
-	"""
-	
-	#barf.Barf('DBG', "Orig Message: %s" % message)
-
-	# Had to write my own initial capitalizing code *sigh*
-	message = "%s%s" % (message[:1].upper(), message[1:])
-	# Fixes punctuation
-	message = message.replace(" ?", "?")
-	message = message.replace(" !", "!")
-	message = message.replace(" .", ".")
-	message = message.replace(" ,", ",")
-	message = message.replace(" : ", ": ")
-	message = message.replace(" ; ", "; ")
-	# Fixes I and I contractions
-	message = message.replace(" i ", " I ")
-	message = message.replace(" i'", " I'")
-	# Fixes the common issues with the teach system
-	message = message.replace("$C4", "||")
-	message = message.replace("$b7", "|-:")
-	message = message.replace("$b6", ";-|")
-	message = message.replace("$b5", ":-|")
-	message = message.replace("$b4", "|:")
-	message = message.replace("$b3", ";|")
-	message = message.replace("$b2", "=|")
-	message = message.replace("$b1", ":|")
-	
-	# New emoticon filter that tries to catch almost all variations	
-	eyes, nose, mouth = r":;8BX=", r"-~'^O", r")(></\|CDPo39"
-	# Removed nose from the pattern for the sake of my sanity
-	pattern1 = "[\s][%s][%s][\s]" % tuple(map(re.escape, [eyes, mouth]))
-	pattern2 = "[\s][%s][%s][\s]" % tuple(map(re.escape, [mouth, eyes]))
-	eye, horzmouth = r"^><vou*@#sxz~-=+", r"-_o.wv"
-	pattern3 = "[\s][%s][%s][%s][\s]" % tuple(map(re.escape, [eye, horzmouth, eye]))
-
-	# Add whitespace for less false positives; it will be stripped out of the string later
-	if not message == "":
-		message = " " + message + " "
-	emoticon = re.search(pattern1, message, re.IGNORECASE)
-	pattern = pattern1
-	if emoticon == None:
-		emoticon = re.search(pattern2, message, re.IGNORECASE)
-		pattern = pattern2
-		if emoticon == None:
-			emoticon = re.search(pattern3, message, re.IGNORECASE)
-			pattern = pattern3
-	
-	# Init some strings so it does't barf later
-	extra = ""
-	emote = ""
-	
-	if not emoticon == None:
-		emoticon = "%s" % emoticon.group()
-		emotebeg = re.search(pattern, message, re.IGNORECASE).start()
-		emoteend = re.search(pattern, message, re.IGNORECASE).end()
-		
-		# Remove the whitespace we added earlier
-		message = message.strip()
-		
-		if not emotebeg == 0:
-			emotebeg = emotebeg - 1
-		if emotebeg == 0:
-			emoteend = emoteend - 2
-		emote = message[emotebeg:emoteend]
-		barf.Barf('DBG', "Emote found: %s" % emote)
-		new_message = message[:emotebeg]
-		extra = message[emoteend:]
-		message = new_message
-		
-		# Fixes the annoying XP capitalization in words...
-		message = message.replace("XP", "xp")
-		message = message.replace(" xp", " XP")
-		message = message.replace("XX", "xx")
-		
-	if not message == "":
-		# Remove whitespace if it wasn't removed earlier
-		message = message.strip()
-		if message.endswith(','):
-			message = message[:-1]
-		if not message.endswith(('.', '!', '?')):
-			message = message + "."
-			
-	if not extra == "":
-		extra = extra[1:]
-		extra = "%s%s" % (extra[:1].upper(), extra[1:])
-		if not extra.endswith(('.', '!', '?')):
-			extra = extra + "."
-		extra = extra + " "
-			
-	if not emote == "":
-		message = message + extra + emote
-
-	return message
-
-
 class scrib:
 	"""
 	The meat of scrib
@@ -277,7 +166,7 @@ class scrib:
 				if dbread(body):
 					if self.debug == 1:
 						self.barf('DBG', "Using prepared answer.")
-					message = unfilter_reply(dbread(body))
+					message = self.brain.clean.unfilter_reply(dbread(body))
 					if self.debug == 1:
 						self.barf('DBG', "Replying with: " + message)
 					return
@@ -302,7 +191,7 @@ class scrib:
 					message = self.reply(body)
 					if self.debug == 1:
 						self.barf('DBG', "Reply formed; unfiltering...")
-					message = unfilter_reply(message)
+					message = self.brain.clean.unfilter_reply(message)
 					if self.debug == 1:
 						self.barf('DBG', "Unfiltered message: " + message)
 			else:
@@ -342,7 +231,7 @@ class scrib:
 						if "#nick" in key:
 							msg = "Yeah, that won't work."
 						else:
-							value = teach_filter(' '.join(cmds[1:]).split("|")[1].strip())
+							value = self.brain.clean.teach_filter(' '.join(cmds[1:]).split("|")[1].strip())
 							dbwrite(key[0:], value[0:])
 							if rnum > 1:
 								array = ' '.join(cmds[1:]).split("|")
@@ -351,10 +240,10 @@ class scrib:
 									if rcount == 1:
 										rcount = rcount + 1
 									else:
-										dbwrite(key[0:], teach_filter(value[0:].strip()))
+										dbwrite(key[0:], self.brain.clean.teach_filter(value[0:].strip()))
 							else:
 								value = ' '.join(cmds[1:]).split("|")[1].strip()
-								dbwrite(key[0:], teach_filter(value[0:]))
+								dbwrite(key[0:], self.brain.clean.teach_filter(value[0:]))
 							msg = "New response learned for %s" % key
 					except Exception, e:
 						msg = "I couldn't learn that: %s" % e
@@ -514,7 +403,7 @@ class scrib:
 					self.barf('ACT', "Looking for: %s" % context)
 					# Unlearn contexts containing 'context'
 					t = time.time()
-					self.unlearn(context)
+					self.brain.unlearn(context)
 					# we don't actually check if anything was
 					# done..
 					msg = "Unlearn done in %0.2fs" % ( time.time() - t)
@@ -719,46 +608,6 @@ class scrib:
 		del self.brain.words[old]
 		return "%d instances of %s replaced with %s" % ( changed, old, new )
 
-	def unlearn(self, context):
-		"""
-		Unlearn all contexts containing 'context'. If 'context'
-		is a single word then all contexts containing that word
-		will be removed, just like the old !unlearn <word>
-		"""
-		# Pad thing to look for
-		# We pad so we don't match 'shit' when searching for 'hit', etc.
-		context = " " + context + " "
-		# Search through contexts
-		# count deleted items
-		dellist = []
-		# words that will have broken context due to this
-		wordlist = []
-		for x in self.brain.lines.keys():
-			# get context. pad
-			c = " " + self.brain.lines[x][0] + " "
-			if c.find(context) != -1:
-				# Split line up
-				#wlist = self.brain.lines[x][0].split()
-				## add touched words to list
-				#for w in wlist:
-				#	if not w in wordlist:
-				#		wordlist.append(w)
-				dellist.append(x)
-				del self.brain.lines[x]
-		words = self.brain.words
-		# update links
-		for x in wordlist:
-			word_contexts = words[x]
-			# Check all the word's links (backwards so we can delete)
-			for y in xrange(len(word_contexts) - 1, -1, -1):
-				# Check for any of the deleted contexts
-				if y[0] in dellist:
-					del word_contexts[y]
-					self.brain.stats['num_contexts'] = self.brain.stats['num_contexts'] - 1
-			if len(words[x]) == 0:
-				del words[x]
-				self.brain.stats['num_words'] = self.brain.stats['num_words'] - 1
-				self.barf('ACT', "\"%s\" vaporized from brain." % x)
 
 	def reply(self, body):
 		"""
@@ -784,8 +633,8 @@ class scrib:
 		index = []
 		known = -1
 
-		# If the word is in at least three contexts, it can be chosen.
-		known_min = 3
+		# If the word is in at least these many contexts, it can be chosen.
+		known_min = 1 # was three
 		for x in xrange(0, len(words)):
 			if self.brain.words.has_key(words[x]):
 				k = len(self.brain.words[words[x]])
@@ -820,8 +669,8 @@ class scrib:
 				w = self.brain.words[word][1]
 				try:
 					context = self.brain.lines[l][0]
-				except KeyError:
-					break
+				except KeyError, e:
+					self.barf('ERR', e)
 				num_context = self.brain.lines[l][1]
 				cwords = context.split()
 				#if the word is not the first of the context, look to the previous one
@@ -841,11 +690,11 @@ class scrib:
 						pre_words[look_for] += num_context
 				else:
 					pre_words[""] += num_context
-			if self.settings.debug == 1:
-				self.barf('DBG', 'Context: %s' % context)
-				self.barf('DBG', 'l: %s, w: %s' % (l, w))
-				self.barf('DBG', 'cwords[w]: %s, word: %s' % ( cwords[w], word ))
 
+				if self.settings.debug == 1:
+					self.barf('DBG', 'Context: %s' % context)
+					self.barf('DBG', 'l: %s, w: %s' % (l, w))
+					self.barf('DBG', 'cwords[w]: %s, word: %s' % ( cwords[w], word ))
 			#Sort the words
 			list = pre_words.items()
 			list.sort(lambda x, y: cmp(y[1], x[1]))

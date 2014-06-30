@@ -21,7 +21,7 @@ class brain:
 		self.settings = self.cfg.set()
 		self.scribsettings = self.cfg.set()
 		self.clean = clean.clean()
-		
+	
 		self.settings.load("conf/brain.cfg", {
 							'debug': 0,
 							'learning': 1,
@@ -31,6 +31,11 @@ class brain:
 							"optimum": 1,
 							"version": '0.2.0',
 							})
+
+		if self.brain_type(self.settings.version) < 4:
+			self.barf('ROL', 'Brain files before 0.2.0 will fail on upgrade.')
+			self.barf('ROL', 'We are working on an external conversion script.')
+			self.barf('ROL', 'Continue without upgrading.')
 
 		self.scribsettings.load("conf/scrib.cfg", '')
 
@@ -101,6 +106,9 @@ class brain:
 			stuff = pickle.dumps(file)
 		elif self.brain_type(version) == 3 or self.brain_type(version) == 4:
 			import json
+			if upgrade == True:
+				stuff = json.dumps(file, sort_keys=True, indent=4, separators=(',', ': ')).decode('latin1').encode('utf8', 'replace')
+				return stuff
 			stuff = json.dumps(file, sort_keys=True, indent=4, separators=(',', ': '))
 		return stuff
 
@@ -438,7 +446,48 @@ class brain:
 			return msg
 		else:
 			return "Learning mode is off; will not rebuild."
-	
+
+	def unlearn(self, context):
+		"""
+		Unlearn all contexts containing 'context'. If 'context'
+		is a single word then all contexts containing that word
+		will be removed, just like the old !unlearn <word>
+		"""
+		# Pad thing to look for
+		# We pad so we don't match 'shit' when searching for 'hit', etc.
+		context = " " + context + " "
+		# Search through contexts
+		# count deleted items
+		dellist = []
+		# words that will have broken context due to this
+		wordlist = []
+		for x in self.brain.lines.keys():
+			# get context. pad
+			c = " " + self.brain.lines[x][0] + " "
+			if c.find(context) != -1:
+				# Split line up
+				#wlist = self.brain.lines[x][0].split()
+				## add touched words to list
+				#for w in wlist:
+				#	if not w in wordlist:
+				#		wordlist.append(w)
+				dellist.append(x)
+				del self.brain.lines[x]
+		words = self.brain.words
+		# update links
+		for x in wordlist:
+			word_contexts = words[x]
+			# Check all the word's links (backwards so we can delete)
+			for y in xrange(len(word_contexts) - 1, -1, -1):
+				# Check for any of the deleted contexts
+				if y[0] in dellist:
+					del word_contexts[y]
+					self.brain.stats['num_contexts'] = self.brain.stats['num_contexts'] - 1
+			if len(words[x]) == 0:
+				del words[x]
+				self.brain.stats['num_words'] = self.brain.stats['num_words'] - 1
+				self.barf('ACT', "\"%s\" vaporized from brain." % x)
+
 	def to_sec(self, s):
 		seconds_per_unit = {"s": 1, "m": 60, "h": 3600, "d": 86400, "w": 604800}
 		return int(s[:-1]) * seconds_per_unit[s[-1]]

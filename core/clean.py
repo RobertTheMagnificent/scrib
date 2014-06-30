@@ -16,10 +16,12 @@ class clean:
 			"""
 			Sanitize incoming data for ease of learning.
 			"""
+			
 			if message == '':
 				return '';
-				
-			# Make sure it isn't doesn't have a uri-like thing.
+			if self.settings.debug == True:
+				self.barf('DBG', "Message is type: %s" % type(message))
+			# Firstly, make sure it isn't doesn't have a uri.
 			urls = ['://']
 			for url in urls:
 				if url in message:
@@ -92,4 +94,117 @@ class clean:
 							words[x] = z
 
 			message = " ".join(words)
+			if self.settings.debug == 1:
+				self.barf('DBG', 'Cleaned messages is of type: %s' % type(message))
 			return message
+
+	
+	# Some more machic to fix some common issues with the teach system
+	def teach_filter(self, message):
+		message = message.replace("||", "$C4")
+		message = message.replace("|-:", "$b7")
+		message = message.replace(":-|", "$b6")
+		message = message.replace(";-|", "$b5")
+		message = message.replace("|:", "$b4")
+		message = message.replace(";|", "$b3")
+		message = message.replace("=|", "$b2")
+		message = message.replace(":|", "$b1")
+		return message
+
+
+	def unfilter_reply(self, message):
+		"""
+		This undoes the phrase mangling the central code does
+		so the bot sounds more human :P
+		"""
+	
+		#barf.Barf('DBG', "Orig Message: %s" % message)
+
+		# Had to write my own initial capitalizing code *sigh*
+		message = "%s%s" % (message[:1].upper(), message[1:])
+		# Fixes punctuation
+		message = message.replace(" ?", "?")
+		message = message.replace(" !", "!")
+		message = message.replace(" .", ".")
+		message = message.replace(" ,", ",")
+		message = message.replace(" : ", ": ")
+		message = message.replace(" ; ", "; ")
+		# Fixes I and I contractions
+		message = message.replace(" i ", " I ")
+		message = message.replace(" i'", " I'")
+		# Fixes the common issues with the teach system
+		message = message.replace("$C4", "||")
+		message = message.replace("$b7", "|-:")
+		message = message.replace("$b6", ";-|")
+		message = message.replace("$b5", ":-|")
+		message = message.replace("$b4", "|:")
+		message = message.replace("$b3", ";|")
+		message = message.replace("$b2", "=|")
+		message = message.replace("$b1", ":|")
+	
+		# New emoticon filter that tries to catch almost all variations	
+		eyes, nose, mouth = r":;8BX=", r"-~'^O", r")(></\|CDPo39"
+		# Removed nose from the pattern for the sake of my sanity
+		pattern1 = "[\s][%s][%s][\s]" % tuple(map(re.escape, [eyes, mouth]))
+		pattern2 = "[\s][%s][%s][\s]" % tuple(map(re.escape, [mouth, eyes]))
+		eye, horzmouth = r"^><vou*@#sxz~-=+", r"-_o.wv"
+		pattern3 = "[\s][%s][%s][%s][\s]" % tuple(map(re.escape, [eye, horzmouth, eye]))
+
+		# Add whitespace for less false positives; it will be stripped out of the string later
+		if not message == "":
+			message = " " + message + " "
+		emoticon = re.search(pattern1, message, re.IGNORECASE)
+		pattern = pattern1
+		if emoticon == None:
+			emoticon = re.search(pattern2, message, re.IGNORECASE)
+			pattern = pattern2
+			if emoticon == None:
+				emoticon = re.search(pattern3, message, re.IGNORECASE)
+				pattern = pattern3
+	
+		# Init some strings so it does't barf later
+		extra = ""
+		emote = ""
+	
+		if not emoticon == None:
+			emoticon = "%s" % emoticon.group()
+			emotebeg = re.search(pattern, message, re.IGNORECASE).start()
+			emoteend = re.search(pattern, message, re.IGNORECASE).end()
+		
+			# Remove the whitespace we added earlier
+			message = message.strip()
+		
+			if not emotebeg == 0:
+				emotebeg = emotebeg - 1
+			if emotebeg == 0:
+				emoteend = emoteend - 2
+			emote = message[emotebeg:emoteend]
+			barf.Barf('DBG', "Emote found: %s" % emote)
+			new_message = message[:emotebeg]
+			extra = message[emoteend:]
+			message = new_message
+		
+			# Fixes the annoying XP capitalization in words...
+			message = message.replace("XP", "xp")
+			message = message.replace(" xp", " XP")
+			message = message.replace("XX", "xx")
+		
+		if not message == "":
+			# Remove whitespace if it wasn't removed earlier
+			message = message.strip()
+			if message.endswith(','):
+				message = message[:-1]
+			if not message.endswith(('.', '!', '?')):
+				message = message + "."
+			
+		if not extra == "":
+			extra = extra[1:]
+			extra = "%s%s" % (extra[:1].upper(), extra[1:])
+			if not extra.endswith(('.', '!', '?')):
+				extra = extra + "."
+			extra = extra + " "
+			
+		if not emote == "":
+			message = message + extra + emote
+
+		return message

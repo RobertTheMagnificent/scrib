@@ -17,36 +17,40 @@ import clean
 class brain:
 
 	def __init__(self):
+		"""
+		Here we'll load settings and set up us the brain.
+		"""
 		self.version = '0.2.1'
 		self.barf = barf.Barf
-		self.cfg = cfg
-		self.settings = self.cfg.set()
-		self.scribsettings = self.cfg.set()
 		self.clean = clean.clean()
-	
-		self.settings.load("conf/brain.cfg", {
-							'debug': 0,
-							'learning': 1,
-							"censored": [],
-							"num_aliases": 0,
-							"aliases": {},
-							"optimum": 1,
-							"ignore_list": [],
-							"version": self.version,
-							})
+		self.cfg = cfg
+		self.settings = cfg.set()
+		
+		# Load brain config (or create with these defaults).
+		self.settings.load('conf/brain.cfg', {
+			'debug': 0,
+			'symbol': '!',
+			'learning': 1,
+			'censored': [],
+			'reply_rate': 100,
+			'nick_reply_rate': 100,
+			'num_aliases': 0,
+			'aliases': {},
+			'optimum': 1,
+			'ignore_list': [],
+			'version': self.version
+			})
 
-		if self.brain_type(self.settings.version) < 4:
+		if self.brain_type(self.settings.version) <= 3:
 			self.barf('ROL', 'Brain files before 0.2.0 will fail on upgrade.')
 			self.barf('ROL', 'We are working on an external conversion script.')
 			self.barf('ROL', 'Continue without upgrading.')
 
-		self.scribsettings.load("conf/scrib.cfg", '')
-
 		self.stats = {
-							"num_contexts": 0,
-							"num_words": 0,
-							"max_words": 1000000
-							}			
+			"num_contexts": 0,
+			"num_words": 0,
+			"max_words": 1000000
+		}			
 		self.static_answers = self.cfg.set()
 		self.static_answers.load("brain/answers.dat", {
 							"sentences": {}
@@ -389,6 +393,7 @@ class brain:
 			if self.settings.debug == 1:
 				self.barf('DBG', "Restart timer started.")
 
+
 	def learn(self, body, num_context=1):
 		"""
 		Lines should be cleaned (clean.line()) before passing to this.
@@ -477,7 +482,7 @@ class brain:
 			self.stats['num_contexts'] = 0
 
 			for k in old_lines.keys():
-				filtered_line = self.clean.line(old_lines[k][0])
+				filtered_line = self.clean.line(old_lines[k][0], self.settings)
 				self.learn(filtered_line, old_lines[k][1])
 			msg = "Rebuilt brain in %0.2fs. Words %d (%+d), contexts %d (%+d)." % \
 				  (time.time() - t,
@@ -758,7 +763,7 @@ class brain:
 		'new'. Nice for fixing learnt typos.
 		"""
 		try:
-			pointers = self.brain.words[old]
+			pointers = self.words[old]
 		except KeyError, e:
 			return "%s is not known." % old
 		changed = 0
@@ -768,24 +773,24 @@ class brain:
 			l = pointers[0]
 			w = pointers[1]
 
-			line = self.brain.lines[l][0].split()
-			number = self.brain.lines[l][1]
+			line = self.lines[l][0].split()
+			number = self.lines[l][1]
 			if line[w] != old:
 				# fucked brain
-				self.barf('ERR', "Broken link: %s %s" % (x, self.brain.lines[l][0] ))
+				self.barf('ERR', "Broken link: %s %s" % (x, self.lines[l][0] ))
 				continue
 			else:
 				line[w] = new
-				self.brain.lines[l][0] = " ".join(line)
-				self.brain.lines[l][1] += number
+				self.lines[l][0] = " ".join(line)
+				self.lines[l][1] += number
 				changed += 1
 
-		if self.brain.words.has_key(new):
+		if self.words.has_key(new):
 			self.brain.stats['num_words'] -= 1
-			self.brain.words[new].extend(self.brain.words[old])
+			self.words[new].extend(self.words[old])
 		else:
-			self.brain.words[new] = self.brain.words[old]
-		del self.brain.words[old]
+			self.words[new] = self.words[old]
+		del self.words[old]
 		return "%d instances of %s replaced with %s" % ( changed, old, new )
 			
 	def to_sec(self, s):
@@ -799,7 +804,7 @@ class brain:
 	def shutdown(self, interface):
 		# Save the brain
 		self.kill_timers()
-		self.save_all(False)
+		self.save_all(interface, False)
 		self.barf('MSG', 'Goodbye!')
 		# Now we close everything.
 		os._exit(0)

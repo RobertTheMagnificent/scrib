@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import fileinput
+import os
 from random import randint
 import time
 
 import barf
 import brain
-import cfg
 import clean
 from plugins import PluginManager
 
@@ -14,13 +15,11 @@ class process:
 	This is where we process commands and messages.
 	"""
 	def __init__(self):
-		# This is where we do some ownership command voodoo.
-		self.cfg = cfg
+		self.brain = brain.brain()
 		self.barf = barf.Barf
 		self.clean = clean.clean()
-		self.brain = brain.brain()
-		self.settings = self.cfg.set()
-		self.settings.load("conf/scrib.cfg", '')
+		
+		# This is where we do some ownership command voodoo.
 		self.owner_commands = {
 			'alias': "alias [this] [that]",
 			'find': "find [word]",
@@ -42,7 +41,6 @@ class process:
 			'date': "Shows the date.",
 			'help': "Shows commands.",
 			'known': "known [word]",
-			'owner': "Shows owner.",
 			'version': "Displays bot version.",
 			'words': "Shows number of words and contexts."
 		}
@@ -50,22 +48,21 @@ class process:
 		self.plugin_commands = PluginManager.plugin_commands
 		self.commands = self.general_commands.keys() + self.owner_commands.keys() + self.plugin_commands.keys()
 		
-		
 	def msg(self, interface, body, replyrate, learn, args, owner=0, muted=0):
 		"""
 		Process message 'body' and pass back to IO module with args.
 		If muted == 1 only respond with taught responses.
 		"""
 		
-		if self.settings.debug == 1:
+		if self.brain.settings.debug == 1:
 			self.barf('DBG', "Processing message...")
 
 		# add trailing space so sentences are broken up correctly
 		body = body + " "
 
 		# Parse commands
-		if body[0] == self.settings.symbol:
-			if self.settings.debug == 1:
+		if body[0] == self.brain.settings.symbol:
+			if self.brain.settings.debug == 1:
 				user = 'user'
 				if owner == 1:
 					user = 'owner'
@@ -74,12 +71,10 @@ class process:
 			self.cmd(interface, body[1:], args, owner)
 			return
 
-
 		# Filter out garbage and do some formatting
-		if self.settings.debug == 1:
+		if self.brain.settings.debug == 1:
 			self.barf('DBG', "Filtering message...")
-		body = self.clean.line(body)
-
+		body = self.clean.line(body, self.brain.settings)
 
 		# if status 0 is set, ignore.
 		if body == 0:
@@ -87,31 +82,30 @@ class process:
 
 		# Learn from input
 		if self.brain.settings.learning == 1:
-			if self.settings.debug == 1:
+			if self.brain.settings.debug == 1:
 				self.barf('DBG', "Learning from: %s" % body)
 			self.brain.learn(body)
 
-
 		# Make a reply if desired
 		if randint(0, 99) < replyrate:
-			if self.settings.debug == 1:
+			if self.brain.settings.debug == 1:
 				self.barf('DBG', "Decided to answer...")
 			message = ""
 
 			if muted == 0:
 				#Look if we can find a prepared answer
 				if self.brain.dbread(body):
-					if self.settings.debug == 1:
+					if self.brain.settings.debug == 1:
 						self.barf('DBG', "Using prepared answer.")
 					message = self.clean.unfilter_reply(self.brain.dbread(body))
-					if self.settings.debug == 1:
+					if self.brain.settings.debug == 1:
 						self.barf('DBG', "Replying with: " + message)
 					return
 
 				for sentence in self.brain.static_answers.sentences.keys():
 					pattern = "^%s$" % sentence
 					if re.search(pattern, body):
-						if self.settings.debug == 1:
+						if self.brain.settings.debug == 1:
 							self.barf('DBG', "Searching for reply...")
 						message = self.brain.static_answers.sentences[sentence][
 							randint(0, len(self.brain.static_answers.sentences[sentence]) - 1)]
@@ -123,28 +117,28 @@ class process:
 							self.unfilterd[body] = 0
 
 				if message == "":
-					if self.settings.debug == 1:
+					if self.brain.settings.debug == 1:
 						self.barf('DBG', "No prepared answer; thinking...")
 					message = self.brain.reply(body)
-					if self.settings.debug == 1:
+					if self.brain.settings.debug == 1:
 						self.barf('DBG', "Reply formed; unfiltering...")
 					message = self.clean.unfilter_reply(message)
-					if self.settings.debug == 1:
+					if self.brain.settings.debug == 1:
 						self.barf('DBG', "Unfiltered message: " + message)
 			else:
 				return
 
 			# empty. do not output
 			if message == "":
-				if self.settings.debug == 1:
+				if self.brain.settings.debug == 1:
 					self.barf('DBG', "Message empty.")
 				replying = "Not replying."
 			else:
 				time.sleep(.075 * len(message))
-				if self.settings.debug == 1:
+				if self.brain.settings.debug == 1:
 					replying = "Reply sent."
 				interface.output(message, args)
-			if self.settings.debug == 1:
+			if self.brain.settings.debug == 1:
 				self.barf('DBG', replying)
 
 	def cmd(self, interface, body, args, owner):
@@ -255,7 +249,7 @@ class process:
 					msg = ''
 					if cmds[0] == 'check':
 						msg += 'Check has been removed. '
-					interface.output(self.settings.symbol+"Rebuilding...", args)
+					interface.output(self.brain.settings.symbol+"Rebuilding...", args)
 					
 					msg += self.brain.auto_rebuild()
 
@@ -271,10 +265,10 @@ class process:
 						self.settings.reply_rate = int(cmds[1])
 						msg = "Now replying to %d%% of messages." % int(cmds[1])
 					else:
-						msg = "Reply rate is %d%%." % self.settings.reply_rate
+						msg = "Reply rate is %d%%." % self.brain.settings.reply_rate
 
 				elif cmds[0] == "context":
-					if self.settings.debug == 1:
+					if self.brain.settings.debug == 1:
 						self.barf('DBG', "Checking contexts...")
 
 					# build context we are looking for
@@ -331,7 +325,7 @@ class process:
 
 				# Remove a word from the vocabulary [use with care]
 				elif cmds[0] == "unlearn":
-					if self.settings.debug == 1:
+					if self.brain.settings.debug == 1:
 						self.barf('DBG', "Unlearning...")
 					# build context we are looking for
 					context = " ".join(cmds[1:])
@@ -377,12 +371,12 @@ class process:
 								msg += "%s is already censored." % ( cmds[x])
 							else:
 								self.settings.censored.append(cmds[x])
-								self.unlearn(cmds[x])
+								self.brain.unlearn(cmds[x])
 								msg += "%s is now censored." % ( cmds[x])
 							msg += "\n"
 
 				elif cmds[0] == "uncensor":
-					if self.settings.debug == 1:
+					if self.brain.settings.debug == 1:
 						self.barf('DBG', "Uncensoring...")
 					# Remove words listed from the censor list
 					# eg !uncensor tom dick harry
@@ -404,7 +398,7 @@ class process:
 				elif cmds[0] == 'debug':
 					msg = "debug mode "
 					if len(cmds) == 1:
-						if self.settings.debug == 0:
+						if self.brain.settings.debug == 0:
 							msg = msg + 'off'
 						else:
 							msg = msg + 'on'
@@ -412,11 +406,11 @@ class process:
 						toggle = cmds[1]
 						if toggle == 'on':
 							msg = msg + 'on'
-							self.settings.debug = 1 # Set current session
+							self.brain.settings.debug = 1 # Set current session
 							self.settings._defaults['debug'] = 1 # Set default to save to file.
 						else:
 							msg = msg + 'off'
-							self.settings.debug = 0
+							self.brain.settings.debug = 0
 							self.settings._defaults['debug'] = 0
 
 				elif cmds[0] == "alias":
@@ -452,19 +446,20 @@ class process:
 			# Publicly accessible commands
 			if cmds[0] == 'help':
 				if owner == 0 or owner == 1:
-					msg = "General commands: "
+					msg = 'General commands: '
 					msg += ', '.join(str(cmd) for cmd in self.general_commands)
 				if owner == 1:
-					msg += " :: Owner commands: "
+					msg += ' :: Owner commands: '
 					msg += ', '.join(str(cmd) for cmd in self.owner_commands)
 				if self.plugin_commands:
-					msg += " :: Plugin commands: "
+					msg += ' :: Plugin commands: '
 					msg += ', '.join(str(cmd) for cmd in self.plugin_commands)
 
 			elif cmds[0] == "version":
-				msg = 'scrib: %s; brain: %s' % ( self.settings.version, self.brain.settings.version )
+				#msg = 'scrib: %s; brain: %s' % ( self.settings.version, self.brain.settings.version )
+				msg = 'Temporarily disabled.'
 
-			elif cmds[0] == "!date":
+			elif cmds[0] == "date":
 				msg = "It is ".join(i for i in os.popen('date').readlines())
 
 			elif cmds[0] == "words":
@@ -505,4 +500,4 @@ class process:
 			self.barf('MSG', 'Ignoring a secret.')
 
 		if msg != "":
-			interface.output(self.settings.symbol+msg, args)
+			interface.output(self.brain.settings.symbol+msg, args)

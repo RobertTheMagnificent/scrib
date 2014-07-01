@@ -2,103 +2,99 @@
 # -*- coding: utf-8 -*-
 import re
 
-import brain
-import cfg
+import barf
 
 class clean:
 
 	def __init__(self):
-		self.settings = cfg.set()
-		self.barf = brain.barf.Barf
-		self.settings.load('conf/brain.cfg', '', True)
+		self.barf = barf.Barf
 
-	def line(self, message):
-			"""
-			Sanitize incoming data for ease of learning.
-			"""
-			
-			if message == '':
-				return '';
-			if self.settings.debug == True:
-				self.barf('DBG', "Message is type: %s" % type(message))
-			# Firstly, make sure it isn't doesn't have a uri.
-			urls = ['://']
-			for url in urls:
-				if url in message:
-					brain.barf.Barf('ACT', 'URI-like thing detected. Ignoring.')
-					return 0
-			message = re.sub("([a-zA-Z0-9\-_]+?\.)*[a-zA-Z0-9\-_]+?\.[a-zA-Z]{2,5}(\/[a-zA-Z0-9]*)*", "", message)
+	def line(self, message, settings):
+		"""
+		Sanitize incoming data for ease of learning.
+		"""
+		if message == '':
+			return '';
+		if settings.debug == True:
+			self.barf('DBG', "Message is type: %s" % type(message))
+		# Firstly, make sure it isn't doesn't have a uri.
+		urls = ['://']
+		for url in urls:
+			if url in message:
+				self.barf('ACT', 'URI-like thing detected. Ignoring.')
+				return 0
+		message = re.sub("([a-zA-Z0-9\-_]+?\.)*[a-zA-Z0-9\-_]+?\.[a-zA-Z]{2,5}(\/[a-zA-Z0-9]*)*", "", message)
 
-			# remove garbage
-			message = message.replace("\"", "")
-			message = message.replace("\n", " ")
-			message = message.replace("\r", " ")
+		# remove garbage
+		message = message.replace("\"", "")
+		message = message.replace("\n", " ")
+		message = message.replace("\r", " ")
 
-			# remove matching brackets
-			index = 0
-			try:
-				while 1:
-					index = message.index("(", index)
-					# Remove matching ) bracket
-					i = message.index(")", index + 1)
-					message = message[0:i] + message[i + 1:]
-					# And remove the (
-					message = message[0:index] + message[index + 1:]
-			except ValueError, e:				
-				pass # will just say 'substring not found' on every line that hasn't the above.
+		# remove matching brackets
+		index = 0
+		try:
+			while 1:
+				index = message.index("(", index)
+				# Remove matching ) bracket
+				i = message.index(")", index + 1)
+				message = message[0:i] + message[i + 1:]
+				# And remove the (
+				message = message[0:index] + message[index + 1:]
+		except ValueError, e:				
+			pass # will just say 'substring not found' on every line that hasn't the above.
 
-			# Strips out mIRC Control codes
-			ccstrip = re.compile("\x1f|\x02|\x12|\x0f|\x16|\x03(?:\d{1,2}(?:,\d{1,2})?)?", re.UNICODE)
-			message = ccstrip.sub("", message)
+		# Strips out mIRC Control codes
+		ccstrip = re.compile("\x1f|\x02|\x12|\x0f|\x16|\x03(?:\d{1,2}(?:,\d{1,2})?)?", re.UNICODE)
+		message = ccstrip.sub("", message)
 
-			# Few of my fixes...
-			message = message.replace(": ", " : ")
-			message = message.replace("; ", " ; ")
-			# ^--- because some : and ; might be smileys...
-			message = message.replace("`", "'")
+		# Few of my fixes...
+		message = message.replace(": ", " : ")
+		message = message.replace("; ", " ; ")
+		# ^--- because some : and ; might be smileys...
+		message = message.replace("`", "'")
 
-			message = message.replace("?", " ? ")
-			message = message.replace("!", " ! ")
-			message = message.replace(".", " . ")
-			message = message.replace(",", " , ")
+		message = message.replace("?", " ? ")
+		message = message.replace("!", " ! ")
+		message = message.replace(".", " . ")
+		message = message.replace(",", " , ")
 
-			# Fixes broken emoticons...
-			message = message.replace("^ . ^", "^.^")
-			message = message.replace("- . -", "-.-")
-			message = message.replace("O . o", "O.o")
-			message = message.replace("o . O", "o.O")
-			message = message.replace("o . o", "o.o")
-			message = message.replace("O . O", "O.O")
-			message = message.replace("< . <", "<.<")
-			message = message.replace("> . >", ">.>")
-			message = message.replace("> . <", ">.<")
-			message = message.replace(": ?", ":?")
-			message = message.replace(":- ?", ":-?")
-			message = message.replace(", , l , ,", ",,l,,")
-			message = message.replace("@ . @", "@.@")
-			message = message.replace("D :", "D:")
-			message = message.replace("c :", "c:")
-			message = message.replace("C :", "C:")
+		# Fixes broken emoticons...
+		message = message.replace("^ . ^", "^.^")
+		message = message.replace("- . -", "-.-")
+		message = message.replace("O . o", "O.o")
+		message = message.replace("o . O", "o.O")
+		message = message.replace("o . o", "o.o")
+		message = message.replace("O . O", "O.O")
+		message = message.replace("< . <", "<.<")
+		message = message.replace("> . >", ">.>")
+		message = message.replace("> . <", ">.<")
+		message = message.replace(": ?", ":?")
+		message = message.replace(":- ?", ":-?")
+		message = message.replace(", , l , ,", ",,l,,")
+		message = message.replace("@ . @", "@.@")
+		message = message.replace("D :", "D:")
+		message = message.replace("c :", "c:")
+		message = message.replace("C :", "C:")
 
-			words = message.split()
-			for x in xrange(0, len(words)):
-				#is there aliases ?
-				for z in self.settings.aliases.keys():
-					if self.settings.debug == 1:
-						self.barf('DBG', 'Is %s in keys?' % z)
-					for alias in self.settings.aliases[z]:
-						pattern = "^%s$" % alias
-						if re.search(pattern, words[x]):
-							if self.settings.debug == 1:
-								self.barf('DBG', 'Checking if %s is in %s' % ( z, words[x] ))
-							words[x] = z
+		words = message.split()
+		for x in xrange(0, len(words)):
+			#is there aliases ?
+			for z in settings.aliases.keys():
+				if settings.debug == 1:
+					self.barf('DBG', 'Is %s in keys?' % z)
+				for alias in settings.aliases[z]:
+					pattern = "^%s$" % alias
+					if re.search(pattern, words[x]):
+						if settings.debug == 1:
+							self.barf('DBG', 'Checking if %s is in %s' % ( z, words[x] ))
+						words[x] = z
 
-			message = " ".join(words)
-			if self.settings.debug == 1:
-				self.barf('DBG', 'Cleaned messages is of type: %s' % type(message))
-			return message
+		message = " ".join(words)
+		if settings.debug == 1:
+			self.barf('DBG', 'Cleaned messages is of type: %s' % type(message))
+		return message
 
-	
+
 	# Some more machic to fix some common issues with the teach system
 	def teach_filter(self, message):
 		message = message.replace("||", "$C4")
@@ -117,7 +113,7 @@ class clean:
 		This undoes the phrase mangling the central code does
 		so the bot sounds more human :P
 		"""
-	
+
 		#barf.Barf('DBG', "Orig Message: %s" % message)
 
 		# Had to write my own initial capitalizing code *sigh*
@@ -141,7 +137,7 @@ class clean:
 		message = message.replace("$b3", ";|")
 		message = message.replace("$b2", "=|")
 		message = message.replace("$b1", ":|")
-	
+
 		# New emoticon filter that tries to catch almost all variations	
 		eyes, nose, mouth = r":;8BX=", r"-~'^O", r")(></\|CDPo39"
 		# Removed nose from the pattern for the sake of my sanity
@@ -161,11 +157,11 @@ class clean:
 			if emoticon == None:
 				emoticon = re.search(pattern3, message, re.IGNORECASE)
 				pattern = pattern3
-	
+
 		# Init some strings so it does't barf later
 		extra = ""
 		emote = ""
-	
+
 		if not emoticon == None:
 			emoticon = "%s" % emoticon.group()
 			emotebeg = re.search(pattern, message, re.IGNORECASE).start()

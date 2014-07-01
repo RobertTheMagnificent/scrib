@@ -41,6 +41,11 @@ class scrib:
 	It sucks. :( This is where we'll do more sane importing too, so we aren't
 	importing the same files over and over again. 
 	
+	For example, you will know (as of this note) that the brain loads twice
+	and some of the config files load 3-4 times each. This is very bad and
+	has led to some undesirable results. For testing purposes, however,
+	it isn't breaking anything (famous last words amirite).
+	
 	You'll probably hate me for it but I am doing it to slim down the memory
 	footprint and keep things far more consistent. - cptmashek, 20140701
 	"""

@@ -6,6 +6,7 @@ import hashlib
 import os
 import re
 import shutil
+import string
 import threading
 import time
 import zipfile

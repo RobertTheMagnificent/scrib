@@ -34,3 +34,13 @@ class scrib:
 							"muted": 0,
 							"version": self.version
 							})
+
+	"""
+	So, the plan here is to do checks (configuration, plugin, brain sanity)
+	here, since we do virtually NONE of that. We just blindly run and crash.
+	It sucks. :( This is where we'll do more sane importing too, so we aren't
+	importing the same files over and over again. 
+	
+	You'll probably hate me for it but I am doing it to slim down the memory
+	footprint and keep things far more consistent. - cptmashek, 20140701
+	"""

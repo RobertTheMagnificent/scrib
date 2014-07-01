@@ -189,7 +189,7 @@ class ScribIRC(SingleServerIRCBot):
 
 		# Ignore quoted messages
 		if body[0] == "<" or body[0:1] == "\"" or body[0:1] == " <" or body[0] == "[":
-			if self.scrib.debug == 1:
+			if self.scrib.settings.debug == 1:
 				self.scrib.barf('DBG', "Ignoring quoted text.")
 			return
 
@@ -200,7 +200,7 @@ class ScribIRC(SingleServerIRCBot):
 
 		if self.nick_check(body) == 1:
 			replyrate = nickreplyrate
-			if self.scrib.debug == 1:
+			if self.scrib.settings.debug == 1:
 				self.scrib.barf('DBG', "Responding to Highlight")
 
 		# Always reply to private messages
@@ -247,7 +247,7 @@ class ScribIRC(SingleServerIRCBot):
 		### Owner commands (Which is all of them for now)
 		if source in self.owners and e.source() in self.owner_mask:
 			# Only accept commands that are in the Command List
-			if self.scrib.debug == 1:
+			if self.scrib.settings.debug == 1:
 				self.scrib.barf('DBG', "Command: %s" % cmds[0])
 				self.scrib.barf('DBG', "Command list: %s" % str(cmds))
 			if cmds[0][1:] in self.commands:

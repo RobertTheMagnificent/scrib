@@ -38,7 +38,7 @@ class scrib:
 		
 		self.process = process.process()
 		
-		self.barf('ACT', 'scrib initialized')
+		self.barf('MSG', 'Scrib %s initialized' % self.version)
 
 	def getsymbol(self):
 		return self.process.brain.settings.symbol

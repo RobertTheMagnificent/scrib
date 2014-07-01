@@ -4,6 +4,17 @@ import barf
 import cfg
 import process
 
+"""
+	So, the plan here is to do checks (configuration, plugin, brain sanity)
+	since we do virtually NONE of that. We just blindly run and crash.
+	It sucks. :( This is where we'll do more sane importing too, so we aren't
+	importing the same files over and over again. 
+	
+	This is where we will also expose internals for plugins to use.
+	
+	- cptmashek, 20140701
+"""
+
 class scrib:
 	"""
 	The meat of scrib
@@ -29,17 +40,5 @@ class scrib:
 		
 		self.barf('ACT', 'scrib initialized')
 
-	"""
-	So, the plan here is to do checks (configuration, plugin, brain sanity)
-	here, since we do virtually NONE of that. We just blindly run and crash.
-	It sucks. :( This is where we'll do more sane importing too, so we aren't
-	importing the same files over and over again. 
-	
-	For example, you will know (as of this note) that the brain loads twice
-	and some of the config files load 3-4 times each. This is very bad and
-	has led to some undesirable results. For testing purposes, however,
-	it isn't breaking anything (famous last words amirite).
-	
-	You'll probably hate me for it but I am doing it to slim down the memory
-	footprint and keep things far more consistent. - cptmashek, 20140701
-	"""
+	def getsymbol(self):
+		return self.process.brain.settings.symbol

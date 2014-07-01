@@ -33,8 +33,6 @@ class brain:
 			'symbol': '!',
 			'learning': 1,
 			'censored': [],
-			'reply_rate': 100,
-			'nick_reply_rate': 100,
 			'num_aliases': 0,
 			'aliases': {},
 			'optimum': 1,

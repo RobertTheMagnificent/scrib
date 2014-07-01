@@ -45,12 +45,16 @@ class ScribIRC(SingleServerIRCBot):
 								"servers": [("irc.freenode.net", 6667)],
 								"channels": ["#scoundrels"],
 								"owners": ["OwnerOne"],
+								'reply_rate': 100,
+								'nick_reply_rate': 100,
 								"owner_passwords": ["Ducks"],
 								"quit_message": "Goodbye.",
 						   })
 		self.scrib.settings.name = my_scrib.settings.name
 		self.owners = self.settings.owners[:]
 		self.chans = self.settings.channels[:]
+		
+		self.symbol = self.scrib.getsymbol()
 
 		# Parse command prompt parameters
 
@@ -191,8 +195,8 @@ class ScribIRC(SingleServerIRCBot):
 
 		# We want replies reply_rate%, if speaking is on
 		muted = self.scrib.settings.muted
-		replyrate = self.scrib.settings.reply_rate
-		nickreplyrate = self.scrib.settings.nick_reply_rate
+		replyrate = self.settings.reply_rate
+		nickreplyrate = self.settings.nick_reply_rate
 
 		if self.nick_check(body) == 1:
 			replyrate = nickreplyrate
@@ -205,7 +209,7 @@ class ScribIRC(SingleServerIRCBot):
 			muted = 0
 
 			try:
-				if body[0] == self.scrib.settings.symbol:
+				if body[0] == self.symbol:
 					if self.irc_commands(body, source, target, c, e) == 1: return
 					return
 			except: pass
@@ -213,7 +217,7 @@ class ScribIRC(SingleServerIRCBot):
 		#replace nicknames, including own, with "#nick"
 		if e.eventtype() == "pubmsg":
 			try:
-				if body[0] == self.scrib.settings.symbol:
+				if body[0] == self.symbol:
 					if self.irc_commands(body, source, target, c, e) == 1: return
 			except: pass
 

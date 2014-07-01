@@ -1,6 +1,5 @@
+#! /usr/bin/env python
 # -*- coding: utf-8 -*-
-#
-# scrib config file manager
 import json
 import string
 import time

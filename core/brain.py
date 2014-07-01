@@ -17,6 +17,7 @@ import clean
 class brain:
 
 	def __init__(self):
+		self.version = '0.2.1'
 		self.barf = barf.Barf
 		self.cfg = cfg
 		self.settings = self.cfg.set()
@@ -31,7 +32,7 @@ class brain:
 							"aliases": {},
 							"optimum": 1,
 							"ignore_list": [],
-							"version": '0.2.1',
+							"version": self.version,
 							})
 
 		if self.brain_type(self.settings.version) < 4:
@@ -175,7 +176,7 @@ class brain:
 			self.barf('ERR', "No brain found.")
 		try:
 			f = open("brain/version", "rb")
-			v = f.read().strip()
+			v = f.read()
 			self.barf('MSG', "Current brain version is %s " % v)
 			f.close()
 			if v != self.settings.version:
@@ -278,7 +279,7 @@ class brain:
 							pattern = "^%s$" % alias
 							if re.search(pattern, x):
 								self.barf('ACT', "Replacing %s with %s" % (x, z))
-								#self.replace(x, z)
+								self.replace(x, z)
 
 			for x in self.words.keys():
 				if not (x in self.settings.aliases.keys()) and x[0] == '~':
@@ -750,7 +751,43 @@ class brain:
 			return
 		else:
 			self.learn(self, body, num_context=1)
-				
+
+	def replace(self, old, new):
+		"""
+		Replace all occurrences of 'old' in the brain with
+		'new'. Nice for fixing learnt typos.
+		"""
+		try:
+			pointers = self.brain.words[old]
+		except KeyError, e:
+			return "%s is not known." % old
+		changed = 0
+		num_pointers = len(pointers)
+		print pointers
+		for x in pointers:
+			l = pointers[0]
+			w = pointers[1]
+
+			line = self.brain.lines[l][0].split()
+			number = self.brain.lines[l][1]
+			if line[w] != old:
+				# fucked brain
+				self.barf('ERR', "Broken link: %s %s" % (x, self.brain.lines[l][0] ))
+				continue
+			else:
+				line[w] = new
+				self.brain.lines[l][0] = " ".join(line)
+				self.brain.lines[l][1] += number
+				changed += 1
+
+		if self.brain.words.has_key(new):
+			self.brain.stats['num_words'] -= 1
+			self.brain.words[new].extend(self.brain.words[old])
+		else:
+			self.brain.words[new] = self.brain.words[old]
+		del self.brain.words[old]
+		return "%d instances of %s replaced with %s" % ( changed, old, new )
+			
 	def to_sec(self, s):
 		seconds_per_unit = {"s": 1, "m": 60, "h": 3600, "d": 86400, "w": 604800}
 		return int(s[:-1]) * seconds_per_unit[s[-1]]

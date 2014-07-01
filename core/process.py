@@ -14,7 +14,13 @@ class process:
 	This is where we process commands and messages.
 	"""
 	def __init__(self):
-			# This is where we do some ownership command voodoo.
+		# This is where we do some ownership command voodoo.
+		self.cfg = cfg
+		self.barf = barf.Barf
+		self.clean = clean.clean()
+		self.brain = brain.brain()
+		self.settings = self.cfg.set()
+		self.settings.load("conf/scrib.cfg", '')
 		self.owner_commands = {
 			'alias': "alias [this] [that]",
 			'find': "find [word]",
@@ -50,12 +56,6 @@ class process:
 		Process message 'body' and pass back to IO module with args.
 		If muted == 1 only respond with taught responses.
 		"""
-		self.cfg = cfg
-		self.barf = barf.Barf
-		self.clean = clean.clean()
-		self.brain = brain.brain()
-		self.settings = self.cfg.set()
-		self.settings.load("conf/scrib.cfg", '')
 		
 		if self.settings.debug == 1:
 			self.barf('DBG', "Processing message...")
@@ -264,7 +264,7 @@ class process:
 						return
 					old = cmds[1]
 					new = cmds[2]
-					msg = self.replace(old, new)
+					msg = self.brain.replace(old, new)
 
 				elif cmds[0] == "replyrate":
 					if len(cmds) == 2:
@@ -440,13 +440,13 @@ class process:
 						if cmds[1][0] != '~': cmds[1] = '~' + cmds[1]
 						if not (cmds[1] in self.brain.settings.aliases.keys()):
 							self.brain.settings.aliases[cmds[1]] = [cmds[1][1:]]
-							self.replace(cmds[1][1:], cmds[1])
+							self.brain.replace(cmds[1][1:], cmds[1])
 							msg += cmds[1][1:] + " "
 						for x in xrange(2, len(cmds)):
 							msg += "%s " % cmds[x]
 							self.brain.settings.aliases[cmds[1]].append(cmds[x])
 							#replace each words by his alias
-							self.replace(cmds[x], cmds[1])
+							self.brain.replace(cmds[x], cmds[1])
 						msg += "have been aliased to %s." % cmds[1]
 
 			# Publicly accessible commands
@@ -462,7 +462,7 @@ class process:
 					msg += ', '.join(str(cmd) for cmd in self.plugin_commands)
 
 			elif cmds[0] == "version":
-				msg = 'scrib: %s; brain: %s' % ( self.version, self.brain.settings.version )
+				msg = 'scrib: %s; brain: %s' % ( self.settings.version, self.brain.settings.version )
 
 			elif cmds[0] == "!date":
 				msg = "It is ".join(i for i in os.popen('date').readlines())

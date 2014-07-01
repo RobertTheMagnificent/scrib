@@ -40,5 +40,9 @@ class scrib:
 		
 		self.barf('MSG', 'Scrib %s initialized' % self.version)
 
+	
+	def shutdown(self, interface):
+		return self.process.brain.shutdown(interface)
+
 	def getsymbol(self):
 		return self.process.brain.settings.symbol

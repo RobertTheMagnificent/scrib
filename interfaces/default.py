@@ -73,4 +73,4 @@ if __name__ == "__main__":
 		barf.Barf('ERR', "Oh no, I've crashed! Would you like to save my brain?", False)
 		c = raw_input("[Y/n]")
 		if c[:1] != "n":
-			my_scrib.process.brain.shutdown(my_scrib)
+			my_scrib.shutdown(my_scrib)

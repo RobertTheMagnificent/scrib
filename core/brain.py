@@ -189,7 +189,7 @@ class brain:
 				c = raw_input("[Y/n]")
 				if c[:1].lower() != 'n':
 					timestamp = "%s-%s" % (datetime.date.today(), time.strftime("%H%M%S",time.localtime(time.time())))
-					shutil.copyfile("brain/cortex.zip", "backups/%s-cortex-%s.zip" % ( self.scribsettings.name, timestamp ))
+					shutil.copyfile("brain/cortex.zip", "backups/%s-cortex-%s.zip" % ( 'backup', timestamp ))
 					self.barf('ACT', "Backup saved to backups/cortex-%s.zip" % timestamp)
 					self.barf('ACT', "Starting update, may take a few moments.")
 					f = open("brain/words.dat", "rb")

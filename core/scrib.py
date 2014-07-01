@@ -19,7 +19,7 @@ class scrib:
 		"""
 		Here we'll load settings and set up modules.
 		"""
-		self.version = "1.1.1"
+		self.version = "1.2.0"
 		self.barf = barf.Barf # So that we don't have to include it elsewhere.
 		self.brain = brain.brain()
 		self.process = process.process()

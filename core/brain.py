@@ -31,7 +31,7 @@ class brain:
 							"aliases": {},
 							"optimum": 1,
 							"ignore_list": [],
-							"version": '0.2.0',
+							"version": '0.2.1',
 							})
 
 		if self.brain_type(self.settings.version) < 4:
@@ -111,7 +111,7 @@ class brain:
 		marshal = ['0.0.1', '0.1.0', '0.1.1']
 		pickle = ['0.1.2', '0.1.3', '0.1.4']
 		json = ['0.1.5', '0.1.6', '0.1.7', '0.1.8']
-		verfour = ['0.1.9', '0.2.0']
+		verfour = ['0.1.9', '0.2.0', '0.2.1']
 		
 		if version in marshal:
 			btype = 1

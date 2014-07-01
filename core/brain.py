@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from random import randint
 import datetime
 import hashlib
 import os
@@ -29,6 +30,7 @@ class brain:
 							"num_aliases": 0,
 							"aliases": {},
 							"optimum": 1,
+							"ignore_list": [],
 							"version": '0.2.0',
 							})
 
@@ -65,6 +67,46 @@ class brain:
 
 		self._load()
 
+	# Makes !learn and !teach usable
+	def dbread(self, key):
+		value = None
+		if os.path.isfile("brain/prepared.dat"):
+			file = open("brain/prepared.dat")
+			for line in file.readlines():
+				reps = int(len(line.split(":=:")) - 1)
+				data = line.split(":=:")[0]
+				dlen = r'\b.{2,}\b'
+				if re.search(dlen, key, re.IGNORECASE):
+					if key in data or data in key:
+						if reps > 1:
+							repnum = randint(1, int(reps))
+							value = line.split(":=:")[repnum].strip()
+						else:
+							value = line.split(":=:")[1].strip()
+						break
+				else:
+					value = None
+					break
+
+			file.close()
+		return value
+
+	def dbwrite(self, key, value):
+		if self.dbread(key) is None:
+			file = open("brain/prepared.dat", "a")
+			file.write(str(key) + ":=:" + str(value) + "\n")
+			file.close()
+
+		else:
+			for line in fileinput.input("brain/prepared.dat", inplace=1):
+				data = line.split(":=:")[0]
+				dlen = r'\b.{2,}\b'
+				if re.search(dlen, key, re.IGNORECASE):
+					if key.lower() in data.lower() or data.lower() in key.lower():
+						print str(line.strip()) + ":=:" + str(value)
+				else:
+					print line.strip()
+		
 	def brain_type(self, version):
 		marshal = ['0.0.1', '0.1.0', '0.1.1']
 		pickle = ['0.1.2', '0.1.3', '0.1.4']
@@ -94,8 +136,12 @@ class brain:
 			stuff = pickle.loads(file)
 		elif self.brain_type(version) == 3 or self.brain_type(version) == 4:
 			import json
-			stuff = json.loads(file)
-		return stuff
+			s = json.loads(file)
+			if upgrade == True:
+				for v in s:
+					s[v][0] = filter(lambda x: x in string.printable, s[v][0])
+				return s
+			return s
 
 	def pack(self, file, version, upgrade=False):
 		if self.brain_type(version) == 1:
@@ -107,7 +153,7 @@ class brain:
 		elif self.brain_type(version) == 3 or self.brain_type(version) == 4:
 			import json
 			if upgrade == True:
-				stuff = json.dumps(file, sort_keys=True, indent=4, separators=(',', ': ')).decode('latin1').encode('utf8', 'replace')
+				stuff = json.dumps(file, sort_keys=True, indent=4, separators=(',', ': '), encoding='latin-1')
 				return stuff
 			stuff = json.dumps(file, sort_keys=True, indent=4, separators=(',', ': '))
 		return stuff
@@ -151,7 +197,7 @@ class brain:
 					if self.settings.debug == 1:
 						self.barf('DBG', "Saving words...")
 					f = open("brain/words.dat", "wb")
-					s = self.pack(self.words, self.settings.version, True)
+					s = self.pack(self.words, self.settings.version)
 					f.write(s)
 					f.close()
 					del s
@@ -461,19 +507,19 @@ class brain:
 		dellist = []
 		# words that will have broken context due to this
 		wordlist = []
-		for x in self.brain.lines.keys():
+		for x in self.lines.keys():
 			# get context. pad
-			c = " " + self.brain.lines[x][0] + " "
+			c = " " + self.lines[x][0] + " "
 			if c.find(context) != -1:
 				# Split line up
-				#wlist = self.brain.lines[x][0].split()
+				#wlist = self.lines[x][0].split()
 				## add touched words to list
 				#for w in wlist:
 				#	if not w in wordlist:
 				#		wordlist.append(w)
 				dellist.append(x)
-				del self.brain.lines[x]
-		words = self.brain.words
+				del self.lines[x]
+		words = self.words
 		# update links
 		for x in wordlist:
 			word_contexts = words[x]
@@ -482,12 +528,229 @@ class brain:
 				# Check for any of the deleted contexts
 				if y[0] in dellist:
 					del word_contexts[y]
-					self.brain.stats['num_contexts'] = self.brain.stats['num_contexts'] - 1
+					self.stats['num_contexts'] = self.stats['num_contexts'] - 1
 			if len(words[x]) == 0:
 				del words[x]
-				self.brain.stats['num_words'] = self.brain.stats['num_words'] - 1
+				self.stats['num_words'] = self.stats['num_words'] - 1
 				self.barf('ACT', "\"%s\" vaporized from brain." % x)
 
+	def reply(self, body):
+		"""
+		Reply to a line of text.
+		"""
+		if self.settings.debug == 1:
+			self.barf('DBG', "Forming a reply...")
+
+		# split sentences into list of words
+		_words = body.split(" ")
+		words = []
+		for i in _words:
+			words += i.split()
+		del _words
+
+		if len(words) == 0:
+			return ""
+
+		#remove words on the ignore list
+		words = [x for x in words if x not in self.settings.ignore_list and not x.isdigit()]
+
+		# Find rarest word (excluding those unknown)
+		index = []
+		known = -1
+
+		# If the word is in at least these many contexts, it can be chosen.
+		known_min = 1 # was three
+		for x in xrange(0, len(words)):
+			if self.words.has_key(words[x]):
+				k = len(self.words[words[x]])
+				if self.settings.debug == 1:
+					self.barf('DBG', 'k: %s,' % (words[x]))
+			else:
+				continue
+			if (known == -1 or k < known) and k > known_min:
+				index = [words[x]]
+				known = k
+				continue
+			elif k == known:
+				index.append(words[x])
+				continue
+		# Index now contains list of rarest known words in sentence
+		if len(index) == 0:
+			return ""
+		word = index[randint(0, len(index) - 1)]
+		if self.settings.debug == 1:
+			self.barf('DBG', "Chosen root word: %s" % word)
+
+		# Build sentence backwards from "chosen" word
+		sentence = [word]
+		done = 0
+		while done == 0:
+			#create a brain which will contain all the words we can find before the "chosen" word
+			pre_words = {"": 0}
+			#this is to prevent a case where we have an ignore_listd word
+			word = str(sentence[0].split(" ")[0])
+			for x in xrange(0, len(self.words[word]) - 1):
+				l = self.words[word][0]
+				w = self.words[word][1]
+				try:
+					context = self.lines[l][0]
+				except KeyError, e:
+					self.barf('ERR', e)
+				num_context = self.lines[l][1]
+				cwords = context.split()
+				#if the word is not the first of the context, look to the previous one
+				if w:
+					#look if we can find a pair with the choosen word, and the previous one
+					if len(sentence) > 1 and len(cwords) > w + 1:
+						if sentence[1] != cwords[w + 1]:
+							continue
+					#if the word is in ignore_list, look to the previous word
+					look_for = cwords[w - 1]
+					if look_for in self.settings.ignore_list and w > 1:
+						look_for = cwords[w - 2] + " " + look_for
+					#saves how many times we can find each word
+					if not (pre_words.has_key(look_for)):
+						pre_words[look_for] = num_context
+					else:
+						pre_words[look_for] += num_context
+				else:
+					pre_words[""] += num_context
+
+				if self.settings.debug == 1:
+					self.barf('DBG', 'Context: %s' % context)
+					self.barf('DBG', 'l: %s, w: %s' % (l, w))
+					self.barf('DBG', 'cwords[w]: %s, word: %s' % ( cwords[w], word ))
+			#Sort the words
+			list = pre_words.items()
+			list.sort(lambda x, y: cmp(y[1], x[1]))
+
+			numbers = [list[0][1]]
+			for x in xrange(1, len(list)):
+				numbers.append(list[x][1] + numbers[x - 1])
+
+			#take one of them from the list (randomly)
+			mot = randint(0, numbers[len(numbers) - 1])
+			for x in xrange(0, len(numbers)):
+				if mot <= numbers[x]:
+					mot = list[x][0]
+					break
+
+			#if the word is already chosen, pick the next one
+			while mot in sentence:
+				x += 1
+				if x >= len(list) - 1:
+					mot = ''
+				mot = list[x][0]
+
+			mot = mot.split(" ")
+			mot.reverse()
+			if mot == ['']:
+				done = 1
+			else:
+				map((lambda x: sentence.insert(0, x) ), mot)
+
+		pre_words = sentence
+		sentence = sentence[-2:]
+
+		# Now build sentence forwards from "chosen" word
+
+		#We've got
+		#cwords:	...	cwords[w-1]	cwords[w]	cwords[w+1]	cwords[w+2]
+		#sentence:	...	sentence[-2]	sentence[-1]	look_for	look_for ?
+
+		#we are looking, for a cwords[w] known, and maybe a cwords[w-1] known, what will be the cwords[w+1] to choose.
+		#cwords[w+2] is need when cwords[w+1] is in ignored list
+
+
+		done = 0
+		while done == 0:
+			#create a brain which will contain all the words we can find before the "chosen" word
+			post_words = {"": 0}
+			word = str(sentence[-1].split(" ")[-1])
+			for x in xrange(0, len(self.words[word])):
+				l = self.words[word][x][0]
+				w = self.words[word][x][1]
+				try:
+					context = self.lines[l][0]
+				except KeyError:
+					break
+				num_context = self.lines[l][1]
+				cwords = context.split()
+				#look if we can find a pair with the chosen word, and the next one
+				if len(sentence) > 1:
+					if sentence[len(sentence) - 2] != cwords[w - 1]:
+						continue
+
+				if w < len(cwords) - 1:
+					#if the word is in ignore_list, look to the next word
+					look_for = cwords[w + 1]
+					if look_for in self.settings.ignore_list and w < len(cwords) - 2:
+						look_for = look_for + " " + cwords[w + 2]
+
+					if not (post_words.has_key(look_for)):
+						post_words[look_for] = num_context
+					else:
+						post_words[look_for] += num_context
+				else:
+					post_words[""] += num_context
+			#Sort the words
+			list = post_words.items()
+			list.sort(lambda x, y: cmp(y[1], x[1]))
+			numbers = [list[0][1]]
+
+			for x in xrange(1, len(list)):
+				numbers.append(list[x][1] + numbers[x - 1])
+
+			#take one of them from the list (randomly)
+			mot = randint(0, numbers[len(numbers) - 1])
+			for x in xrange(0, len(numbers)):
+				if mot <= numbers[x]:
+					mot = list[x][0]
+					break
+
+			x = -1
+			while mot in sentence:
+				x += 1
+				if x >= len(list) - 1:
+					mot = ''
+					break
+				mot = list[x][0]
+
+			mot = mot.split(" ")
+			if mot == ['']:
+				done = 1
+			else:
+				map((lambda x: sentence.append(x) ), mot)
+
+		sentence = pre_words[:-2] + sentence
+
+		#Replace aliases
+		for x in xrange(0, len(sentence)):
+			if sentence[x][0] == "~": sentence[x] = sentence[x][1:]
+
+		#Insert space between each words
+		map((lambda x: sentence.insert(1 + x * 2, " ") ), xrange(0, len(sentence) - 1))
+
+		#correct the ' & , spaces problem
+		#the code is not very good and can be improved but it does the job...
+		for x in xrange(0, len(sentence)):
+			if sentence[x] == "'":
+				sentence[x - 1] = ""
+				sentence[x + 1] = ""
+			if sentence[x] == ",":
+				sentence[x - 1] = ""
+
+		#return as string..
+		return "".join(sentence)
+
+		# Ignore if the sentence starts with the self.settings.symbol
+		if body[0:1] == self.settings.symbol:
+			if self.settings.debug == 1:
+				self.barf('ERR', "Not learning: %s" % words)
+			return
+		else:
+			self.learn(self, body, num_context=1)
+				
 	def to_sec(self, s):
 		seconds_per_unit = {"s": 1, "m": 60, "h": 3600, "d": 86400, "w": 604800}
 		return int(s[:-1]) * seconds_per_unit[s[-1]]
@@ -495,3 +758,11 @@ class brain:
 	def kill_timers(self):
 		self.autosave.cancel()
 		self.autorebuild.cancel()
+
+	def shutdown(self, interface):
+		# Save the brain
+		self.kill_timers()
+		self.save_all(False)
+		self.barf('MSG', 'Goodbye!')
+		# Now we close everything.
+		os._exit(0)

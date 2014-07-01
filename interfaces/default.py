@@ -42,7 +42,7 @@ class ModLineIn:
 										continue
 
 						# Pass message to scrib
-						self.scrib.process(self, body, 100, 1, ( name ), owner = 1)
+						self.scrib.process.msg(self, body, 100, 1, ( name ), owner = 1)
 
 		def linein_commands(self, body):
 				command_list = string.split(body)
@@ -72,5 +72,5 @@ if __name__ == "__main__":
 		my_scrib.barf('ERR', "Oh no, I've crashed! Would you like to save my brain?", False)
 		c = raw_input("[Y/n]")
 		if c[:1] != "n":
-			my_scrib.shutdown(my_scrib)
+			my_scrib.brain.shutdown(my_scrib)
 

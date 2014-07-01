@@ -227,10 +227,10 @@ class ScribIRC(SingleServerIRCBot):
 
 		# Pass on to scrib
 		if source in self.owners and e.source() in self.owner_mask:
-			self.scrib.process(self, body, replyrate, learn, (body, source, target, c, e), 1, muted)
+			self.scrib.process.msg(self, body, replyrate, learn, (body, source, target, c, e), 1, muted)
 		else:
 			#start a new thread
-			thread.start_new_thread(self.scrib.process,
+			thread.start_new_thread(self.scrib.process.msg,
 									(self, body, replyrate, learn, (body, source, target, c, e), 0, muted))
 
 	def irc_commands(self, body, source, target, c, e):
@@ -331,5 +331,5 @@ if __name__ == "__main__":
 		my_scrib.barf('ERR', "Oh no, I've crashed! Would you like to save my brain?", False)
 		c = raw_input("[Y/n]")
 		if c[:1] != 'n':
-			my_scrib.shutdown(my_scrib)
+			my_scrib.brain.shutdown(my_scrib)
 		sys.exit(0)

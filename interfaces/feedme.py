@@ -1,7 +1,5 @@
 #!/usr/bin/env python
-#
-# I eat ASCII
-
+# -*- coding: utf-8 -*-
 import sys
 import os
 
@@ -49,5 +47,5 @@ class ModFileIn:
 if __name__ == "__main__":
 	my_scrib = scrib.scrib()
 	ModFileIn(my_scrib)
-	my_scrib.shutdown(my_scrib)
+	my_scrib.brain.shutdown(my_scrib)
 	del my_scrib

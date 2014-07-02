@@ -143,6 +143,7 @@ class brain:
 			s = json.loads(file)
 			if upgrade == True:
 				for v in s:
+					print 'Filtering...'
 					s[v][0] = filter(lambda x: x in string.printable, s[v][0])
 				return s
 			return s

@@ -38,7 +38,7 @@ class brain:
 			'num_aliases': 0,
 			'max_words': 1000000,
 			'aliases': {},
-			'optimum': 1,
+			'optimum': 0,
 			'ignore_list': []
 			})
 
@@ -576,7 +576,7 @@ class brain:
 		known = -1
 
 		# If the word is in at least these many contexts, it can be chosen.
-		known_min = 1 # was three
+		known_min = 3
 		for x in xrange(0, len(words)):
 			if self.words.has_key(words[x]):
 				k = len(self.words[words[x]])
@@ -617,7 +617,7 @@ class brain:
 				cwords = context.split()
 				#if the word is not the first of the context, look to the previous one
 				if w:
-					#look if we can find a pair with the choosen word, and the previous one
+					#look if we can find a pair with the chosen word, and the previous one
 					if len(sentence) > 1 and len(cwords) > w + 1:
 						if sentence[1] != cwords[w + 1]:
 							continue
@@ -759,14 +759,6 @@ class brain:
 
 		#return as string..
 		return "".join(sentence)
-
-		# Ignore if the sentence starts with the self.settings.symbol
-		if body[0:1] == self.settings.symbol:
-			if self.settings.debug == 1:
-				self.barf('ERR', "Not learning: %s" % words)
-			return
-		else:
-			self.learn(self, body, num_context=1)
 
 	def replace(self, old, new):
 		"""

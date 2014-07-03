@@ -245,7 +245,7 @@ class process:
 
 				elif cmds[0] == 'check':
 					msg = ''
-					interface.output(self.brain.settings.symbol+"Rebuilding...", args)
+					interface.output(self.brain.settings.symbol+" Checking consistency!", args)
 					
 					msg += self.brain.auto_rebuild()
 
@@ -384,6 +384,8 @@ class process:
 							pass
 
 				elif cmds[0] == 'quit':
+					msg = 'Good bye!'
+					interface.output(self.brain.settings.symbol+' '+msg, args)
 					self.brain.shutdown(interface)
 			
 				elif cmds[0] == 'save':
@@ -392,7 +394,7 @@ class process:
 					msg = "Saved!"
 
 				elif cmds[0] == 'debug':
-					msg = "debug mode "
+					msg = "Debug mode "
 					if len(cmds) == 1:
 						if self.brain.settings.debug == 0:
 							msg = msg + 'off'
@@ -496,4 +498,4 @@ class process:
 			self.barf('MSG', 'Ignoring a secret.')
 
 		if msg != "":
-			interface.output(self.brain.settings.symbol+msg, args)
+			interface.output(self.brain.settings.symbol+' '+msg, args)

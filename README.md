@@ -38,6 +38,8 @@ _(General Scrib options)_
 {
     "debug": 0,			Toggles debug mode for core scrib functionality. 
     "muted": 0, 		Toggles whether or not scrib can speak.
+	"reply_rate": 100, 			Percent chance of reply per line (hectic in busy channels)
+    "nick_reply_rate": 100, 	Percent chance of reply when highlighted.
     "version": "1.2.0", Denotes the version scrib was last time it ran (automatically changes on updates)
     "name": "scrib"		The name you want your scrib to have.
 }
@@ -70,11 +72,10 @@ _(IRC-specific options)_
         "OwnerOne"				A list of people authorized to send owner commands to scrib.
     ], 
     "realname": "Scrib Bot", 	The "real name" reported to the IRC server(s)
-    "reply_rate": 100, 			Percent chance of reply per line (hectic in busy channels)
+
     "owner_passwords": [
         "Ducks"					The password(s) used to let persons take ownership of scrib.
     ], 
-    "nick_reply_rate": 100, 	Percent chance of reply when highlighted.
     "servers": [
         [
             "irc.freenode.net", List of server and port to join on start.

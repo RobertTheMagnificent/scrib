@@ -33,6 +33,8 @@ class scrib:
 			'name': 'scrib',
 			'debug': 0,
 			'muted': 0,
+			'reply_rate': 100,
+			'nick_reply_rate': 100,
 			'version': self.version
 			})
 		

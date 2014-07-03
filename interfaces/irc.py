@@ -45,8 +45,6 @@ class ScribIRC(SingleServerIRCBot):
 								"servers": [("irc.freenode.net", 6667)],
 								"channels": ["#scoundrels"],
 								"owners": ["OwnerOne"],
-								'reply_rate': 100,
-								'nick_reply_rate': 100,
 								"owner_passwords": ["Ducks"],
 								"quit_message": "Goodbye.",
 						   })

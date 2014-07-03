@@ -20,15 +20,14 @@ class ModLineIn:
 		def __init__(self, my_scrib):
 			self.scrib = my_scrib
 			self.settings = self.scrib.settings #compat. yuk.
-			self.barf = self.scrib.barf
 			self.start()
 
 		def start(self):
-			self.barf('ACT', "Scrib offline chat!")
-			self.barf('ACT', "Type !quit to leave")
-			self.barf('ACT', "Enter your name?\033[0m")
+			self.scrib.barf('ACT', "Scrib offline chat!")
+			self.scrib.barf('ACT', "Type !quit to leave")
+			self.scrib.barf('ACT', "Enter your name?\033[0m")
 			name = raw_input("> ")
-			self.barf('MSG', "Hello %s." %name)
+			self.scrib.barf('MSG', "Hello %s." %name)
 			while 1:
 					try:
 						body = raw_input("> ")
@@ -53,14 +52,14 @@ class ModLineIn:
 			Output a line of text.
 			"""
 			message = message.replace("#nick", args)
-			self.barf('MSG', message + "\033[0m")
+			self.scrib.barf('MSG', message + "\033[0m")
 
 if __name__ == "__main__":
 	try:
 		my_scrib = scrib.scrib()
 	except ValueError, e:
 		from core import barf
-		my_scrib.barf('ERR', traceback.format_exc())
+		barf.Barf('ERR', traceback.format_exc())
 		sys.exit(0)
 
 	try:
@@ -74,3 +73,4 @@ if __name__ == "__main__":
 		c = raw_input("[Y/n]")
 		if c[:1] != "n":
 			my_scrib.shutdown(my_scrib)
+	my_scrib.shutdown(my_scrib)

@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from random import randint
+from bs4 import UnicodeDammit
 import datetime
 import hashlib
 import os
@@ -10,7 +11,6 @@ import string
 import threading
 import time
 import zipfile
-
 import barf
 import cfg
 import clean
@@ -39,14 +39,8 @@ class brain:
 			'max_words': 1000000,
 			'aliases': {},
 			'optimum': 1,
-			'ignore_list': [],
-			'version': self.version
+			'ignore_list': []
 			})
-
-		if self.brain_type(self.settings.version) <= 3:
-			self.barf('ROL', 'Brain files before 0.2.0 will fail on upgrade.')
-			self.barf('ROL', 'We are working on an external conversion script.')
-			self.barf('ROL', 'Continue without upgrading.')
 
 		self.static_answers = self.cfg.set()
 		self.static_answers.load("brain/answers.dat", {
@@ -108,8 +102,11 @@ class brain:
 						print str(line.strip()) + ":=:" + str(value)
 				else:
 					print line.strip()
-		
+	
 	def brain_type(self, version):
+		"""
+		This be awful, yo.
+		"""
 		marshal = ['0.0.1', '0.1.0', '0.1.1']
 		pickle = ['0.1.2', '0.1.3', '0.1.4']
 		json = ['0.1.5', '0.1.6', '0.1.7', '0.1.8']
@@ -133,32 +130,68 @@ class brain:
 		if self.brain_type(version) == 1:
 			import marshal
 			stuff = marshal.loads(file)
+				
 		elif self.brain_type(version) == 2:
 			import cPickle as pickle
 			stuff = pickle.loads(file)
-		elif self.brain_type(version) == 3 or self.brain_type(version) == 4:
+				
+		elif self.brain_type(version) >= 3:
 			import json
-			s = json.loads(file)
-			if upgrade == True:
-				for v in s:
-					s[v][0] = filter(lambda x: x in string.printable, s[v][0])
-				return s
-			return s
+			stuff = json.loads(file)
 
+		if upgrade == True:
+			self.upgrade(file)
+			
+		return stuff
+		
 	def pack(self, file, version, upgrade=False):
 		if self.brain_type(version) == 1:
-			import marshal
+			#import marshal
 			stuff = marshal.dumps(file)
 		elif self.brain_type(version) == 2:
-			import cPickle as pickle
+			#import cPickle as pickle
 			stuff = pickle.dumps(file)
 		elif self.brain_type(version) == 3 or self.brain_type(version) == 4:
 			import json
-			if upgrade == True:
-				stuff = json.dumps(file, sort_keys=True, indent=4, separators=(',', ': '), encoding='latin-1')
-				return stuff
-			stuff = json.dumps(file, sort_keys=True, indent=4, separators=(',', ': '))
+			stuff = json.dumps(file, sort_keys=True, indent=4, separators=(',', ': '), encoding='utf-8')
+
 		return stuff
+
+
+	def upgrade(self, file):
+			try:
+				tmp = 'brain/tmp'
+				self.words = {}
+				self.lines = {}
+				self.settings.num_words = 0
+				self.settings.num_lines = 0
+				d = 0
+				i = 0
+				self.barf('ACT', 'Recompiling...')
+				with open(tmp, 'w+') as s:
+					for v in s:
+						if len(v.split()) < 3:
+							s[v][0] = UnicodeDammit(s[v][0])
+							#self.learn(self.clean.line(s[v][0].unicode_markup.encode('utf8'), settings), 1)
+							f.write(s[v][0].unicode_markup.encode('utf8'))
+							i += 1
+							if self.settings.debug == 1:
+								self.barf('DBG', '%d (%d dumped)' % ( i, d ))
+						else:
+							d += 1				
+				i = 0
+				self.barf('ACT', 'Learning...')
+				with open(tmp, 'rb') as c:
+					for l in c:
+						self.learn(self.clean.line(l, self.settings), 1)
+						if self.settings.debug == 1:
+							self.barf('DBG', '%s ' % l)
+				os.remove(tmp)
+				
+				self.barf('ACT', 'Generating contexs...')
+				self.auto_rebuild()
+			except Exception, e:
+				self.barf('ERR', '%s: %s' % (tmp, e))
 
 	def _load(self):
 		"""
@@ -180,8 +213,8 @@ class brain:
 			v = f.read()
 			self.barf('MSG', "Current brain version is %s " % v)
 			f.close()
-			if v != self.settings.version:
-				self.barf('ERR', "Brain is version "+v+", but I use "+self.settings.version+".")
+			if v != self.version:
+				self.barf('ERR', "Brain is version "+v+", but I use "+self.version+".")
 				self.barf('ERR', "Would you like to update the brain?")
 				c = raw_input("[Y/n]")
 				if c[:1].lower() != 'n':
@@ -189,51 +222,53 @@ class brain:
 					shutil.copyfile("brain/cortex.zip", "backups/%s-cortex-%s.zip" % ( 'backup', timestamp ))
 					self.barf('ACT', "Backup saved to backups/cortex-%s.zip" % timestamp)
 					self.barf('ACT', "Starting update, may take a few moments.")
-					f = open("brain/words.dat", "rb")
 					if self.settings.debug == 1:
-						self.barf('DBG', "Reading words...")
-					s = f.read()
-					f.close()
-					self.words = self.unpack(s, v, True)
-					del s
-					if self.settings.debug == 1:
-						self.barf('DBG', "Saving words...")
-					f = open("brain/words.dat", "wb")
-					s = self.pack(self.words, self.settings.version)
-					f.write(s)
-					f.close()
-					del s
-					if self.settings.debug == 1:
-						self.barf('DBG', "Words converted.")
+					#	self.barf('DBG', "Words converted.")
 						self.barf('DBG', "Reading lines...")
 					f = open("brain/lines.dat", "rb")
 					s = f.read()
 					f.close()
-					self.lines = self.unpack(s, v)
+					self.lines = self.unpack(s, v, True)
+					if self.settings.debug == 1:
+						self.barf('DBG', 'Found %d lines' % len(self.lines))
 					if self.settings.optimum == 1:
+						self.words = {}
+						self.lines = {}
 						if self.settings.debug == 1:
 							self.barf('DBG', "Applying filter to adjust to new brain system.")
-							self.barf('TAB', "This may take a bit, and will shrink the dataset.")
-						try:
-							self.auto_rebuild()
-						except:
-							self.barf('ERR', 'Brain failed to migrate.')
+							self.barf('TAB', "This may take a bit, and may shrink the dataset.")
+							try:
+								self.auto_rebuild()
+							except:
+								self.barf('ERR', 'Brain failed to migrate.')
+								self.barf('ERR', 'Words: %s' % type(self.words))
+								self.barf('ERR', 'Lines: %s' % type(self.lines))
 					f = open("brain/lines.dat", "wb")
-					s = self.pack(self.lines, self.settings.version, True)
+					s = self.pack(self.lines, self.version)
 					f.write(s)
 					f.close()
 					del s
 					if self.settings.debug == 1:
 						self.barf('DBG', "Lines converted.")
 					f = open("brain/version", "wb")
-					f.write(self.settings.version)
+					f.write(self.version)
 					f.close()
 					if self.settings.debug == 1:
+						self.barf('DBG', 'Found %d words' % len(self.words))
+						self.barf('DBG', 'Type: %s' % type(self.words[0]))
+					#del s
+					if self.settings.debug == 1:
+						self.barf('DBG', "Saving words...")
+					f = open("brain/words.dat", "wb")
+					s = self.pack(self.words, self.version)
+					f.write(s)
+					f.close()
+					del s
+					if self.settings.debug == 1:
 						self.barf('DBG', "Version updated.")
-					v = self.settings.version
-					self.barf('ACT', "Brain converted successfully! Continuing.")
+					v = self.version
 				else:
-					self.settings.version = v # Saves old brain as old brain format.
+					self.version = v # Saves old brain as old brain format.
 
 			f = open("brain/words.dat", "rb")
 			s = f.read()
@@ -313,13 +348,14 @@ class brain:
 		self.barf('SAV', "Writing to my brain...")
 
 		f = open("brain/words.dat", "wb")
-		s = self.pack(self.words, self.settings.version)
+		s = self.pack(self.words, self.version)
 		f.write(s)
 		f.close()
 		if self.settings.debug == 1:
 			self.barf('DBG', "Words saved.")
+
 		f = open("brain/lines.dat", "wb")
-		s = self.pack(self.lines, self.settings.version)
+		s = self.pack(self.lines, self.version)
 		f.write(s)
 		f.close()
 		if self.settings.debug == 1:
@@ -327,27 +363,22 @@ class brain:
 
 		#zip the files
 		f = zipfile.ZipFile('brain/cortex.zip', 'w', zipfile.ZIP_DEFLATED)
+		
 		f.write('brain/words.dat')
 		if self.settings.debug == 1:
 			self.barf('DBG', "Words zipped")
 		os.remove('brain/words.dat')
+
 		f.write('brain/lines.dat')
 		if self.settings.debug == 1:
 			self.barf('DBG', "Lines zipped")
-		try:
-			f.write('brain/version')
-			f.close()
-			if self.settings.debug == 1:
-				self.barf('DBG', "Version zipped")
-			os.remove('brain/version')
-		except:
-			v = open("brain/version", "w")
-			v.write(self.settings.version)
-			v.close()
-			f.write("brain/version")
-			if self.settings.debug == 1:
-				self.barf('DBG', "Version written and zipped.")
-			os.remove('brain/version')
+		os.remove('brain/lines.dat')
+		
+		f.write('brain/version')
+		f.close()
+		if self.settings.debug == 1:
+			self.barf('DBG', "Version zipped")
+		os.remove('brain/version')
 
 		f = open("brain/words.dat", "w")
 		# write each words known
@@ -358,24 +389,7 @@ class brain:
 				wordlist.append([key, len(self.words[key])])
 			except:
 				pass
-		wordlist.sort(lambda x, y: cmp(x[1], y[1]))
-		map((lambda x: f.write(str(x[0]) + "\n\r") ), wordlist)
-		f.close()
-		if self.settings.debug == 1:
-			self.barf('DBG', "Words written.")
-
-		f = open("brain/sentences.dat", "w")
-		# write each words known
-		wordlist = []
-		#Sort the list before to export
-		for key in self.unfilterd.keys():
-			wordlist.append([key, self.unfilterd[key]])
-		wordlist.sort(lambda x, y: cmp(y[1], x[1]))
-		map((lambda x: f.write(str(x[0]) + "\n") ), wordlist)
-		f.close()
-		if self.settings.debug == 1:
-			self.barf('DBG', "Sentences written.")
-
+		
 		# Save settings
 		self.settings.save()
 
@@ -435,10 +449,10 @@ class brain:
 			else:
 				num_cpw = 0
 
-			cleanbody = " ".join(words)
+			cleanbody = " ".join(words).encode('utf8')
 
 			hashval = hashlib.sha1(cleanbody).hexdigest()[:10]
-			if not (num_cpw > 100 and self.settings.learning == 0)and not self.lines.has_key(hashval) :
+			if not (num_cpw > 100 and self.settings.learning == 0) and not self.lines.has_key(hashval) :
 				self.lines[hashval] = [cleanbody, num_context]
 				# Add link for each word
 				if self.settings.debug == 1:
@@ -454,7 +468,7 @@ class brain:
 				self.lines[hashval][1] += num_context
 
 			#is max_words reached, don't learn more
-			if self.settings.num_words >= self.stats['max_words']:
+			if self.settings.num_words >= self.settings.max_words:
 				self.settings.learning = 0
 				self.barf('ERR', "Had to turn off learning- max_words limit reached!")
 

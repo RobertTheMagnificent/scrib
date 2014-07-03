@@ -15,9 +15,11 @@ class clean:
 		"""
 		if message == '':
 			return '';
+
 		if settings.debug == True:
 			self.barf('DBG', "Message is type: %s" % type(message))
-		# Firstly, make sure it isn't doesn't have a uri.
+
+		# Let's make sure it isn't doesn't have a uri.
 		urls = ['://']
 		for url in urls:
 			if url in message:
@@ -44,7 +46,7 @@ class clean:
 			pass # will just say 'substring not found' on every line that hasn't the above.
 
 		# Strips out mIRC Control codes
-		ccstrip = re.compile("\x1f|\x02|\x12|\x0f|\x16|\x03(?:\d{1,2}(?:,\d{1,2})?)?", re.UNICODE)
+		ccstrip = re.compile("\xef|\xbb|\xbf|\xfe|\xff|\x00|\x1f|\x02|\x12|\x0f|\x16|\x03(?:\d{1,2}(?:,\d{1,2})?)?", re.UNICODE)
 		message = ccstrip.sub("", message)
 
 		# Few of my fixes...

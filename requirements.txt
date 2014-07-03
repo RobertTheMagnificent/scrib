@@ -1,3 +1,5 @@
 #hy
+beautifulsoup4
 irc
-nltk
+#nltk
+

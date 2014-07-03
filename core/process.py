@@ -7,7 +7,6 @@ import time
 
 import barf
 import brain
-import clean
 from plugins import PluginManager
 
 class process:
@@ -17,7 +16,7 @@ class process:
 	def __init__(self):
 		self.brain = brain.brain()
 		self.barf = barf.Barf
-		self.clean = clean.clean()
+		self.clean = self.brain.clean
 		
 		# This is where we do some ownership command voodoo.
 		self.owner_commands = {
@@ -29,7 +28,6 @@ class process:
 			'context': "context [word] (outputs to console)",
 			'learn': "learn [word]",
 			'learning': "Toggles bot learning.",
-			'rebuild': "Performs a brain rebuild. Is desructive.",
 			'replace': "replace [current] [new]",
 			'replyrate': "Shows/sets the reply rate.",
 			'save': "Saves the brain.",
@@ -245,10 +243,8 @@ class process:
 					else:
 						msg = "You need to teach me something first!"
 
-				elif cmds[0] == "rebuild" or cmds[0] == 'check':
+				elif cmds[0] == 'check':
 					msg = ''
-					if cmds[0] == 'check':
-						msg += 'Check has been removed. '
 					interface.output(self.brain.settings.symbol+"Rebuilding...", args)
 					
 					msg += self.brain.auto_rebuild()
@@ -463,8 +459,8 @@ class process:
 				msg = "It is ".join(i for i in os.popen('date').readlines())
 
 			elif cmds[0] == "words":
-				num_w = self.brain.stats['num_words']
-				num_c = self.brain.stats['num_contexts']
+				num_w = self.brain.settings.num_words
+				num_c = self.brain.settings.num_contexts
 				num_l = len(self.brain.lines)
 				if num_w != 0:
 					num_cpw = num_c / float(num_w) # contexts per word

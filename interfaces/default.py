@@ -73,4 +73,4 @@ if __name__ == "__main__":
 		c = raw_input("[Y/n]")
 		if c[:1] != "n":
 			my_scrib.shutdown(my_scrib)
-	my_scrib.shutdown(my_scrib)
+	sys.exit()

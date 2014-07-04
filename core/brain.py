@@ -11,6 +11,7 @@ import string
 import threading
 import time
 import zipfile
+
 import barf
 import cfg
 import clean
@@ -25,7 +26,7 @@ class brain:
 		self.barf = barf.Barf
 		self.clean = clean.clean()
 		self.cfg = cfg
-		self.settings = cfg.set()
+		self.settings = self.cfg.set()
 		
 		# Load brain config (or create with these defaults).
 		self.settings.load('conf/brain.cfg', {
@@ -52,7 +53,7 @@ class brain:
 		# Starts the timers:
 		if self.timers_started is False:
 			try:
-				self.autosave = threading.Timer(self.to_sec("125m"), self.save_all)
+				self.autosave = threading.Timer(self.to_sec("125m"), self._save)
 				self.autosave.start()
 				self.autorebuild = threading.Timer(self.to_sec("71h"), self.auto_rebuild)
 				self.autorebuild.start()
@@ -338,11 +339,9 @@ class brain:
 			# No words to unlearn
 			pass
 
-		#self.settings.save()
-
-	def save_all(self, interface, restart_timer=True):
+	def _save(self, interface, restart_timer=True):
 		"""
-		Save ALL THE THINGS Should be moved to private _save()
+		Save the brain files.
 		"""
 		self.barf('SAV', "Writing to my brain...")
 
@@ -390,15 +389,19 @@ class brain:
 				pass
 		
 		# Save settings
+		if self.settings.debug == 1:
+			self.barf('DBG', 'Saving brain settings.')
 		self.settings.save()
 
+		if self.settings.debug == 1:
+			self.barf('DBG', 'Saving interface %s' % interface)
 		if interface != False:
 			interface.settings.save()
 
 		self.barf('SAV', "Brain saved.")
 
 		if restart_timer is True:
-			self.autosave = threading.Timer(self.to_sec("125m"), self.save_all)
+			self.autosave = threading.Timer(self.to_sec("125m"), self._save)
 			self.autosave.start()
 			if self.settings.debug == 1:
 				self.barf('DBG', "Restart timer started.")
@@ -813,7 +816,7 @@ class brain:
 	def shutdown(self, interface):
 		# Save the brain
 		self.kill_timers()
-		self.save_all(interface, False)
+		self._save(interface, False)
 		self.barf('MSG', 'Goodbye!')
 		# Now we close everything.
 		os._exit(0)

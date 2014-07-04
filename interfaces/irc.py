@@ -39,7 +39,7 @@ class ScribIRC(SingleServerIRCBot):
 		self.scrib = my_scrib
 		# load settings
 
-		self.settings = self.scrib.cfg.set()
+		self.settings = self.scrib.setcfg()
 		self.settings.load("conf/irc.cfg", {
 								"realname": "Scrib Bot",
 								"servers": [("irc.freenode.net", 6667)],
@@ -48,11 +48,18 @@ class ScribIRC(SingleServerIRCBot):
 								"owner_passwords": ["Ducks"],
 								"quit_message": "Goodbye.",
 						   })
-		self.scrib.settings.name = my_scrib.settings.name
+		
 		self.owners = self.settings.owners[:]
 		self.chans = self.settings.channels[:]
 		
-		self.symbol = self.scrib.getsymbol()
+		# I know this is overkill. Eventually I want to have an option
+		# where we can append process.settings onto any other self.settings.
+		self.name = self.scrib.getsetting('scrib', 'name')
+		self.symbol = self.scrib.getsetting('brain', 'symbol')
+		self.muted = self.scrib.getsetting('scrib', 'muted')
+		self.reply_rate = self.scrib.getsetting('scrib', 'reply_rate')
+		self.nick_reply_rate = self.scrib.getsetting('scrib', 'nick_reply_rate')
+		self.debug = self.scrib.getsetting('scrib', 'debug')
 
 		# Parse command prompt parameters
 
@@ -80,14 +87,14 @@ class ScribIRC(SingleServerIRCBot):
 			# Nickname
 			if args[x] == "-n":
 				try:
-					self.scrib.settings.name = args[x + 1]
+					self.name = args[x + 1]
 				except IndexError:
 					pass
 
 	def our_start(self):
 		#for server in self.settings.servers:
 		self.scrib.barf('ACT', "Connecting to %s" % self.settings.servers[0][0])
-		SingleServerIRCBot.__init__(self, self.settings.servers, self.scrib.settings.name, self.settings.realname, 2)
+		SingleServerIRCBot.__init__(self, self.settings.servers, self.name, self.settings.realname, 2)
 		self.start()
 
 	def on_welcome(self, c, e):
@@ -115,7 +122,7 @@ class ScribIRC(SingleServerIRCBot):
 		else:
 			reason = ""
 
-		if kicked == self.scrib.settings.name:
+		if kicked == self.name:
 			self.scrib.barf('ACT', "%s was kicked off %s by %s (%s)" % (kicked, target, kicker, reason))
 
 	def on_privmsg(self, c, e):
@@ -182,23 +189,23 @@ class ScribIRC(SingleServerIRCBot):
 		body = body[body.rfind("\xa0") + 1:]
 
 		# WHOOHOOO!!
-		if target == self.scrib.settings.name or source == self.scrib.settings.name:
+		if target == self.name or source == self.name:
 			self.scrib.barf('MSG', "%s <%s> \033[0m%s" % (target, source, body))
 
 		# Ignore quoted messages
 		if body[0] == "<" or body[0:1] == "\"" or body[0:1] == " <" or body[0] == "[":
-			if self.scrib.settings.debug == 1:
+			if self.debug == 1:
 				self.scrib.barf('DBG', "Ignoring quoted text.")
 			return
 
 		# We want replies reply_rate%, if speaking is on
-		muted = self.scrib.settings.muted
-		replyrate = self.scrib.settings.reply_rate
-		nickreplyrate = self.scrib.settings.nick_reply_rate
+		muted = self.muted
+		replyrate = self.reply_rate
+		nickreplyrate = self.nick_reply_rate
 
 		if self.nick_check(body) == 1:
 			replyrate = nickreplyrate
-			if self.scrib.settings.debug == 1:
+			if self.debug == 1:
 				self.scrib.barf('DBG', "Responding to Highlight")
 
 		# Always reply to private messages
@@ -220,8 +227,8 @@ class ScribIRC(SingleServerIRCBot):
 			except: pass
 
 			self.scrib.barf('MSG', "%s <%s> \033[0m%s" % (target, source, body))
-			body = body.replace(self.scrib.settings.name, "#nick")
-			body = body.replace(self.scrib.settings.name.lower(), "#nick")
+			body = body.replace(self.name, "#nick")
+			body = body.replace(self.name.lower(), "#nick")
 			for x in self.channels[target].users():
 				x = re.sub("[\&\%\+\@\~]","", x)
 				if x:
@@ -245,7 +252,7 @@ class ScribIRC(SingleServerIRCBot):
 		### Owner commands (Which is all of them for now)
 		if source in self.owners and e.source() in self.owner_mask:
 			# Only accept commands that are in the Command List
-			if self.scrib.settings.debug == 1:
+			if self.debug == 1:
 				self.scrib.barf('DBG', "Command: %s" % cmds[0])
 				self.scrib.barf('DBG', "Command list: %s" % str(cmds))
 			if cmds[0][1:] in self.commands:
@@ -266,7 +273,7 @@ class ScribIRC(SingleServerIRCBot):
 	def nick_check(self, message):
 		# Check to see if I'm highlighted
 		highlighted = 0
-		if self.scrib.settings.name in message:
+		if self.name in message:
 			highlighted = 1
 		return highlighted
 
@@ -282,9 +289,9 @@ class ScribIRC(SingleServerIRCBot):
 		body, source, target, c, e = args
 
 		# Decide. should we do a ctcp action?
-		if message.find(self.scrib.settings.name + " ") == 0:
+		if message.find(self.name + " ") == 0:
 			action = 1
-			message = message[len(self.scrib.settings.name) + 1:]
+			message = message[len(self.name) + 1:]
 		else:
 			action = 0
 
@@ -294,16 +301,16 @@ class ScribIRC(SingleServerIRCBot):
 		# Joins replies and public messages
 		if e.eventtype() == "join" or e.eventtype() == "quit" or e.eventtype() == "part" or e.eventtype() == "pubmsg":
 			if action == 0:
-				self.scrib.barf('MSG', "%s <%s> \033[0m%s" % ( target, self.scrib.settings.name, message))
+				self.scrib.barf('MSG', "%s <%s> \033[0m%s" % ( target, self.name, message))
 				c.privmsg(target, message)
 			else:
-				self.scrib.barf('MSG', "%s <%s> /me \033[0m%s" % ( target, self.scrib.settings.name, message))
+				self.scrib.barf('MSG', "%s <%s> /me \033[0m%s" % ( target, self.name, message))
 				c.action(target, message)
 		# Private messages
 		elif e.eventtype() == "privmsg":
 			# normal private msg
 			if action == 0:
-				self.scrib.barf('MSG', "%s <%s> \033[0m%s" % ( source, self.scrib.settings.name, message))
+				self.scrib.barf('MSG', "%s <%s> \033[0m%s" % ( source, self.name, message))
 				c.privmsg(source, message)
 				# send copy to owner
 				if not source in self.owners:
@@ -311,7 +318,7 @@ class ScribIRC(SingleServerIRCBot):
 					c.privmsg(','.join(self.owners), "(To   " + source + ") " + message)
 			# ctcp action priv msg
 			else:
-				self.scrib.barf('MSG', "%s <%s> /me \033[0m%s" % ( target, self.scrib.settings.name, message))
+				self.scrib.barf('MSG', "%s <%s> /me \033[0m%s" % ( target, self.name, message))
 				c.action(source, message)
 				# send copy to owner
 				if not source in self.owners:
@@ -334,4 +341,4 @@ if __name__ == "__main__":
 		c = raw_input("[Y/n]")
 		if c[:1] != 'n':
 			my_scrib.shutdown(my_scrib)
-	sys.exit()
+	my_scrib.shutdown(my_scrib)

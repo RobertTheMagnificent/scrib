@@ -57,6 +57,7 @@ class ModLineIn:
 if __name__ == "__main__":
 	try:
 		my_scrib = scrib.scrib()
+		my_scrib.shutdown(my_scrib)
 	except ValueError, e:
 		from core import barf
 		barf.Barf('ERR', traceback.format_exc())

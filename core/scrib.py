@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import barf
-import cfg
 import process
 
 """
@@ -17,34 +16,66 @@ import process
 
 class scrib:
 	"""
-	The meat of scrib
+	Setting up gatekeeping.
 	"""
 	def __init__(self):
 		"""
 		Here we'll load settings and set up modules.
 		"""
-		self.version = '1.2.0'
 		self.barf = barf.Barf
-		self.cfg = cfg
-		self.settings = cfg.set()
-		
-		# Load scrib config (or create with these defaults).
-		self.settings.load('conf/scrib.cfg', {
-			'name': 'scrib',
-			'debug': 0,
-			'muted': 0,
-			'reply_rate': 100,
-			'nick_reply_rate': 100,
-			'version': self.version
-			})
-		
 		self.process = process.process()
 		
-		self.barf('MSG', 'Scrib %s initialized' % self.version)
+		self.barf('MSG', 'Scrib %s initialized' % self.process.version)
 
 	
+	"""
+	Down here, we are making some methods that give interfaces and plugins
+	information in a controllable (and updatable) way.
+	"""
+	
+	def setcfg(self):
+		"""
+		Simple wrapper for cfg.set()
+		"""
+		return self.process.cfg.set()
+
+	def save_all(self, interface, restart_timer=True):
+		self.savesettings()
+		self.process.brain._save(interface, restart_timer)
+
 	def shutdown(self, interface):
+		"""
+		Shuts us the scrib down.
+		"""
+		self._save()
 		return self.process.brain.shutdown(interface)
 
-	def getsymbol(self):
-		return self.process.brain.settings.symbol
+	def setsetting(self, module, setting, set):
+		"""
+		Set brain setting.
+		"""
+		try:
+			if module == 'scrib':
+				mod = self.process.settings
+			elif module == 'brain':
+				mod = self.process.brain.settings
+			setattr(mod, setting, set)
+		except AttributeError:
+			self.barf('ERR', 'No %s setting' % setting)
+
+	def getsetting(self, module, setting):
+		"""
+		Get brain setting.
+		"""
+		try:
+			if module == 'scrib':
+				return getattr(self.process.settings, setting)
+			elif module == 'brain':
+				return getattr(self.process.brain.settings, setting)
+		except AttributeError:
+			self.barf('ERR', 'No %s setting' % setting)
+	
+	def savesettings(self):
+		if self.settings.debug == 1:
+			self.barf('DBG', 'Saving process settings.')
+		self.process.settings.save()

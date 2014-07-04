@@ -7,6 +7,7 @@ import time
 
 import barf
 import brain
+import cfg
 from plugins import PluginManager
 
 class process:
@@ -14,10 +15,22 @@ class process:
 	This is where we process commands and messages.
 	"""
 	def __init__(self):
+		self.version = '1.2.0'
 		self.brain = brain.brain()
 		self.barf = barf.Barf
 		self.clean = self.brain.clean
+		self.cfg = cfg
+		self.settings = self.cfg.set()
 		
+		# Load scrib config (or create with these defaults).
+		self.settings.load('conf/scrib.cfg', {
+			'name': 'scrib',
+			'debug': 0,
+			'muted': 0,
+			'reply_rate': 100,
+			'nick_reply_rate': 100,
+			'version': self.version
+			})
 		# This is where we do some ownership command voodoo.
 		self.owner_commands = {
 			'alias': "alias [this] [that]",
@@ -261,7 +274,7 @@ class process:
 						self.settings.reply_rate = int(cmds[1])
 						msg = "Now replying to %d%% of messages." % int(cmds[1])
 					else:
-						msg = "Reply rate is %d%%." % self.brain.settings.reply_rate
+						msg = "Reply rate is %d%%." % self.settings.reply_rate
 
 				elif cmds[0] == "context":
 					if self.brain.settings.debug == 1:

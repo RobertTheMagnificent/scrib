@@ -41,13 +41,13 @@ class scrib:
 
 	def save_all(self, interface, restart_timer=True):
 		self.savesettings()
-		self.process.brain._save(interface, restart_timer)
+		self.process.brain.__save(interface, restart_timer)
 
 	def shutdown(self, interface):
 		"""
 		Shuts us the scrib down.
 		"""
-		self._save()
+		self.__save()
 		return self.process.brain.shutdown(interface)
 
 	def setsetting(self, module, setting, set):
@@ -75,7 +75,7 @@ class scrib:
 		except AttributeError:
 			self.barf('ERR', 'No %s setting' % setting)
 	
-	def savesettings(self):
+	def __save(self):
 		if self.settings.debug == 1:
 			self.barf('DBG', 'Saving process settings.')
 		self.process.settings.save()

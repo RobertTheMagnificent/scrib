@@ -53,7 +53,7 @@ class brain:
 		# Starts the timers:
 		if self.timers_started is False:
 			try:
-				self.autosave = threading.Timer(self.to_sec("125m"), self._save)
+				self.autosave = threading.Timer(self.to_sec("125m"), self.__save)
 				self.autosave.start()
 				self.autorebuild = threading.Timer(self.to_sec("71h"), self.auto_rebuild)
 				self.autorebuild.start()
@@ -339,7 +339,7 @@ class brain:
 			# No words to unlearn
 			pass
 
-	def _save(self, interface, restart_timer=True):
+	def __save(self, interface, restart_timer=True):
 		"""
 		Save the brain files.
 		"""
@@ -401,7 +401,7 @@ class brain:
 		self.barf('SAV', "Brain saved.")
 
 		if restart_timer is True:
-			self.autosave = threading.Timer(self.to_sec("125m"), self._save)
+			self.autosave = threading.Timer(self.to_sec("125m"), self.__save)
 			self.autosave.start()
 			if self.settings.debug == 1:
 				self.barf('DBG', "Restart timer started.")
@@ -812,11 +812,11 @@ class brain:
 	def kill_timers(self):
 		self.autosave.cancel()
 		self.autorebuild.cancel()
-
+		
 	def shutdown(self, interface):
 		# Save the brain
 		self.kill_timers()
-		self._save(interface, False)
+		self.__save(interface, False)
 		self.barf('MSG', 'Goodbye!')
 		# Now we close everything.
 		os._exit(0)

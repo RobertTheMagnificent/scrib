@@ -46,7 +46,7 @@ class clean:
 			pass # will just say 'substring not found' on every line that hasn't the above.
 
 		# Strips out mIRC Control codes
-		ccstrip = re.compile("\xef|\xbb|\xbf|\xfe|\xff|\x00|\x1f|\x02|\x12|\x0f|\x16|\x03(?:\d{1,2}(?:,\d{1,2})?)?", re.UNICODE)
+		ccstrip = re.compile("\x1f|\x02|\x12|\x0f|\x16|\x03(?:\d{1,2}(?:,\d{1,2})?)?", re.UNICODE)
 		message = ccstrip.sub("", message)
 
 		# Few of my fixes...
@@ -80,7 +80,7 @@ class clean:
 
 		words = message.split()
 		for x in xrange(0, len(words)):
-			#is there aliases ?
+			# Are there aliases ?
 			for z in settings.aliases.keys():
 				if settings.debug == 1:
 					self.barf('DBG', 'Is %s in keys?' % z)

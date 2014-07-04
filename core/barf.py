@@ -6,7 +6,7 @@
 # Author: Sina Mashek <mashek@thescoundrels.net>
 # Version 1.2
 # License: Expat, http://cptmashek.mit-license.org
-
+from bs4 import UnicodeDammit
 import datetime
 import time
 
@@ -24,14 +24,16 @@ class Barf:
 	}
 	
 	def __init__(self, code, message, time=True):
-		if "debug = true" or "debug = True" in open('options.cfg').read():
-			if code not in self.msg_codes:
-				code = "DEF"
-
-			if code == "TAB":
-				print self.timeless_barf(code, str(message))
-			else:
-				print self.barf(code, str(message), time)
+		if code not in self.msg_codes:
+			code = "DEF"
+		
+		# Making barf compatible with scrib.
+		message = UnicodeDammit(message).unicode_markup.encode('utf8')
+		
+		if code == "TAB":
+			print self.timeless_barf(code, str(message))
+		else:
+			print self.barf(code, str(message), time)
 
 	def disable(self):
 		DEF = ''

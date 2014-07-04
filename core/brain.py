@@ -172,7 +172,6 @@ class brain:
 					for v in s:
 						if len(v.split()) < 3:
 							s[v][0] = UnicodeDammit(s[v][0])
-							#self.learn(self.clean.line(s[v][0].unicode_markup.encode('utf8'), settings), 1)
 							f.write(s[v][0].unicode_markup.encode('utf8'))
 							i += 1
 							if self.settings.debug == 1:
@@ -456,7 +455,7 @@ class brain:
 				self.lines[hashval] = [cleanbody, num_context]
 				# Add link for each word
 				if self.settings.debug == 1:
-					self.barf('DBG', 'hash %s added' % ( hashval ))
+					self.barf('DBG', 'Hash %s added' % ( hashval ))
 				for x in xrange(0, len(words)):
 					if self.words.has_key(words[x]):
 						self.words[words[x]].append([hashval, x])
@@ -590,6 +589,8 @@ class brain:
 				continue
 			elif k == known:
 				index.append(words[x])
+				if self.settings.debug == 1:
+					self.barf('DBG', 'Appending %s' % words[x])
 				continue
 		# Index now contains list of rarest known words in sentence
 		if len(index) == 0:
@@ -606,6 +607,7 @@ class brain:
 			pre_words = {"": 0}
 			#this is to prevent a case where we have an ignore_listd word
 			word = str(sentence[0].split(" ")[0])
+			
 			for x in xrange(0, len(self.words[word]) - 1):
 				l = self.words[word][0]
 				w = self.words[word][1]
@@ -613,6 +615,8 @@ class brain:
 					context = self.lines[l][0]
 				except KeyError, e:
 					self.barf('ERR', e)
+					break
+
 				num_context = self.lines[l][1]
 				cwords = context.split()
 				#if the word is not the first of the context, look to the previous one
@@ -625,6 +629,7 @@ class brain:
 					look_for = cwords[w - 1]
 					if look_for in self.settings.ignore_list and w > 1:
 						look_for = cwords[w - 2] + " " + look_for
+
 					#saves how many times we can find each word
 					if not (pre_words.has_key(look_for)):
 						pre_words[look_for] = num_context
@@ -636,7 +641,8 @@ class brain:
 				if self.settings.debug == 1:
 					self.barf('DBG', 'Context: %s' % context)
 					self.barf('DBG', 'l: %s, w: %s' % (l, w))
-					self.barf('DBG', 'cwords[w]: %s, word: %s' % ( cwords[w], word ))
+					self.barf('DBG', 'Word: %s' % ( word ))
+
 			#Sort the words
 			list = pre_words.items()
 			list.sort(lambda x, y: cmp(y[1], x[1]))

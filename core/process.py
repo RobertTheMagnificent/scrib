@@ -97,12 +97,11 @@ class process:
 			self.brain.learn(body)
 
 		# Make a reply if desired
-		if randint(0, 99) < replyrate:
+		if randint(0, 99) < replyrate and self.muted == 0:
 			if self.brain.settings.debug == 1:
 				self.barf('DBG', "Decided to answer...")
 			message = ""
 
-			if muted == 0:
 				#Look if we can find a prepared answer
 				if self.brain.dbread(body):
 					if self.brain.settings.debug == 1:

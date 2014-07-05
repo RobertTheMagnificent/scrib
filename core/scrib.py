@@ -24,7 +24,8 @@ class scrib:
 		"""
 		self.barf = barf.Barf
 		self.process = process.process()
-		
+		self.debug = self.getsetting('brain', 'debug')		
+
 		self.barf('MSG', 'Scrib %s initialized' % self.process.version)
 
 	
@@ -61,7 +62,7 @@ class scrib:
 				mod = self.process.brain.settings
 			setattr(mod, setting, set)
 		except AttributeError:
-			self.barf('ERR', 'No %s setting' % setting)
+			self.barf('ERR', 'No %s setting in %s' % ( setting, module ))
 
 	def getsetting(self, module, setting):
 		"""
@@ -73,9 +74,9 @@ class scrib:
 			elif module == 'brain':
 				return getattr(self.process.brain.settings, setting)
 		except AttributeError:
-			self.barf('ERR', 'No %s setting' % setting)
+			self.barf('ERR', 'No %s setting in %s' % ( setting, module ))
 	
 	def __save(self):
-		if self.settings.debug == 1:
+		if self.debug == 1:
 			self.barf('DBG', 'Saving process settings.')
 		self.process.settings.save()

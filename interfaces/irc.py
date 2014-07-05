@@ -54,15 +54,15 @@ class ScribIRC(SingleServerIRCBot):
 		
 		# I know this is overkill. Eventually I want to have an option
 		# where we can append process.settings onto any other self.settings.
-		self.name = self.scrib.getsetting('scrib', 'name')
 		self.symbol = self.scrib.getsetting('brain', 'symbol')
+		self.debug = self.scrib.getsetting('brain', 'debug')
+		
+		self.name = self.scrib.getsetting('scrib', 'name')
 		self.muted = self.scrib.getsetting('scrib', 'muted')
 		self.reply_rate = self.scrib.getsetting('scrib', 'reply_rate')
 		self.nick_reply_rate = self.scrib.getsetting('scrib', 'nick_reply_rate')
-		self.debug = self.scrib.getsetting('scrib', 'debug')
 
 		# Parse command prompt parameters
-
 		for x in xrange(1, len(args)):
 			# Specify servers
 			if args[x] == "-s":

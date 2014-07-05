@@ -64,11 +64,6 @@ class process:
 		Process message 'body' and pass back to IO module with args.
 		If muted == 1 only respond with taught responses.
 		"""
-		if message == "" or message == " ":
-			if self.settings.debug == 1:
-				self.barf('DBG', 'No message to process.')
-			return
-		
 		if self.brain.settings.debug == 1:
 			self.barf('DBG', "Processing message...")
 

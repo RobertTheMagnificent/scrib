@@ -102,38 +102,38 @@ class process:
 				self.barf('DBG', "Decided to answer...")
 			message = ""
 
-				#Look if we can find a prepared answer
-				if self.brain.dbread(body):
-					if self.brain.settings.debug == 1:
-						self.barf('DBG', "Using prepared answer.")
-					message = self.clean.unfilter_reply(self.brain.dbread(body))
-					if self.brain.settings.debug == 1:
-						self.barf('DBG', "Replying with: " + message)
-					return
+			#Look if we can find a prepared answer
+			if self.brain.dbread(body):
+				if self.brain.settings.debug == 1:
+					self.barf('DBG', "Using prepared answer.")
+				message = self.clean.unfilter_reply(self.brain.dbread(body))
+				if self.brain.settings.debug == 1:
+					self.barf('DBG', "Replying with: " + message)
+				return
 
-				for sentence in self.brain.static_answers.sentences.keys():
-					pattern = "^%s$" % sentence
-					if re.search(pattern, body):
-						if self.brain.settings.debug == 1:
-							self.barf('DBG', "Searching for reply...")
-						message = self.brain.static_answers.sentences[sentence][
-							randint(0, len(self.brain.static_answers.sentences[sentence]) - 1)]
-						break
+			for sentence in self.brain.static_answers.sentences.keys():
+				pattern = "^%s$" % sentence
+				if re.search(pattern, body):
+					if self.brain.settings.debug == 1:
+						self.barf('DBG', "Searching for reply...")
+					message = self.brain.static_answers.sentences[sentence][
+						randint(0, len(self.brain.static_answers.sentences[sentence]) - 1)]
+					break
+				else:
+					if body in self.unfilterd:
+						self.unfilterd[body] = self.unfilterd[body] + 1
 					else:
-						if body in self.unfilterd:
-							self.unfilterd[body] = self.unfilterd[body] + 1
-						else:
-							self.unfilterd[body] = 0
+						self.unfilterd[body] = 0
 
-				if message == "":
-					if self.brain.settings.debug == 1:
-						self.barf('DBG', "No prepared answer; thinking...")
-					message = self.brain.reply(body)
-					if self.brain.settings.debug == 1:
-						self.barf('DBG', "Reply formed; unfiltering...")
-					message = self.clean.unfilter_reply(message)
-					if self.brain.settings.debug == 1:
-						self.barf('DBG', "Unfiltered message: " + message)
+			if message == "":
+				if self.brain.settings.debug == 1:
+					self.barf('DBG', "No prepared answer; thinking...")
+				message = self.brain.reply(body)
+				if self.brain.settings.debug == 1:
+					self.barf('DBG', "Reply formed; unfiltering...")
+				message = self.clean.unfilter_reply(message)
+				if self.brain.settings.debug == 1:
+					self.barf('DBG', "Unfiltered message: " + message)
 			else:
 				return
 

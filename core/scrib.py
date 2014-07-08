@@ -24,6 +24,7 @@ class scrib:
 		"""
 		self.barf = barf.Barf
 		self.process = process.process()
+		self.settings = '' # compat, ugly.
 		self.debug = self.getsetting('brain', 'debug')		
 
 		self.barf('MSG', 'Scrib %s initialized' % self.process.version)

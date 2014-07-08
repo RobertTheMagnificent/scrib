@@ -97,7 +97,7 @@ class process:
 			self.brain.learn(body)
 
 		# Make a reply if desired
-		if randint(0, 99) < replyrate and self.muted == 0:
+		if randint(0, 99) < replyrate and self.settings.muted == 0:
 			if self.brain.settings.debug == 1:
 				self.barf('DBG', "Decided to answer...")
 			message = ""

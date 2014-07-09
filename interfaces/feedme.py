@@ -12,8 +12,8 @@ class ModFileIn:
 	I learn from ASCII files!
 	"""
 	def __init__(self, scrib):
-		self.barf = scrib.barf
-		self.barf('MSG', 'Where is the food located?')
+		self.scrib = scrib
+		self.scrib.barf('MSG', 'Where is the food located?')
 		self.food = raw_input("location: ")
 
 		correct = False
@@ -21,28 +21,28 @@ class ModFileIn:
 			try:		
 				f = open(self.food, "r")
 			except IOError:
-				self.barf('ERR', 'That file does not exist.')
+				self.scrib.barf('ERR', 'That file does not exist.')
 			correct = True
 		
 		noms = f.read()
 		f.close()
 
 		if scrib.debug == 1:
-			self.barf('DBG', "scrib: %s; brain: %s" % ( scrib.settings.version, scrib.brain.settings.version ))
-		before = "I knew "+`scrib.brain.stats['num_words']`+" words ("+`len(scrib.brain.lines)`+" lines) before reading '%s'" % self.food
-		noms = scrib.brain.clean.line(noms)
+			self.scrib.barf('DBG', "scrib: %s; brain: %s" % ( self.scrib.getsetting('scrib', 'version'), self.scrib.process.brain.version))
+		before = "I knew "+`self.scrib.getsetting('brain', 'num_words')`+" words ("+`len(scrib.process.brain.lines)`+" lines) before reading '%s'" % self.food
+		noms = scrib.process.brain.clean.line(noms, self.scrib.process.brain.settings)
 		# Learn from input
 		try:
-			self.barf('MSG', noms)
-			scrib.brain.learn(noms)
+			self.scrib.barf('MSG', noms)
+			scrib.process.brain.learn(noms)
 		except KeyboardInterrupt, e:
 			# Close database cleanly
-			self.barf('ERR', "Early termination.")
-		after = "I know "+`scrib.brain.stats['num_words']`+" words ("+`len(scrib.brain.lines)`+" lines) now."
+			self.scrib.barf('ERR', "Early termination.")
+		after = "I know "+`self.scrib.getsetting('brain', 'num_words')`+" words ("+`len(scrib.process.brain.lines)`+" lines) now."
 		del scrib
 		
-		self.barf('ACT', before)
-		self.barf('ACT', after)
+		self.scrib.barf('ACT', before)
+		self.scrib.barf('ACT', after)
 
 if __name__ == "__main__":
 	my_scrib = scrib.scrib()

@@ -41,7 +41,7 @@ class ModLineIn:
 							continue
 
 					# Pass message to scrib
-					my_scrib.process.msg(self, body, 100, 1, ( name ), owner = 1)
+					self.scrib.process.msg(self, body, 100, 1, ( name ), owner = 1)
 
 		def linein_commands(self, body):
 			command_list = string.split(body)
@@ -57,7 +57,6 @@ class ModLineIn:
 if __name__ == "__main__":
 	try:
 		my_scrib = scrib.scrib()
-		my_scrib.shutdown(my_scrib)
 	except ValueError, e:
 		from core import barf
 		barf.Barf('ERR', traceback.format_exc())

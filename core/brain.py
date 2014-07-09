@@ -358,6 +358,12 @@ class brain:
 		f.close()
 		if self.settings.debug == 1:
 			self.barf('DBG', "Lines saved.")
+		
+		if self.settings.debug == 1:
+			self.barf('DBG', 'Saving version.')
+		f = open("brain/version", "wb")
+		f.write(self.version)
+		f.close()
 
 		#zip the files
 		f = zipfile.ZipFile('brain/cortex.zip', 'w', zipfile.ZIP_DEFLATED)
@@ -393,10 +399,12 @@ class brain:
 			self.barf('DBG', 'Saving brain settings.')
 		self.settings.save()
 
-		if self.settings.debug == 1:
-			self.barf('DBG', 'Saving interface %s' % interface)
-		if interface != False:
-			interface.settings.save()
+		# This is causing a headache and I am working on replacing it.
+		# ~ cptmashek
+		#if self.settings.debug == 1:
+		#	self.barf('DBG', 'Saving interface %s' % interface)
+		#if interface != False:
+		#	interface.settings.save()
 
 		self.barf('SAV', "Brain saved.")
 

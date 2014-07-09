@@ -4,10 +4,11 @@ from plugins import PluginManager
 import os
 
 # User command
-command = "fortune"
+alias = "fortune"
+command = { alias: "See your fortune." }
 
 # Plugin Action
-class EchoPlugin(PluginManager.Load):
+class FortunePlugin(PluginManager.Load):
 	def action(self, cmds, scrib, c):
 		if scrib.scrib.settings.debug == 1:
 			PluginManager.barf(PluginManager.DBG, "Fortune Plugin activated.")
@@ -15,4 +16,4 @@ class EchoPlugin(PluginManager.Load):
 			msg = "".join([i for i in os.popen('fortune').readlines()]).replace('\n\n','\n').replace('\n', ' ')
 			msg = self.filter(msg)
 
-PluginManager.addPlugin( command, EchoPlugin() )
+PluginManager.addPlugin( command, alias, FortunePlugin() )

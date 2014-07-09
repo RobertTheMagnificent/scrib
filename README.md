@@ -1,122 +1,98 @@
-Scrib, the IRC ChatBot
-======================
+# Scrib, a Python IRC Chat Bot
 <pre>
-License:	GNU GPLv2
+License:	GNU GPL v2 <https://www.gnu.org/licenses/old-licenses/gpl-2.0.html#SEC1>
 Authors:	See AUTHORS
 </pre>
 
-Scrib is a learning chat bot that self-optimizes. It can also be taught through various commands.
+[ ![Codeship Status for scoundrels/scrib](https://codeship.io/projects/cf8473b0-129d-0131-7f02-02093dca7a42/status?branch=master)](https://codeship.io/projects/7883)
 
-Scrib's origins lie within the sources of Pyborg, which was written by Tom Morton and Sébastian Dailly. It was a simple Markov chain-driven bot, similar to MegaHAL, but with the unique ability to learn patterns of speech by figuring out what words go together well. This gives the bot the ability to come up with its own replies, as well as repeating previously learned phrases. There have been pieces absorbed from the Alia fork of Pyborg, as well.
+Scrib is a chat bot that learns from conversations, and self-optimizes its information. 
 
-Though Scrib is based on Pyborg, very little of the bot is compatible with any other Pyborg (including the original)! The intention is to morph this bot into something more robust, while maintaining speed, reliability and providing extendability though use of the PluginManager.
+Scrib's ancestors include PyBorg and Alia, but with the intention to be far more extendible (via PluginManager) and more robust.  
+Their brains *might* be upgradable into the new system. Let us know if you try!
 
-IRC is no longer the main focus of scrib, but rather, one of the several ways to interact.
+## What You'll Need
+* [python-irclib](http://python-irclib.sourceforge.net)
+* [BeautifulSoup](http://www.crummy.com/software/BeautifulSoup/)
 
-Post 1.1 release, we are migrating the scrib brain system to mysql to alleviate a great many problems.
+Install them via your OS repository, the links above, or `pip install -r requirements.txt`
 
-What You'll Need
-----------------
-* [python-irclib](http://python-irclib.sourceforge.net) Most distros: install python-irclib
-
-How to Start
-------------
-Scrib comes with three 'interfaces' by default:
+## The interfaces
+Scrib comes with three interfaces by default:
 
 * Command line: 'python start.py' starts the default command interface.
-* IRC: 'python start.py --irc'
-* Feedme: 'python start.py --feedme file.txt' This is used to 'feed' plain text files into scrib.
+* IRC: 'python start.py irc' loads the irc interface (and makes accessible irc plugins)
+* Feedme: 'python start.py feedme' Interactive way to 'feed' scrib data from plaintext documents.
 
-Initial Setup
--------------
-* Please edit the configuration files in conf/ before running.
+## Initial Setup
+* Run `./start.py`, enter your name, then `!quit`. This generates configuration files.
+* Navigate to `conf/` and edit `scrib.cfg` and `brain.cfg` to your liking.
+**Note**: Other interfaces and plugins may generate new configuration files (such as irc), so you will want to edit those too.
 
-Configuration
-=============
-Here's an outline of configuration file options.
+## Configuration
+Here's an outline of configuration file options:
 
-scrib.cfg
----------
+### scrib.cfg
 _(General Scrib options)_
 ```
-pubsym	= '!'			This is the "public symbol" that the bot will prepend to any command reply.
-num_aliases	= 0 		This is the number of total aliases known. *Needs to be moved to brain/knowledge*
-no_save	= 'False'		Setting this to true will disable brain saving.
-ignore_list	= ['!']		This is a list of items to ignore and not reply *Doesn't seem to work*
-length	= 25			This is the length of formed reply. If it goes over this number of characters, the bot won't reply.
-max_words	= 10600		This is the maximum number of words allowed in the bot's brain.
-learning	= 1			This toggles whether the bot is in learning mode.
-debug	= 0				This toggles whether or not the bot is in debug mode. Debug mode makes more verbose terminal messages.
-censored	= ['']		If a statement contains any words in this list, that message is ignored.
-aliases	= {}			These are a list of similar words.
+{
+    "debug": 0,			Toggles debug mode for core scrib functionality. 
+    "muted": 0, 		Toggles whether or not scrib can speak.
+	"reply_rate": 100, 			Percent chance of reply per line (hectic in busy channels)
+    "nick_reply_rate": 100, 	Percent chance of reply when highlighted.
+    "version": "1.2.0", Denotes the version scrib was last time it ran (automatically changes on updates)
+    "name": "scrib"		The name you want your scrib to have.
+}
 ```
-
-scrib-irc.cfg
--------------
+### brain.cfg
+```
+{
+    "num_aliases": 0, 	This is the number of aliases this scrib knows. (Auto updates)
+    "symbol": "!", 		This is the symbol that you use to send commands. If no command, scrib will ignore any line starting with it.
+    "num_contexts": 0,  This is the number of aliases this scrib knows. (Auto updates)
+    "ignore_list": [], 	These are the users the bot ignores.
+    "max_words": 1000000, This is the maximum words this scrib can know. 
+    "learning": 1, 		Toggles whether or not this scrib will learn from chats.
+    "debug": 0, 		Toggles debug mode for brain functions.
+    "num_words": 0, 	This is the number of words this scrib knows. (Auto updates)
+    "optimum": 0, 		Toggles a more aggressive "optimal" state for the brain (Highly Unstable at this time)
+    "censored": [], 	These words are censored and scrib will not learn.
+    "aliases": {}		This is a dictionary of words that will be aliased.
+}
+```
+### irc.cfg
 _(IRC-specific options)_
 ```
-owners = ['']			This lets you set a list of people that can use all bot commands.
-reply_chance = 50		This is the percent(%) chance that the bot will reply.
-nick_reply_chance = 100	This is the percent(%) chance that the bot will reply when highlighted.
-realname = 'Bot Name'	This is the 'real name' reported to the IRC server.
-myname = 'scrib'		This is your bot's nickname.
-replyIgnored = 0		Setting this to 1 will allow your bot to reply to people that are on the ignore list, but not learn from them.
-servers = [('', 6667)]	This is a list of servers that your bot can connect to. For now, only one is supported.
-ignorelist = ['']		This is the list of ignored nicks.
-private = 1				Setting this to 0 will allow others to use the public IRC commands.
-chans = ['']			These are the channels the bot will join, across all servers.
-password = 'sekrit'		This is your admin password. Generally you won't want to give this out.
-speaking = 1			This toggles whether or not the bot talks.
-quitmsg = 'Quitting.'	This is the message channels see when the bot quits IRC.
+{
+    "channels": [
+        "#scoundrels"			All the channels you want the scrib to join, comma separated.
+    ], 
+    "quit_message": "Goodbye.", What the scrib says when it leaves a chat room.
+    "owners": [
+        "OwnerOne"				A list of people authorized to send owner commands to scrib.
+    ], 
+    "realname": "Scrib Bot", 	The "real name" reported to the IRC server(s)
+
+    "owner_passwords": [
+        "Ducks"					The password(s) used to let persons take ownership of scrib.
+    ], 
+    "servers": [
+        [
+            "irc.freenode.net", List of server and port to join on start.
+            6667
+        ]
+    ]
+}
 ```
-Commands
-========
-We are in the process of moving all commands to the plugin architecture. These are the commands that have been plugin-ized.
 
-Public/Private Commands
----------------
-_(These are only public if private is set to 0)_
-* Control (to become a controller of the bot)
- * !control
-* Echo (echoes what you type)
- * !echo
+## Commands
+[TODO: Compile a list of built-in commands.]
 
-Owner Commands
-----------------
-_(These are only available to listed bot owners)_
-* Basic IRC Commands:
- * !join
- * !part,
- * !nick,
- * !chans,
- * !quitmsg,
- * !quit,
- * !ignore,
- * !unignore,
- * !replyIgnore
-* Private (command setting control)
- * !private
-* Reply Rate (verbosity of the bot)
- * !replyrate
-* Sleep and Wake (force a bot to be quiet)
- * !sleep
- * !wake
-
-Plugins
--------
-_(These are bundles that extend functionality through other services)_
-
-Notes
------
+## Notes
+Table of representation regarding terminal output.
 ```
 [!] = Error
 [#] = loading/saving brain
 [~] = action
 [-] = message
 ```
-
-TODO
-====
-* Consolidate configuration to make easier to use
-* Break code into more manageable chunks
-* Adopt a better coding policy

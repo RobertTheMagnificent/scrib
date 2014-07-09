@@ -56,14 +56,19 @@ def main(argv):
 
 
 if __name__ == "__main__":
-	def dirCheck(thisdir):
-		if not os.path.exists(thisdir):
-			os.makedirs(thisdir)
-		
-	dirCheck('conf')
-	if len(sys.argv) > 1:
-		if sys.argv[1] in interfaces:
-			load(sys.argv[1])
-	else:
-		load('default')
 
+	try:
+		def dirCheck(thisdir):
+			if not os.path.exists(thisdir):
+				os.makedirs(thisdir)
+		
+		dirCheck('conf')
+		if len(sys.argv) > 1:
+			if sys.argv[1] in interfaces:
+				load(sys.argv[1])
+		else:
+			load('default')
+	except KeyboardInterrupt, e:
+		sys.exit()
+	except SystemExit, e:
+		sys.exit()

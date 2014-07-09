@@ -1,7 +1,5 @@
 #!/usr/bin/env python
-#
-# I eat ASCII
-
+# -*- coding: utf-8 -*-
 import sys
 import os
 
@@ -13,49 +11,41 @@ class ModFileIn:
 	"""
 	I learn from ASCII files!
 	"""
+	def __init__(self, scrib):
+		self.scrib = scrib
+		self.scrib.barf('MSG', 'Where is the food located?')
+		self.food = raw_input("location: ")
 
-	# Command list for this module
-	commandlist = "FileIn Module Commands:\nNone"
-	commanddict = {}
-	
-	def __init__(self, scrib, args):
-
-		f = open(args[1], "r")
-		buffer = f.read()
+		correct = False
+		while correct == False:
+			try:		
+				f = open(self.food, "r")
+			except IOError:
+				self.scrib.barf('ERR', 'That file does not exist.')
+			correct = True
+		
+		noms = f.read()
 		f.close()
 
 		if scrib.debug == 1:
-			scrib.barf('DBG', "scrib: %s" % scrib.settings)
-		before = "I knew "+`scrib.brainstats.num_words`+" words ("+`len(scrib.lines)`+" lines) before reading "+sys.argv[1]
-		buffer = scrib.filter_message(buffer)
+			self.scrib.barf('DBG', "scrib: %s; brain: %s" % ( self.scrib.getsetting('scrib', 'version'), self.scrib.process.brain.version))
+		before = "I knew "+`self.scrib.getsetting('brain', 'num_words')`+" words ("+`len(scrib.process.brain.lines)`+" lines) before reading '%s'" % self.food
+		noms = scrib.process.brain.clean.line(noms, self.scrib.process.brain.settings)
 		# Learn from input
 		try:
-			scrib.barf(barf.MSG, buffer)
-			scrib.learn(buffer)
+			self.scrib.barf('MSG', noms)
+			scrib.process.brain.learn(noms)
 		except KeyboardInterrupt, e:
 			# Close database cleanly
-			scrib.barf('ERR', "Early termination.")
-		after = "I know "+`scrib.brainstats.num_words`+" words ("+`len(scrib.lines)`+" lines) now."
+			self.scrib.barf('ERR', "Early termination.")
+		after = "I know "+`self.scrib.getsetting('brain', 'num_words')`+" words ("+`len(scrib.process.brain.lines)`+" lines) now."
 		del scrib
 		
-		scrib.barf('ACT', before)
-		scrib.barf('ACT', after)
-
-	def shutdown(self):
-		pass
-
-	def start(self):
-		sys.exit()
-
-	def output(self, message, args):
-		pass
+		self.scrib.barf('ACT', before)
+		self.scrib.barf('ACT', after)
 
 if __name__ == "__main__":
-	if len(sys.argv) < 2:
-		scrib.barf('ERR', "Please specify a filename.")
-		sys.exit()
-	# start the scrib
 	my_scrib = scrib.scrib()
-	ModFileIn(my_scrib, sys.argv)
-	my_scrib.save_all(False)
+	ModFileIn(my_scrib)
+	my_scrib.shutdown(my_scrib)
 	del my_scrib
